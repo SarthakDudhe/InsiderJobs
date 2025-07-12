@@ -36,16 +36,9 @@ app.post("/webhooks",clerkWebHooks)
 const PORT = process.env.PORT || 5000
 Sentry.setupExpressErrorHandler(app);
 
-// app.listen(PORT,()=>{
-//     console.log("Server is running at port ",PORT)
-// })
+app.listen(PORT,()=>{
+    console.log("Server is running at port ",PORT)
+})
 
 
 
-if (process.env.NODE_ENV !=="production") {
- 
-app.listen(PORT,()=>console.log("Server is running on PORT : ",PORT));  
-}
-
-//Export server for vercel
-export default app;
