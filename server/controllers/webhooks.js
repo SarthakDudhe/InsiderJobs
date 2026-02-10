@@ -22,7 +22,7 @@ try {
   const {data,type} = req.body;
 
   //Switch Case for different Events
-
+console.log(type)
   switch (type) {
     case "user.created":{
                   

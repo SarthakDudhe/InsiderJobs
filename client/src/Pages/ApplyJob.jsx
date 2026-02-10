@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import Loader from '../LoaderFront/Loader'
 import Navbar from '../components/Navbar'
@@ -8,25 +8,72 @@ import kConvert from 'k-convert'
 import moment from 'moment'
 import JobCard from '../components/JobCard'
 import Footer from '../components/Footer'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+import { useAuth } from '@clerk/clerk-react'
 
 const ApplyJob = () => {
 
 const{id} =useParams()
+const {getToken} = useAuth()
 
+
+const navigate = useNavigate()
 const [jobData,setjobData] =useState(null)
 
-const {jobs} = useContext(AppContext)
-const fetchjob=async()=>{
- const data =jobs.filter(job => job._id === id)
- if (data.length !==0) {
-  setjobData(data[0])
-  console.log(data[0])
- }
+const {jobs,backendUrl,userData,userApplications} = useContext(AppContext)
+
+
+const fetchjob=async()=>
+{
+
+try {
+  const {data} =await axios.get(backendUrl+`/api/jobs/${id}`)
+if (data.success) {
+  setjobData(data.job)
+}
+else{
+  toast.error(data.message)
+}
+} catch (error) {
+   toast.error(error.message)
+}
 }
 
-useEffect(()=>{if (jobs.length>0) {
-  fetchjob()
+const applyHandler = async () => {
+  try {
+    if (!userData) {
+      return toast.error("Login to apply for jobs ")
+    }
+
+    if (!userData.resume) {
+      navigate("/applications")
+      return toast.error("Upload Resume to Apply ")
+    }
+
+const token = await getToken()
+
+const {data}= await axios.post(backendUrl+'/api/users/apply',
+  {jobId:jobData._id},
+  {headers:{Authorization:`Bearer ${token}`}}
+)
+
+if (data.success) {
+  toast.success(data.message)
 }
+else{
+   toast.error(data.message) 
+}
+
+  } catch (error) {
+      toast.error(error.message)
+  }
+}
+
+
+useEffect(()=>{ 
+  fetchjob()
+
   
 },[id,jobs])
 
@@ -64,7 +111,7 @@ useEffect(()=>{if (jobs.length>0) {
       </div>
 
 <div className='flex flex-col justify-center text-end text-sm max-md:mx-auto max-md:text-center'>
-  <button className='bg-blue-600 p-2.5 px-10 text-white rounded cursor-pointer'>Apply Now</button>
+  <button onClick={applyHandler} className='bg-blue-600 p-2.5 px-10 text-white rounded cursor-pointer'>Apply Now</button>
   <p className='mt-2 text-gray-600'>Posted {moment(jobData.data).fromNow()}</p>
 </div>
     </div>
@@ -76,7 +123,7 @@ useEffect(()=>{if (jobs.length>0) {
       <h2 className='font-bold text-2xl mb-4'>Job description</h2>
   <div className='rich-text' dangerouslySetInnerHTML={{__html:jobData.description}}></div>
   
-  <button className='bg-blue-600 p-2.5 px-10 text-white rounded cursor-pointer mt-10'>Apply Now</button>
+  <button onClick={applyHandler}   className='bg-blue-600 p-2.5 px-10 text-white rounded cursor-pointer mt-10'>Apply Now</button>
 </div>
 
 
