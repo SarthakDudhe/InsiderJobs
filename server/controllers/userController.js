@@ -29,6 +29,10 @@ export const applyForJob = async (req,res) => {
     const {jobId} = req.body
     const {userId} = req.auth
 
+        if (!userId) {
+        return res.json({ success: false, message: "Not Authorized, Login Again" })
+    }
+
     try {
         const isAlreadyApplied = await JobApplication.find({jobId,userId})
         if (isAlreadyApplied.length>0) {
