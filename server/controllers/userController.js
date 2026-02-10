@@ -3,38 +3,13 @@ import JobApplication from "../models/JobApplication.js"
 import User from "../models/User.js"
 import { v2 as cloudinary } from "cloudinary"
 import { clerkClient } from "@clerk/express"
-//get user Data
-
-
-
-import jwt from 'jsonwebtoken'
 
 export const getUserData = async (req, res) => {
     const userId = req.auth.userId
-    console.log("getUserData called")
-    console.log("Authorization Header:", req.headers.authorization ? "Present with length " + req.headers.authorization.length : "Missing")
-    if (req.headers.authorization) {
-        const token = req.headers.authorization.split(' ')[1]
-        console.log("Authorization Header starts with Bearer:", req.headers.authorization.startsWith("Bearer "))
-        const decoded = jwt.decode(token)
-        console.log("Decoded Token Payload:", decoded)
-        if (decoded && decoded.exp) {
-            const expDate = new Date(decoded.exp * 1000)
-            const now = new Date()
-            console.log("Token Expiration Check:")
-            console.log("  Token Exp:", expDate.toLocaleString())
-            console.log("  Current Server Time:", now.toLocaleString())
-            console.log("  Is Expired:", now > expDate ? "YES" : "NO")
-        }
-    }
-    console.log("req.auth object keys:", Object.keys(req.auth))
-    console.log("req.auth.userId:", userId)
-    console.log("Clerk Secret Key check:", process.env.CLERK_SECRET_KEY ? "Loaded" : "MISSING")
-    console.log("Clerk Publishable Key check:", process.env.CLERK_PUBLISHABLE_KEY ? "Loaded" : "MISSING")
 
     try {
         const user = await User.findById(userId)
-        console.log("Database fetch result:", user ? "User found" : "User not found")
+
         if (!user) {
             console.log("User not found in database, attempting to auto-create from Clerk...")
             try {

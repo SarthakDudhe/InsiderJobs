@@ -79,10 +79,8 @@ export const AppcontextProvider = (props) => {
         try {
 
             const token = await getToken()
-            console.log("fetchUserData triggered. Token:", token ? "Present" : "Missing")
 
             const { data } = await axios.get(backendUrl + '/api/users/user', { headers: { Authorization: `Bearer ${token}` } })
-            console.log("fetchUserData response:", data)
 
             if (data.success) {
                 setUserData(data.user)

@@ -23,7 +23,7 @@ await connectCloudinary()
 
 app.use(cors())
 app.use(express.json())
-app.use(clerkMiddleware({ debug: true }))
+app.use(clerkMiddleware())
 
 
 //Routes
