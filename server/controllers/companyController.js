@@ -116,7 +116,16 @@ res.json({success:true,newJob})
 //Get company Job Applications
 
 export const getCompanyJobApplication = async (req,res) => {
-    
+    try {
+        const companyId = req.company._id
+
+        //Find job applications for the user & populate related data
+        const applications = await JobApplication.find({companyId}).populate('userId','name image resume').populate('jobId','title location category level salary').exec()
+
+        return res.json({success:true,applications})
+    } catch (error) {
+         res.json({success:false,message:error.message})
+    }
 }
 
 //Get Company Posted Jobs
@@ -145,7 +154,16 @@ res.json({success:true,jobsData})
 //Change Job Application Status
 
 export const ChangeJobApplicationStatus = async (req,res) => {
-    
+    const {id,status} = req.body;
+    //find job application and update the status
+try {
+     await JobApplication.findOneAndUpdate({_id:id},{status})
+
+    res.json({success:true,message:"Status changed"})
+} catch (error) {
+     res.json({success:false,message:error.message})
+}
+   
 }
 
 //Change job Visibility

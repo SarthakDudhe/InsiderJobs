@@ -59,11 +59,14 @@ export const AppcontextProvider = (props) => {
             const { data } = await axios.get(backendUrl + "/api/company/company", { headers: { token: companyToken } })
             if (data.success) {
                 setcompanyData(data.company)
-                console.log(data);
-
             }
             else {
                 toast.error(data.message)
+                if (data.message === 'jwt expired' || data.message === "Session Expired, Login Again") {
+                    setCompanyToken(null)
+                    setcompanyData(null)
+                    localStorage.removeItem('companyToken')
+                }
             }
 
 
@@ -87,8 +90,30 @@ export const AppcontextProvider = (props) => {
             }
             else {
                 toast.error(data.message)
+                if (data.message === 'jwt expired' || data.message === "clerk_error") { // Adjust based on Clerk actual error string
+                    setUserData(null)
+                }
             }
 
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+    //Fetch user applied applications
+    const fetchUserApplications = async () => {
+        try {
+            const token = await getToken();
+
+            const { data } = await axios.get(backendUrl + '/api/users/applications', { headers: { Authorization: `Bearer ${token}` } })
+            if (data.success) {
+                setUserApplications(data.application)
+            } else {
+                toast.error(data.message)
+                if (data.message === 'jwt expired' || data.message === "clerk_error") {
+                    setUserApplications([])
+                    setUserData(null)
+                }
+            }
         } catch (error) {
             toast.error(error.message)
         }
@@ -115,12 +140,13 @@ export const AppcontextProvider = (props) => {
     useEffect(() => {
         if (user) {
             fetchUserData()
+            fetchUserApplications()
         }
     }, [user])
 
 
     const value = {
-        searchFilter, setSearchFilter, isSearched, setIsSearched, jobs, setjobs, showRecruiterLogin, setShowRecruiterLogin, companyToken, setCompanyToken, companyData, setcompanyData, backendUrl, userData, userApplications, setUserData, setUserApplications, fetchUserData
+        searchFilter, setSearchFilter, isSearched, setIsSearched, jobs, setjobs, showRecruiterLogin, setShowRecruiterLogin, companyToken, setCompanyToken, companyData, setcompanyData, backendUrl, userData, userApplications, setUserData, setUserApplications, fetchUserData, fetchUserApplications
     }
 
     return (

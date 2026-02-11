@@ -5,11 +5,12 @@ import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import Loader from '../LoaderFront/Loader'
 const ManageJobs = () => {
 
 const navigate=useNavigate()
 
-const [jobs,setJobs] = useState([])
+const [jobs,setJobs] = useState(false)
 
 const {backendUrl,companyToken} = useContext(AppContext)
 
@@ -66,7 +67,8 @@ useEffect(()=>{
 
 
 
-  return (
+  return jobs ? jobs.length === 0 ? ( <div className='flex items-center justify-center h-[70vh]'><p className='text-xl sm:text-2xl'>No jobs found</p></div>
+) : (
     <div className='container p-4 max-w-5xl'>
       <div className='overflow-x-auto'>
         <table className='min-w-full bg-white border border-gray-200 max-sm:text-sm'>
@@ -102,7 +104,10 @@ useEffect(()=>{
         </button>
       </div>
     </div>
-  )
+  ):  <div className="flex items-center justify-center min-h-screen">
+    <Loader />
+  </div>
+
 }
 
 export default ManageJobs

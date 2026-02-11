@@ -24,8 +24,41 @@ export const getUserData = async (req, res) => {
                 await User.create(userData)
                 return res.json({ success: true, user: userData })
             } catch (error) {
+                // Handle Duplicate Key Error (E11000)
+                if (error.code === 11000) {
+                    console.log("Duplicate key error detected (likely email collision). Resolving...")
+
+                    // Fetch the conflicting user by email
+                    const clerkUser = await clerkClient.users.getUser(userId)
+                    const email = clerkUser.emailAddresses[0].emailAddress
+                    const existingUser = await User.findOne({ email })
+
+                    if (existingUser) {
+                        // Check if it's a race condition (ID matches) or a zombie account (ID mismatch)
+                        if (existingUser._id === userId) {
+                            console.log("Race condition detected: User already created. Returning existing user.")
+                            return res.json({ success: true, user: existingUser })
+                        } else {
+                            // ID Mismatch: Delete the old (stale) record and create the new one
+                            console.log(`ID Mismatch detected. Deleting stale user ${existingUser._id} and recreating...`)
+                            await User.findByIdAndDelete(existingUser._id)
+
+                            // Retry creation
+                            const userData = {
+                                _id: userId,
+                                name: clerkUser.firstName + " " + clerkUser.lastName,
+                                email: email,
+                                image: clerkUser.imageUrl,
+                                resume: ''
+                            }
+                            await User.create(userData)
+                            return res.json({ success: true, user: userData })
+                        }
+                    }
+                }
+
                 console.log("Failed to auto-create user:", error.message)
-                return res.json({ success: false, message: "User Not Found ! " })
+                return res.json({ success: false, message: error.message })
             }
         }
         res.json({ success: true, user })

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import Loader from '../LoaderFront/Loader'
 import Navbar from '../components/Navbar'
-import { assets } from '../assets/assets'
+import { assets, } from '../assets/assets'
 import kConvert from 'k-convert'
 import moment from 'moment'
 import JobCard from '../components/JobCard'
@@ -22,8 +22,9 @@ const ApplyJob = () => {
 
   const navigate = useNavigate()
   const [jobData, setjobData] = useState(null)
+  const [isAlreadyApplied, setIsAlreadyApplied] = useState(false)
 
-  const { jobs, backendUrl, userData, userApplications } = useContext(AppContext)
+  const { jobs, backendUrl, userData, userApplications, fetchUserApplications } = useContext(AppContext)
 
 
   const fetchjob = async () => {
@@ -48,7 +49,7 @@ const ApplyJob = () => {
       }
 
       if (!userData) {
-        return toast.error("Wait for user data to load")
+        return toast.error("Login to apply for jobs")
       }
 
       if (!userData.resume) {
@@ -65,6 +66,7 @@ const ApplyJob = () => {
 
       if (data.success) {
         toast.success(data.message)
+        fetchUserApplications()
       }
       else {
         toast.error(data.message)
@@ -76,12 +78,23 @@ const ApplyJob = () => {
   }
 
 
+  const checkAlreadyApplied = () => {
+    const hasApplied = userApplications.some(item => item.jobId._id === jobData._id)
+    setIsAlreadyApplied(hasApplied)
+  }
+
+
+
+
   useEffect(() => {
     fetchjob()
-
-
   }, [id, jobs])
 
+  useEffect(() => {
+    if (userApplications.length > 0 && jobData) {
+      checkAlreadyApplied()
+    }
+  }, [jobData, userApplications, , id])
 
 
   return jobData ? (
@@ -116,8 +129,8 @@ const ApplyJob = () => {
             </div>
 
             <div className='flex flex-col justify-center text-end text-sm max-md:mx-auto max-md:text-center'>
-              <button onClick={applyHandler} className='bg-blue-600 p-2.5 px-10 text-white rounded cursor-pointer'>Apply Now</button>
-              <p className='mt-2 text-gray-600'>Posted {moment(jobData.data).fromNow()}</p>
+              <button onClick={applyHandler} className='bg-blue-600 p-2.5 px-10 text-white rounded cursor-pointer'>{isAlreadyApplied ? "Already Applied" : "Apply Now"}</button>
+              <p className='mt-2 text-gray-600'>Posted {moment(jobData.date).fromNow()}</p>
             </div>
           </div>
 
@@ -128,7 +141,7 @@ const ApplyJob = () => {
               <h2 className='font-bold text-2xl mb-4'>Job description</h2>
               <div className='rich-text' dangerouslySetInnerHTML={{ __html: jobData.description }}></div>
 
-              <button onClick={applyHandler} className='bg-blue-600 p-2.5 px-10 text-white rounded cursor-pointer mt-10'>Apply Now</button>
+              <button onClick={applyHandler} className='bg-blue-600 p-2.5 px-10 text-white rounded cursor-pointer mt-10'>{isAlreadyApplied ? "Already Applied" : "Apply Now"}</button>
             </div>
 
 
@@ -136,7 +149,13 @@ const ApplyJob = () => {
             <div className='w-full lg:w-1/3 mt-8 lg:mt-0 lg:ml-8 space-y-5'>
               <h2>More jobs from {jobData.companyId.name} </h2>
               {jobs.filter(job => job._id !== jobData._id && job.companyId._id === jobData.companyId._id).filter(
-                job => true).slice(0, 4).map((job, index) => <JobCard key={index} job={job} />
+                job => {
+                  // set of applied jobids
+
+                  const appliedJobsIds = new Set(userApplications.map(app => app.jobId && app.jobId._id))
+                  //return true if the user has not already applied for this job
+                  return !appliedJobsIds.has(job._id)
+                }).slice(0, 4).map((job, index) => <JobCard key={index} job={job} />
                 )}
             </div>
 
@@ -156,7 +175,7 @@ const ApplyJob = () => {
 
     </>
   ) : (
-    <div className='min-h-screen flex items-center justify-center'>
+    <div className='flex items-center justify-center min-h-screen'>
       <Loader />
     </div>
   )

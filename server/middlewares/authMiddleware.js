@@ -1,19 +1,23 @@
 import jwt from "jsonwebtoken"
 import Company from "../models/Company.js"
 
-export const protectCompany = async (req,res,next) => {
+export const protectCompany = async (req, res, next) => {
     const token = req.headers.token
     if (!token) {
-        return res.json({success:false,message:"Not Authorized, Login Again !"})
+        return res.json({ success: false, message: "Not Authorized, Login Again !" })
     }
-try {
-    const decoded = jwt.verify(token,process.env.JWT_SECRET)
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET, { clockTolerance: 300 }) // 5 minutes leeway
 
-    req.company = await Company.findById(decoded.id).select('-password')
+        req.company = await Company.findById(decoded.id).select('-password')
 
-    next()
-} catch (error) {
-      res.json({success:false,message:error.message})
-}
+        next()
+    } catch (error) {
+        console.log("Auth Error:", error.message)
+        if (error.name === 'TokenExpiredError') {
+            return res.json({ success: false, message: "Session Expired, Login Again" })
+        }
+        res.json({ success: false, message: error.message })
+    }
 
 }

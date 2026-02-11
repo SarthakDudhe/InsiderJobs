@@ -64,7 +64,7 @@ useEffect(()=>{
       </ul>
      </div>
 
-<div>
+<div className='flex-1 h-full p-2 sm:p-5'>
   <Outlet/>
 </div>
 
