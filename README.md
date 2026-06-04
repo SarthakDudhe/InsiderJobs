@@ -15,7 +15,7 @@
     Recommended Dimensions: 200x200 pixels
     Content: The official InsiderJobs logo with a transparent background.
   -->
-<img width="180" height="50" alt="logo_transparent" src="https://github.com/user-attachments/assets/c4c9063b-3566-48ba-a875-5cc453b07273" />
+<img width="180" height="50" alt="ChatGPT Image Jun 4, 2026, 01_26_24 PM" src="https://github.com/user-attachments/assets/1e04e3a6-651a-443d-8b7d-a1f9a9063e6d" />
 
   **The Premium AI-Powered Career Ecosystem**
 
