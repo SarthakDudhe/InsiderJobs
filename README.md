@@ -123,23 +123,27 @@ graph TD
 InsiderJobs utilizes a decoupled client-server architecture, communicating via RESTful APIs with strict CORS and JWT middleware security.
 
 ```mermaid
-architecture-beta
-    group api(cloud)[Backend Services]
-    group db(database)[Data Layer]
-    group web(computer)[Client Tier]
+flowchart TD
+    subgraph Client Tier
+        UI[React Vite App]
+    end
 
-    service frontend(internet)[React Vite App] in web
-    service express(server)[Node.js / Express] in api
-    service mongo(database)[MongoDB Atlas] in db
-    service clerk(key)[Clerk Auth] in api
-    service groq(bot)[Groq AI / Llama 3.3] in api
-    service cloudinary(cloud)[Cloudinary] in db
+    subgraph Backend Services
+        API[Node.js / Express]
+        Clerk[Clerk Auth]
+        Groq[Groq AI / Llama 3.3]
+    end
 
-    frontend:R --> L:express
-    express:R --> L:mongo
-    express:T --> B:clerk
-    express:B --> T:groq
-    express:R --> L:cloudinary
+    subgraph Data Layer
+        Mongo[(MongoDB Atlas)]
+        Cloudinary[(Cloudinary)]
+    end
+
+    UI <-->|REST API| API
+    API <-->|Webhooks & Auth| Clerk
+    API <-->|AI Prompts| Groq
+    API <-->|Mongoose ORM| Mongo
+    API <-->|Image/Resume Uploads| Cloudinary
 ```
 
 ### 🛠️ Technology Ecosystem
