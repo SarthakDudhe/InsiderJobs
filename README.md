@@ -4,7 +4,7 @@
     Recommended Dimensions: 1200x400 pixels
     Content: A vibrant, visually striking banner showing the InsiderJobs dashboard, Glassmorphism UI elements, or an abstract representation of AI in recruitment.
   -->
-  <img width="1919" height="913" alt="Screenshot 2026-04-26 225015" src="https://github.com/user-attachments/assets/db091a35-aa82-4563-b2b5-32284d4a50ef" />
+
 
 
   <br />
@@ -21,7 +21,7 @@
 
   **The Premium AI-Powered Career Ecosystem**
 
-
+  <img width="1919" height="913" alt="Screenshot 2026-04-26 225015" src="https://github.com/user-attachments/assets/db091a35-aa82-4563-b2b5-32284d4a50ef" />
 
   *Bridging the gap between top-tier talent and forward-thinking recruiters through LLM-driven insights, premium aesthetics, and a highly scalable MERN architecture.*
 
