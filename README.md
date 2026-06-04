@@ -32,8 +32,7 @@
 
   <p align="center">
   
-    <!-- PLACEHOLDER: Deployment Status Badge (e.g., Vercel/Render) -->
-    <img src="https://img.shields.io/badge/Deployment-Live-success?style=flat-square" alt="Deployment Status" />
+   
   </p>
 
 
