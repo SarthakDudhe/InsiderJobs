@@ -13,9 +13,9 @@ import { clerkMiddleware } from '@clerk/express'
 //initialize Express
 const app = express()
 
-//connect to database
-await connectDB()
-await connectCloudinary()
+// connect to database
+connectDB()
+connectCloudinary()
 
 
 
@@ -31,6 +31,7 @@ app.use(clerkMiddleware())
 app.get("/", function (req, res) {
   res.send("Api is Working")
 })
+app.get("/favicon.ico", (req, res) => res.status(204).end());
 app.get("/debug-sentry", function mainHandler(req, res) {
   throw new Error("My first Sentry error!");
 });
@@ -44,9 +45,13 @@ app.use("/api/users", userRoutes)
 const PORT = process.env.PORT || 5000
 Sentry.setupExpressErrorHandler(app);
 
-app.listen(PORT, () => {
-  console.log("Server is running at port ", PORT)
-})
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log("Server is running at port ", PORT)
+  })
+}
+
+export default app;
 
 
 
