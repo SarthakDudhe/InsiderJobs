@@ -4,7 +4,8 @@
     Recommended Dimensions: 1200x400 pixels
     Content: A vibrant, visually striking banner showing the InsiderJobs dashboard, Glassmorphism UI elements, or an abstract representation of AI in recruitment.
   -->
-  <img src="https://via.placeholder.com/1200x400/0f172a/38bdf8?text=InsiderJobs+Hero+Banner+(Replace+with+App+UI+Screenshot)" alt="InsiderJobs Hero Banner" />
+  <img width="1919" height="913" alt="Screenshot 2026-04-26 225015" src="https://github.com/user-attachments/assets/db091a35-aa82-4563-b2b5-32284d4a50ef" />
+
 
   <br />
   <br />
@@ -14,11 +15,13 @@
     Recommended Dimensions: 200x200 pixels
     Content: The official InsiderJobs logo with a transparent background.
   -->
-  <img src="https://via.placeholder.com/200x200/0f172a/38bdf8?text=Logo" alt="InsiderJobs Logo" width="120" />
+<img width="180" height="50" alt="logo_transparent" src="https://github.com/user-attachments/assets/c4c9063b-3566-48ba-a875-5cc453b07273" />
 
   <h1>💼 InsiderJobs</h1>
 
   **The Premium AI-Powered Career Ecosystem**
+
+
 
   *Bridging the gap between top-tier talent and forward-thinking recruiters through LLM-driven insights, premium aesthetics, and a highly scalable MERN architecture.*
 
