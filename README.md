@@ -31,15 +31,12 @@
   </p>
 
   <p align="center">
-    <img src="https://img.shields.io/github/license/SarthakDudhe/InsiderJobs?style=flat-square&color=blue" alt="License" />
-    <img src="https://img.shields.io/github/stars/SarthakDudhe/InsiderJobs?style=flat-square&color=yellow" alt="Stars" />
-    <img src="https://img.shields.io/github/forks/SarthakDudhe/InsiderJobs?style=flat-square&color=orange" alt="Forks" />
-    <img src="https://img.shields.io/github/issues/SarthakDudhe/InsiderJobs?style=flat-square&color=red" alt="Issues" />
+  
     <!-- PLACEHOLDER: Deployment Status Badge (e.g., Vercel/Render) -->
     <img src="https://img.shields.io/badge/Deployment-Live-success?style=flat-square" alt="Deployment Status" />
   </p>
 
-  ### [Live Demo](#) | [Report Bug](#) | [Request Feature](#)
+
 </div>
 
 ---
