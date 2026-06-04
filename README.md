@@ -293,7 +293,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 **Developer:** Sarthak Dudhe  
 **GitHub:** [@SarthakDudhe](https://github.com/SarthakDudhe)  
-**Project Link:** [https://github.com/SarthakDudhe/InsiderJobs](https://github.com/SarthakDudhe/InsiderJobs)
+**Project Link:** [Live Preview](https://insider-jobs-ecru.vercel.app/)
 
 ---
 <p align="center">
