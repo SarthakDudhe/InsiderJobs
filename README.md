@@ -17,8 +17,6 @@
   -->
 <img width="180" height="50" alt="logo_transparent" src="https://github.com/user-attachments/assets/c4c9063b-3566-48ba-a875-5cc453b07273" />
 
-  <h1>💼 InsiderJobs</h1>
-
   **The Premium AI-Powered Career Ecosystem**
 
   <img width="1919" height="913" alt="Screenshot 2026-04-26 225015" src="https://github.com/user-attachments/assets/db091a35-aa82-4563-b2b5-32284d4a50ef" />
