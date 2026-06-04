@@ -98,7 +98,7 @@ graph TD
     F --> G[Applies to Job]
     G --> H[Track Status in Dashboard]
     
-    I[Recruiter Lands on Home] -->|Clerk Auth| J(Recruiter Dashboard)
+    I[Recruiter Lands on Home] -->|Sign-in/Sign up| J(Recruiter Dashboard)
     J --> K[Creates Job via Quill.js]
     K --> L[Job Posted to Platform]
     L --> M[Reviews Applicants]
