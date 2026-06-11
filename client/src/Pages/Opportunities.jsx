@@ -5,9 +5,9 @@ import Footer from '../components/Footer'
 
 const Opportunities = () => {
     return (
-        <div className='min-h-screen bg-white'>
+        <div className='min-h-screen ij-shell'>
             <Navbar />
-            <div className='pt-12'>
+            <div className='pt-8'>
                 <JobListing />
             </div>
             <Footer />

@@ -3,39 +3,57 @@ import { assets } from '../assets/assets'
 import { useClerk, useUser, UserButton } from '@clerk/clerk-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
+import { BrainCircuit, BriefcaseBusiness } from 'lucide-react'
+
 const Navbar = () => {
   const { openSignIn } = useClerk()
-  const { user } = useUser();
+  const { user } = useUser()
   const navigate = useNavigate()
-
   const { setShowRecruiterLogin } = useContext(AppContext)
 
   return (
-    <div className='shadow py-4'>
-      <div className='container px-4 2xl:px-20 mx-auto flex justify-between items-center'>
-        <img onClick={() => navigate("/")} className='cursor-pointer w-32 sm:w-auto' src={assets.logo} alt="" />
-        {
-          user ? <div className='flex items-center gap-3 sm:gap-5 text-gray-800 text-xs sm:text-base'>
-            <Link className='hover:text-blue-600 transition-colors' to={'/ai-recommender'}>✨ <span className='max-sm:hidden'>AI Recommender</span><span className='sm:hidden'>AI</span></Link>
-            <p className='text-gray-400'>|</p>
-            <Link className='hover:text-blue-600 transition-colors text-nowrap' to={'/opportunities'}>Opportunities</Link>
-            <p className='text-gray-400'>|</p>
-            <Link className='hover:text-blue-600 transition-colors text-nowrap' to={'/applications'}>Applied <span className='max-sm:hidden'>Jobs</span></Link>
-            <p className='text-gray-400'>|</p>
-            <p className='max-sm:hidden'>Hi, {user.firstName}</p>
-            <div className='flex items-center'>
-              <UserButton />
-            </div>
-          </div> : <div className='flex gap-3 sm:gap-4 items-center'>
-            <button onClick={(e) => setShowRecruiterLogin(true)} className='text-gray-600 text-xs sm:text-base cursor-pointer'>Recruiter Login</button>
-            <button onClick={e => openSignIn()} className='bg-blue-600 text-white px-5 sm:px-9 py-1.5 sm:py-2 rounded-full text-xs sm:text-base cursor-pointer font-medium transition-all hover:bg-blue-700'>Login</button>
+    <div className='sticky top-0 z-40 border-b border-gray-200/80 bg-white/85 py-3 shadow-[0_10px_30px_rgba(17,24,39,0.04)] backdrop-blur-xl'>
+      <div className='ij-container flex items-center justify-between'>
+        <img
+          onClick={() => navigate('/')}
+          className='w-32 cursor-pointer transition-transform hover:scale-[1.02] sm:w-40'
+          src={assets.logo}
+          alt='InsiderJobs'
+        />
+
+        {user ? (
+          <div className='flex items-center gap-2 text-xs font-semibold text-gray-700 sm:gap-3 sm:text-sm'>
+            <Link className='inline-flex items-center gap-1.5 rounded-full px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-700' to='/ai-recommender'>
+              <BrainCircuit size={16} />
+              <span className='max-sm:hidden'>AI Recommender</span>
+              <span className='sm:hidden'>AI</span>
+            </Link>
+            <Link className='text-nowrap rounded-full px-3 py-2 transition-colors hover:bg-gray-100 hover:text-gray-950' to='/opportunities'>
+              Opportunities
+            </Link>
+            <Link className='text-nowrap rounded-full px-3 py-2 transition-colors hover:bg-gray-100 hover:text-gray-950' to='/applications'>
+              Applied <span className='max-sm:hidden'>Jobs</span>
+            </Link>
+            <p className='pl-2 text-gray-500 max-md:hidden'>Hi, {user.firstName}</p>
+            <UserButton />
           </div>
-        }
-
+        ) : (
+          <div className='flex items-center gap-3 sm:gap-4'>
+            <button
+              onClick={() => setShowRecruiterLogin(true)}
+              className='inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 sm:text-sm'
+            >
+              <BriefcaseBusiness size={16} />
+              <span className='max-sm:hidden'>Recruiter</span>
+            </button>
+            <button onClick={() => openSignIn()} className='premium-button cursor-pointer px-5 py-2.5 text-xs sm:px-7 sm:text-sm'>
+              Login
+            </button>
+          </div>
+        )}
       </div>
-
     </div>
   )
 }
 
-export default Navbar;
+export default Navbar

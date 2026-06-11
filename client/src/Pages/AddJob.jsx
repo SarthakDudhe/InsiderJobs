@@ -3,10 +3,10 @@ import Quill from 'quill'
 import { JobCategories, JobLocations } from '../assets/assets'
 import axios from 'axios'
 import { AppContext } from '../context/AppContext'
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify'
+import { Send } from 'lucide-react'
 
 const AddJob = () => {
-
   const [title, settitle] = useState('')
   const [location, setlocation] = useState('Mumbai')
   const [category, setCategory] = useState('Programming')
@@ -21,142 +21,107 @@ const AddJob = () => {
     e.preventDefault()
     try {
       const description = quilRef.current.root.innerHTML
-
-      const { data } = await axios.post(backendUrl + "/api/company/post-job",
+      const { data } = await axios.post(
+        backendUrl + '/api/company/post-job',
         { title, description, location, salary, category, level },
         { headers: { token: companyToken } }
       )
 
       if (data.success) {
-        console.log(data)
         toast.success(data.message)
         settitle('')
         setSalary(0)
-        quilRef.current.root.innerHTML = ""
-      }
-      else {
+        quilRef.current.root.innerHTML = ''
+      } else {
         toast.error(data.message)
       }
-
-
     } catch (error) {
       toast.error(error.message)
     }
   }
 
-
-
   useEffect(() => {
-    //Initiate Quill only Once
     if (!quilRef.current && editorRef.current) {
-      quilRef.current = new Quill(editorRef.current, {
-        theme: "snow"
-      })
+      quilRef.current = new Quill(editorRef.current, { theme: 'snow' })
     }
-
   }, [])
 
   return (
-    <div className='container mx-auto p-4 sm:p-6 max-w-4xl'>
-      <div className='bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden'>
-        <div className='bg-blue-600 px-6 py-8 text-white'>
-          <h2 className='text-2xl font-bold'>Post a New Job</h2>
-          <p className='text-blue-100 mt-1'>Fill in the details to reach thousands of talented candidates.</p>
+    <div className='mx-auto max-w-5xl'>
+      <div className='mb-6'>
+        <p className='section-kicker'>Create listing</p>
+        <h1 className='mt-2 text-3xl font-extrabold text-gray-950'>Post a new job</h1>
+        <p className='mt-2 text-gray-600'>Craft a polished role that attracts qualified candidates.</p>
+      </div>
+
+      <form onSubmit={onSubmitHandler} className='premium-panel overflow-hidden rounded-[1.5rem]'>
+        <div className='border-b border-gray-200 bg-gray-950 px-6 py-7 text-white sm:px-8'>
+          <h2 className='text-2xl font-extrabold'>Role details</h2>
+          <p className='mt-1 text-sm text-gray-300'>Keep the title clear and the description outcome-focused.</p>
         </div>
 
-        <form onSubmit={onSubmitHandler} className='p-6 sm:p-8 space-y-8'>
-          <div className='grid grid-cols-1 gap-8'>
-            {/* Job Title */}
-            <div>
-              <label className='block text-sm font-bold text-gray-700 mb-2'>Job Title</label>
-              <input
-                className='w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-gray-900'
-                type="text"
-                placeholder='e.g. Senior Full Stack Developer'
-                onChange={e => settitle(e.target.value)}
-                value={title}
-                required
-              />
-            </div>
+        <div className='space-y-8 p-6 sm:p-8'>
+          <div>
+            <label className='mb-2 block text-sm font-extrabold text-gray-700'>Job Title</label>
+            <input
+              className='premium-input w-full rounded-2xl px-4 py-3.5'
+              type='text'
+              placeholder='e.g. Senior Full Stack Developer'
+              onChange={e => settitle(e.target.value)}
+              value={title}
+              required
+            />
+          </div>
 
-            {/* Job Description */}
-            <div>
-              <label className='block text-sm font-bold text-gray-700 mb-2'>Job Description</label>
-              <div className='rounded-xl border border-gray-200 overflow-hidden bg-gray-50'>
-                <div ref={editorRef} className='min-h-[250px] bg-white'></div>
-              </div>
-            </div>
-
-            {/* Grid for Selects */}
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-              <div>
-                <label className='block text-sm font-bold text-gray-700 mb-2'>Category</label>
-                <select
-                  className='w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none cursor-pointer text-gray-700'
-                  onChange={e => setCategory(e.target.value)}
-                  value={category}
-                >
-                  {JobCategories.map((cat, index) => (
-                    <option key={index} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className='block text-sm font-bold text-gray-700 mb-2'>Location</label>
-                <select
-                  className='w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none cursor-pointer text-gray-700'
-                  onChange={e => setlocation(e.target.value)}
-                  value={location}
-                >
-                  {JobLocations.map((loc, index) => (
-                    <option key={index} value={loc}>{loc}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className='block text-sm font-bold text-gray-700 mb-2'>Level</label>
-                <select
-                  className='w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none cursor-pointer text-gray-700'
-                  onChange={e => setLevel(e.target.value)}
-                  value={level}
-                >
-                  <option value="Beginner Level">Beginner Level</option>
-                  <option value="Intermediate Level">Intermediate Level</option>
-                  <option value="Senior Level">Senior Level</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Salary */}
-            <div className='w-full md:w-1/3'>
-              <label className='block text-sm font-bold text-gray-700 mb-2'>Monthly Salary (₹)</label>
-              <div className='relative'>
-                <span className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium'>₹</span>
-                <input
-                  min={0}
-                  className='w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none text-gray-900'
-                  type="number"
-                  placeholder='50000'
-                  onChange={e => setSalary(e.target.value)}
-                  value={salary}
-                />
-              </div>
+          <div>
+            <label className='mb-2 block text-sm font-extrabold text-gray-700'>Job Description</label>
+            <div className='overflow-hidden rounded-2xl border border-gray-200 bg-white'>
+              <div ref={editorRef} className='min-h-[250px] bg-white' />
             </div>
           </div>
 
-          <div className='pt-6 border-t border-gray-100 flex justify-end'>
-            <button
-              className='px-10 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer'
-            >
-              Post Job Now
-            </button>
+          <div className='grid grid-cols-1 gap-5 md:grid-cols-3'>
+            <SelectField label='Category' value={category} onChange={setCategory} options={JobCategories} />
+            <SelectField label='Location' value={location} onChange={setlocation} options={JobLocations} />
+            <SelectField label='Level' value={level} onChange={setLevel} options={['Beginner Level', 'Intermediate Level', 'Senior Level']} />
           </div>
-        </form>
-      </div>
+
+          <div className='w-full md:w-1/3'>
+            <label className='mb-2 block text-sm font-extrabold text-gray-700'>Monthly Salary</label>
+            <input
+              min={0}
+              className='premium-input w-full rounded-2xl px-4 py-3.5'
+              type='number'
+              placeholder='50000'
+              onChange={e => setSalary(e.target.value)}
+              value={salary}
+            />
+          </div>
+        </div>
+
+        <div className='flex justify-end border-t border-gray-200 bg-gray-50 px-6 py-5 sm:px-8'>
+          <button className='premium-button cursor-pointer px-8 py-3.5'>
+            Post Job <Send size={17} />
+          </button>
+        </div>
+      </form>
     </div>
   )
 }
+
+const SelectField = ({ label, value, onChange, options }) => (
+  <div>
+    <label className='mb-2 block text-sm font-extrabold text-gray-700'>{label}</label>
+    <select
+      className='premium-input w-full cursor-pointer rounded-2xl px-4 py-3.5'
+      onChange={e => onChange(e.target.value)}
+      value={value}
+    >
+      {options.map((option, index) => (
+        <option key={index} value={option}>{option}</option>
+      ))}
+    </select>
+  </div>
+)
 
 export default AddJob

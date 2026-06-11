@@ -2,10 +2,11 @@ import React, { useContext, useRef } from 'react'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import { motion } from 'framer-motion'
-import { Search, MapPin, TrendingUp, Users, Building2 } from 'lucide-react'
+import { ArrowRight, BriefcaseBusiness, MapPin, Search, ShieldCheck, Sparkles } from 'lucide-react'
+
+const MotionDiv = motion.div
 
 const Hero = () => {
-
   const { setIsSearched, setSearchFilter } = useContext(AppContext)
   const titleRef = useRef(null)
   const locationRef = useRef(null)
@@ -19,108 +20,133 @@ const Hero = () => {
   }
 
   return (
-    <div className='relative overflow-hidden bg-white'>
-      {/* Background Decorative Elements */}
-      <div className='absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none'>
-        <div className='absolute -top-24 -left-24 w-64 h-64 md:w-96 md:h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob'></div>
-        <div className='absolute top-0 -right-24 w-64 h-64 md:w-96 md:h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000'></div>
-        <div className='absolute -bottom-24 left-1/2 w-64 h-64 md:w-96 md:h-96 bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000'></div>
-      </div>
-
-      <div className='container 2xl:px-20 mx-auto pt-16 pb-12 relative z-10'>
-        <div className='flex flex-col items-center text-center px-4'>
-          <motion.div
+    <div className='relative overflow-hidden'>
+      <div className='ij-container relative z-10 pt-16 pb-12 md:pt-24 md:pb-16'>
+        <div className='grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]'>
+          <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            className='text-center lg:text-left'
           >
-            <span className='inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide uppercase bg-blue-50 text-blue-600 mb-6 border border-blue-100 shadow-sm'>
-              🚀 Join the Future of Work
-            </span>
-            <h1 className='text-4xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 leading-tight mb-6'>
-              Find Your <span className='text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600'>Dream Job</span> <br />
-              With InsiderJobs
+            <h1 className='mb-6 text-4xl font-extrabold leading-[1.02] text-gray-950 md:text-6xl lg:text-7xl'>
+              Find sharper work with a platform built for serious careers.
             </h1>
-            <p className='text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-10 leading-relaxed'>
-              Streamline your job search with our AI-powered platform. Connect with top companies and take the next leap in your career journey today.
+            <p className='mx-auto mb-9 max-w-2xl text-lg leading-relaxed text-gray-600 md:text-xl lg:mx-0'>
+              InsiderJobs connects ambitious candidates with verified roles, AI-guided recommendations, and recruiter workflows that feel polished from first search to final shortlist.
             </p>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className='w-full max-w-4xl'
-          >
-            <div className='bg-white p-2 md:p-3 rounded-2xl shadow-2xl border border-gray-100 backdrop-blur-xl bg-opacity-80 flex flex-col md:flex-row items-center gap-2 md:gap-4'>
-              <div className='flex items-center flex-1 w-full px-4 border-b md:border-b-0 md:border-r border-gray-100 py-3 md:py-1'>
-                <Search className='text-blue-500 w-5 h-5 mr-3 shrink-0' />
-                <input
-                  ref={titleRef}
-                  type="text"
-                  placeholder='Job title, skills, or company'
-                  className='w-full bg-transparent border-none outline-none text-gray-700 placeholder-gray-400 font-medium text-sm md:text-base'
-                />
+            <MotionDiv
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className='premium-card w-full rounded-[1.75rem] p-2.5'
+            >
+              <div className='grid gap-2 md:grid-cols-[1fr_1fr_auto]'>
+                <div className='premium-input flex items-center rounded-2xl px-4 py-4'>
+                  <Search className='mr-3 h-5 w-5 shrink-0 text-blue-600' />
+                  <input
+                    ref={titleRef}
+                    type='text'
+                    placeholder='Job title, skills, or company'
+                    className='w-full border-none bg-transparent text-sm font-semibold text-gray-800 outline-none placeholder:text-gray-400 md:text-base'
+                  />
+                </div>
+                <div className='premium-input flex items-center rounded-2xl px-4 py-4'>
+                  <MapPin className='mr-3 h-5 w-5 shrink-0 text-blue-600' />
+                  <input
+                    ref={locationRef}
+                    type='text'
+                    placeholder='City, state, or remote'
+                    className='w-full border-none bg-transparent text-sm font-semibold text-gray-800 outline-none placeholder:text-gray-400 md:text-base'
+                  />
+                </div>
+                <button onClick={onSearch} className='premium-button w-full px-7 py-4 text-sm md:w-auto md:text-base'>
+                  Find Jobs <ArrowRight size={18} />
+                </button>
               </div>
-              <div className='flex items-center flex-1 w-full px-4 py-3 md:py-1'>
-                <MapPin className='text-purple-500 w-5 h-5 mr-3 shrink-0' />
-                <input
-                  ref={locationRef}
-                  type="text"
-                  placeholder='City, state, or remote'
-                  className='w-full bg-transparent border-none outline-none text-gray-700 placeholder-gray-400 font-medium text-sm md:text-base'
-                />
-              </div>
-              <button
-                onClick={onSearch}
-                className='w-full md:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3.5 md:py-4 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:scale-95 text-sm md:text-base'
-              >
-                Find Jobs
-              </button>
-            </div>
-          </motion.div>
+            </MotionDiv>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className='mt-16 w-full'
-          >
-            <div className='flex flex-wrap justify-center items-center gap-6 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500'>
-              <p className='w-full text-center text-xs md:text-sm font-bold uppercase tracking-widest text-gray-400 mb-2 md:mb-4'>Trusted by Global Leaders</p>
-              <img className='h-5 md:h-8 transition-transform hover:scale-110' src={assets.microsoft_logo} alt="Microsoft" />
-              <img className='h-5 md:h-8 transition-transform hover:scale-110' src={assets.walmart_logo} alt="Walmart" />
-              <img className='h-5 md:h-8 transition-transform hover:scale-110' src={assets.accenture_logo} alt="Accenture" />
-              <img className='h-5 md:h-8 transition-transform hover:scale-110' src={assets.samsung_logo} alt="Samsung" />
-              <img className='h-5 md:h-8 transition-transform hover:scale-110' src={assets.amazon_logo} alt="Amazon" />
-              <img className='h-5 md:h-8 transition-transform hover:scale-110' src={assets.adobe_logo} alt="Adobe" />
+            <div className='mx-auto mt-10 grid max-w-xl grid-cols-3 gap-3 text-left lg:mx-0'>
+              <MiniProof icon={<ShieldCheck />} value='Verified' label='company listings' />
+              <MiniProof icon={<Sparkles />} value='AI-led' label='career matching' />
+              <MiniProof icon={<BriefcaseBusiness />} value='Recruiter' label='grade workflow' />
             </div>
-          </motion.div>
+          </MotionDiv>
+
+          <MotionDiv
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className='relative'
+          >
+            <div className='premium-card float-slow rounded-[2rem] p-5 md:p-7'>
+              <div className='mb-5 flex items-center justify-between border-b border-gray-100 pb-4'>
+                <div>
+                  <p className='text-xs font-bold uppercase tracking-[0.18em] text-blue-600'>Live talent market</p>
+                  <h3 className='mt-1 text-xl font-extrabold text-gray-950'>Senior Product Designer</h3>
+                </div>
+                <span className='status-chip border border-green-100 bg-green-50 text-green-700'>92% Match</span>
+              </div>
+              <div className='space-y-3'>
+                {[
+                  ['Product Lead', 'Remote', 'Shortlisted'],
+                  ['React Engineer', 'Bengaluru', 'Interview'],
+                  ['Data Analyst', 'Mumbai', 'New lead']
+                ].map((item, index) => (
+                  <div key={item[0]} className='flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50/70 p-4 transition-all hover:bg-white hover:shadow-sm'>
+                    <div>
+                      <p className='font-bold text-gray-950'>{item[0]}</p>
+                      <p className='text-sm text-gray-500'>{item[1]}</p>
+                    </div>
+                    <span className={`status-chip ${index === 1 ? 'border border-blue-100 bg-blue-50 text-blue-700' : index === 0 ? 'border border-amber-100 bg-amber-50 text-amber-700' : 'border border-gray-200 bg-gray-100 text-gray-600'}`}>
+                      {item[2]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className='mt-5 grid grid-cols-3 gap-3'>
+                <Metric value='10k+' label='Listings' />
+                <Metric value='500+' label='Companies' />
+                <Metric value='8k+' label='Placements' />
+              </div>
+            </div>
+          </MotionDiv>
         </div>
-      </div>
 
-      {/* Stats Section Integrated into Hero Bottom */}
-      <div className='bg-gray-50 border-y border-gray-100 py-12'>
-        <div className='container mx-auto px-4 2xl:px-20'>
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-8'>
-            <StatItem icon={<TrendingUp className='text-blue-600' />} value="10k+" label="Active Listings" />
-            <StatItem icon={<Building2 className='text-purple-600' />} value="500+" label="Top Companies" />
-            <StatItem icon={<Users className='text-pink-600' />} value="8k+" label="Success Stories" />
-            <StatItem icon={<TrendingUp className='text-indigo-600' />} value="₹12L+" label="Avg. Package" />
+        <MotionDiv
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.45 }}
+          className='mt-16 w-full'
+        >
+          <div className='flex flex-wrap items-center justify-center gap-6 opacity-70 grayscale transition-all duration-500 hover:grayscale-0 md:gap-14'>
+            <p className='mb-1 w-full text-center text-xs font-bold uppercase tracking-[0.18em] text-gray-400 md:text-sm'>Trusted by hiring teams at</p>
+            <img className='h-5 transition-transform hover:scale-110 md:h-8' src={assets.microsoft_logo} alt='Microsoft' />
+            <img className='h-5 transition-transform hover:scale-110 md:h-8' src={assets.walmart_logo} alt='Walmart' />
+            <img className='h-5 transition-transform hover:scale-110 md:h-8' src={assets.accenture_logo} alt='Accenture' />
+            <img className='h-5 transition-transform hover:scale-110 md:h-8' src={assets.samsung_logo} alt='Samsung' />
+            <img className='h-5 transition-transform hover:scale-110 md:h-8' src={assets.amazon_logo} alt='Amazon' />
+            <img className='h-5 transition-transform hover:scale-110 md:h-8' src={assets.adobe_logo} alt='Adobe' />
           </div>
-        </div>
+        </MotionDiv>
       </div>
     </div>
   )
 }
 
-const StatItem = ({ icon, value, label }) => (
-  <div className='flex flex-col items-center text-center p-4 rounded-2xl hover:bg-white hover:shadow-sm transition-all duration-300 transform hover:-translate-y-1'>
-    <div className='p-3 bg-white rounded-xl shadow-sm border border-gray-50 mb-3'>
-      {React.cloneElement(icon, { size: 24 })}
-    </div>
-    <h4 className='text-2xl font-bold text-gray-900'>{value}</h4>
-    <p className='text-sm font-medium text-gray-500 uppercase tracking-tighter'>{label}</p>
+const MiniProof = ({ icon, value, label }) => (
+  <div className='rounded-2xl border border-gray-200 bg-white/70 p-3 shadow-sm'>
+    {React.cloneElement(icon, { size: 18, className: 'mb-2 text-blue-600' })}
+    <p className='text-sm font-extrabold text-gray-950'>{value}</p>
+    <p className='text-xs text-gray-500'>{label}</p>
+  </div>
+)
+
+const Metric = ({ value, label }) => (
+  <div className='rounded-2xl bg-gray-950 p-4 text-center text-white'>
+    <p className='text-xl font-extrabold'>{value}</p>
+    <p className='text-xs text-gray-400'>{label}</p>
   </div>
 )
 

@@ -3,17 +3,19 @@ import { assets } from '../assets/assets'
 
 const Footer = () => {
   return (
-    <div className='container px-4 2xl:px-20 mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 py-6 mt-10 sm:mt-20 border-t border-gray-100'>
-      <img width={140} src={assets.logo} alt="" className='max-sm:mx-auto' />
-      <p className='flex-1 border-l-0 sm:border-l border-gray-300 sm:pl-4 text-[13px] text-gray-500 text-center sm:text-left'>
-        Copyright @SarthakDudhe | All rights reserved.
-      </p>
-      <div className='flex flex-row gap-3'>
-        <img width={32} className='cursor-pointer hover:opacity-80 transition-opacity' src={assets.facebook_icon} alt="" />
-        <img width={32} className='cursor-pointer hover:opacity-80 transition-opacity' src={assets.twitter_icon} alt="" />
-        <img width={32} className='cursor-pointer hover:opacity-80 transition-opacity' src={assets.instagram_icon} alt="" />
+    <footer className='border-t border-gray-200 bg-white'>
+      <div className='ij-container flex flex-col items-center justify-between gap-6 py-8 sm:flex-row'>
+        <img width={145} src={assets.logo} alt='InsiderJobs' className='max-sm:mx-auto' />
+        <p className='flex-1 text-center text-[13px] text-gray-500 sm:border-l sm:border-gray-200 sm:pl-5 sm:text-left'>
+          Copyright @SarthakDudhe | All rights reserved.
+        </p>
+        <div className='flex flex-row gap-3 opacity-80 grayscale'>
+          <img width={30} className='cursor-pointer transition-opacity hover:opacity-80' src={assets.facebook_icon} alt='Facebook' />
+          <img width={30} className='cursor-pointer transition-opacity hover:opacity-80' src={assets.twitter_icon} alt='Twitter' />
+          <img width={30} className='cursor-pointer transition-opacity hover:opacity-80' src={assets.instagram_icon} alt='Instagram' />
+        </div>
       </div>
-    </div>
+    </footer>
   )
 }
 
