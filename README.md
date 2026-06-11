@@ -4,7 +4,8 @@
     Recommended Dimensions: 1200x400 pixels
     Content: A vibrant, visually striking banner showing the InsiderJobs dashboard, Glassmorphism UI elements, or an abstract representation of AI in recruitment.
   -->
-  <img src="https://via.placeholder.com/1200x400/0f172a/38bdf8?text=InsiderJobs+Hero+Banner+(Replace+with+App+UI+Screenshot)" alt="InsiderJobs Hero Banner" />
+
+
 
   <br />
   <br />
@@ -14,11 +15,11 @@
     Recommended Dimensions: 200x200 pixels
     Content: The official InsiderJobs logo with a transparent background.
   -->
-  <img src="https://via.placeholder.com/200x200/0f172a/38bdf8?text=Logo" alt="InsiderJobs Logo" width="120" />
-
-  <h1>💼 InsiderJobs</h1>
+<img width="180" height="50" alt="ChatGPT Image Jun 4, 2026, 01_26_24 PM" src="https://github.com/user-attachments/assets/1e04e3a6-651a-443d-8b7d-a1f9a9063e6d" />
 
   **The Premium AI-Powered Career Ecosystem**
+---
+  <img width="1919" height="913" alt="Screenshot 2026-04-26 225015" src="https://github.com/user-attachments/assets/db091a35-aa82-4563-b2b5-32284d4a50ef" />
 
   *Bridging the gap between top-tier talent and forward-thinking recruiters through LLM-driven insights, premium aesthetics, and a highly scalable MERN architecture.*
 
@@ -31,15 +32,11 @@
   </p>
 
   <p align="center">
-    <img src="https://img.shields.io/github/license/SarthakDudhe/InsiderJobs?style=flat-square&color=blue" alt="License" />
-    <img src="https://img.shields.io/github/stars/SarthakDudhe/InsiderJobs?style=flat-square&color=yellow" alt="Stars" />
-    <img src="https://img.shields.io/github/forks/SarthakDudhe/InsiderJobs?style=flat-square&color=orange" alt="Forks" />
-    <img src="https://img.shields.io/github/issues/SarthakDudhe/InsiderJobs?style=flat-square&color=red" alt="Issues" />
-    <!-- PLACEHOLDER: Deployment Status Badge (e.g., Vercel/Render) -->
-    <img src="https://img.shields.io/badge/Deployment-Live-success?style=flat-square" alt="Deployment Status" />
+  
+   
   </p>
 
-  ### [Live Demo](#) | [Report Bug](#) | [Request Feature](#)
+
 </div>
 
 ---
@@ -79,7 +76,10 @@ This project demonstrates a deep understanding of full-stack engineering, comple
   Content: A grid or collage of screenshots showing the AI Recommender, the Recruiter Dashboard, and the Job Search interface.
 -->
 <p align="center">
-  <img src="https://via.placeholder.com/1000x500/1e293b/38bdf8?text=Feature+Highlights+Collage+(Insert+Screenshots)" alt="Feature Highlights" />
+  <img width="1919" height="910" alt="Screenshot 2026-04-26 223812" src="https://github.com/user-attachments/assets/a136e9ff-0aa7-4fa9-a249-65f4be9604de" />
+<img width="1919" height="910" alt="Screenshot 2026-04-26 225504" src="https://github.com/user-attachments/assets/c501cc9d-7eb2-4f59-82a7-293bddd0cf9b" />
+<img width="1916" height="907" alt="Screenshot 2026-04-26 224818" src="https://github.com/user-attachments/assets/7cd02a9b-a15c-43e8-99fe-1beb57b8b20c" />
+
 </p>
 
 ---
@@ -98,7 +98,7 @@ graph TD
     F --> G[Applies to Job]
     G --> H[Track Status in Dashboard]
     
-    I[Recruiter Lands on Home] -->|Clerk Auth| J(Recruiter Dashboard)
+    I[Recruiter Lands on Home] -->|Sign-in/Sign up| J(Recruiter Dashboard)
     J --> K[Creates Job via Quill.js]
     K --> L[Job Posted to Platform]
     L --> M[Reviews Applicants]
@@ -110,9 +110,7 @@ graph TD
   Recommended Dimensions: 800x450 pixels
   Content: A fast-paced GIF showing a user logging in, getting AI recommendations, and applying for a job.
 -->
-<p align="center">
-  <img src="https://via.placeholder.com/800x450/0f172a/10b981?text=Product+Walkthrough+GIF+(Insert+Screen+Recording)" alt="Product Walkthrough" />
-</p>
+
 
 ---
 
@@ -295,7 +293,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 **Developer:** Sarthak Dudhe  
 **GitHub:** [@SarthakDudhe](https://github.com/SarthakDudhe)  
-**Project Link:** [https://github.com/SarthakDudhe/InsiderJobs](https://github.com/SarthakDudhe/InsiderJobs)
+**Project Link:** [Live Preview](https://insider-jobs-ecru.vercel.app/)
 
 ---
 <p align="center">
