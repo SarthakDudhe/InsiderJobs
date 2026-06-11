@@ -3,13 +3,10 @@ import User from "../models/User.js";
 import axios from "axios";
 import { Groq } from "groq-sdk";
 import { ApifyClient } from "apify-client";
+import { PDFParse } from "pdf-parse";
 
 export const getAIJobRecommendations = async (req, res) => {
     try {
-        const { createRequire } = await import('module');
-        const require = createRequire(import.meta.url);
-        const pdfParse = require("pdf-parse");
-
         const userId = req.auth.userId;
 
         const groqApiKey = process.env.GROK_API_KEY;
@@ -29,9 +26,11 @@ export const getAIJobRecommendations = async (req, res) => {
         // 2. Download resume and extract text
         const response = await axios.get(user.resume, { responseType: 'arraybuffer' });
 
-        // Correct usage of pdf-parse
-        const data = await pdfParse(response.data);
+        // Correct usage of pdf-parse (v2)
+        const parser = new PDFParse({ data: response.data });
+        const data = await parser.getText();
         const resumeText = data.text;
+        await parser.destroy();
 
         // 3. Extract keywords using Groq
         const prompt = `Based on the following resume text, identify the top 3-4 most appropriate JOB TITLES (e.g., "Full Stack Developer", "Backend Engineer") AND the top 3-4 coding skills (e.g., "React", "Node.js").
