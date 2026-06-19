@@ -101,6 +101,9 @@ export const applyForJob = async (req, res) => {
         res.json({ success: true, message: "Applied Successfully 😊" })
 
     } catch (error) {
+        if (error.code === 11000) {
+            return res.json({ success: false, message: "Already Applied" })
+        }
         res.json({ success: false, message: error.message })
     }
 

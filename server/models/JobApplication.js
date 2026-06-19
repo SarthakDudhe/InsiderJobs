@@ -8,6 +8,8 @@ status:{type:String,default:"Pending"},
 date:{type:Number,required:true}
 })
 
+JobApplicationSchema.index({ userId: 1, jobId: 1 }, { unique: true });
+
 const JobApplication = mongoose.model('JobApplication',JobApplicationSchema)
 
 export default JobApplication;
