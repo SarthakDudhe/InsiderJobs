@@ -37,7 +37,7 @@ const AppDownload = () => {
                 </MotionA>
               </div>
 
-              <div className='hidden items-center gap-3 border-l border-white/15 pl-4 lg:flex'>
+              <div className='hidden items-center gap-3 border-l border-slate-200 pl-4 lg:flex'>
                 <div className='rounded-xl bg-white p-2'>
                   <QrCode size={32} className='text-gray-950' />
                 </div>
@@ -50,7 +50,7 @@ const AppDownload = () => {
           </div>
 
           <div className='relative flex justify-center md:w-1/3'>
-            <div className='absolute -left-6 top-10 hidden rounded-2xl border border-white/10 bg-white/10 p-3 text-left backdrop-blur md:block'>
+            <div className='absolute -left-6 top-10 hidden rounded-2xl border border-slate-200 bg-white/88 p-3 text-left shadow-[0_18px_45px_rgba(15,23,42,0.1)] backdrop-blur md:block'>
               <Bell size={16} className='mb-2 text-cyan-300' />
               <p className='text-xs font-bold'>3 new matches</p>
               <p className='text-[11px] text-slate-500'>Based on your resume</p>

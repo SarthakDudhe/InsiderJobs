@@ -431,51 +431,51 @@ const App = () => {
 
         {/* Reported Jobs Tab Content */}
         {activeTab === 'reported-jobs' && (
-          <section className='rounded-3xl border border-rose-500/10 bg-rose-500/[0.01] p-6 backdrop-blur-xl'>
+          <section className='rounded-3xl border border-rose-200 bg-white/88 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl'>
             <div className='mb-6'>
               <h2 className='text-lg font-black tracking-tight text-rose-400 flex items-center gap-2'>
                 <AlertTriangle size={20} /> Reported Listings Queue
               </h2>
-              <p className='text-xs text-gray-400 mt-1'>Audit suspect job listings flagged by candidates for inactivity or scams.</p>
+              <p className='text-xs text-slate-500 mt-1'>Audit suspect job listings flagged by candidates for inactivity or scams.</p>
             </div>
 
-            <div className='overflow-x-auto rounded-2xl border border-white/5 bg-white/5'>
+            <div className='overflow-x-auto rounded-2xl border border-slate-200 bg-white'>
               <table className='w-full text-left border-collapse text-xs'>
                 <thead>
-                  <tr className='border-b border-white/5 bg-white/[0.02] font-extrabold text-gray-400'>
+                  <tr className='border-b border-slate-200 bg-slate-50 font-extrabold text-slate-500'>
                     <th className='p-4'>Job Title & Company</th>
                     <th className='p-4'>Details</th>
                     <th className='p-4'>Report Reasons</th>
                     <th className='p-4 text-right'>Actions</th>
                   </tr>
                 </thead>
-                <tbody className='divide-y divide-white/5'>
+                <tbody className='divide-y divide-slate-100'>
                   {reportedJobs.length > 0 ? (
                     reportedJobs.map((job) => (
-                      <tr key={job._id} className='hover:bg-white/[0.01] transition-colors'>
+                      <tr key={job._id} className='hover:bg-rose-50/40 transition-colors'>
                         <td className='p-4 align-top'>
                           <div className='flex items-center gap-3'>
                             {job.companyId ? (
                               <img src={job.companyId.image} alt='' className='h-8 w-8 rounded-lg object-contain bg-white p-1' />
                             ) : (
-                              <span className='h-8 w-8 rounded-lg bg-gray-800 flex items-center justify-center'>🏢</span>
+                              <span className='h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center'>HQ</span>
                             )}
                             <div>
-                              <p className='font-bold text-gray-200'>{job.title}</p>
-                              <p className='text-[10px] text-gray-400 mt-0.5'>{job.companyId ? job.companyId.name : 'Unknown Company'}</p>
+                              <p className='font-bold text-slate-950'>{job.title}</p>
+                              <p className='text-[10px] text-slate-500 mt-0.5'>{job.companyId ? job.companyId.name : 'Unknown Company'}</p>
                             </div>
                           </div>
                         </td>
-                        <td className='p-4 align-top text-gray-400 space-y-1'>
-                          <p className='flex items-center gap-1.5'><MapPin size={12} className='text-gray-500' /> {job.location}</p>
-                          <p className='flex items-center gap-1.5'><Tag size={12} className='text-gray-500' /> {job.category}</p>
+                        <td className='p-4 align-top text-slate-500 space-y-1'>
+                          <p className='flex items-center gap-1.5'><MapPin size={12} className='text-slate-400' /> {job.location}</p>
+                          <p className='flex items-center gap-1.5'><Tag size={12} className='text-slate-400' /> {job.category}</p>
                         </td>
                         <td className='p-4 align-top'>
                           <div className='space-y-1.5'>
                             {job.reports.map((report, idx) => (
                               <div key={idx} className='bg-rose-500/5 border border-rose-500/10 rounded-lg p-2 max-w-sm'>
                                 <p className='font-bold text-rose-400 text-[10px]'>Reason: {report.reason}</p>
-                                <p className='text-[9px] text-gray-500 mt-0.5'>Reporter ID: {report.userId}</p>
+                                <p className='text-[9px] text-slate-500 mt-0.5'>Reporter ID: {report.userId}</p>
                               </div>
                             ))}
                           </div>
@@ -484,7 +484,7 @@ const App = () => {
                           <button
                             type='button'
                             onClick={() => dismissReports(job._id)}
-                            className='cursor-pointer rounded-lg bg-white/5 px-3 py-1.5 text-[11px] font-bold text-gray-300 hover:bg-white/10 border border-white/5 active:scale-95 transition-all'
+                            className='cursor-pointer rounded-lg bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 active:scale-95 transition-all'
                           >
                             Dismiss Flags
                           </button>
@@ -500,7 +500,7 @@ const App = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className='p-8 text-center text-gray-500 font-semibold'>
+                      <td colSpan={4} className='p-8 text-center text-slate-500 font-semibold'>
                         No reported job listings found in the queue.
                       </td>
                     </tr>
@@ -516,10 +516,10 @@ const App = () => {
 }
 
 const MetricCard = ({ icon, title, count, color, highlight = false }) => (
-  <div className={`rounded-3xl border p-5 flex items-center justify-between transition-all hover:scale-[1.01] ${highlight ? 'bg-amber-500/[0.03] border-amber-500/10' : 'bg-white/5 border-white/5'}`}>
+  <div className={`rounded-3xl border p-5 flex items-center justify-between transition-all hover:scale-[1.01] ${highlight ? 'bg-amber-50 border-amber-100' : 'bg-white/88 border-slate-200 shadow-[0_14px_40px_rgba(15,23,42,0.06)]'}`}>
     <div>
-      <p className='text-[10px] font-bold uppercase tracking-wider text-gray-400'>{title}</p>
-      <h3 className='text-2xl font-black mt-1 text-white'>{count}</h3>
+      <p className='text-[10px] font-bold uppercase tracking-wider text-slate-500'>{title}</p>
+      <h3 className='text-2xl font-black mt-1 text-slate-950'>{count}</h3>
     </div>
     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${color}`}>
       {React.cloneElement(icon, { size: 18 })}
