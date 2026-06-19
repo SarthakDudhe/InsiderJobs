@@ -4,8 +4,6 @@ import Job from "../models/Job.js"
 
 //Get all jobs
 
-
-
 export const getJobs = async (req, res) => {
     try {
         const { page, limit, title = '', location = '', categories = '', locations = '' } = req.query;
@@ -54,9 +52,27 @@ export const getJobs = async (req, res) => {
 
         const jobs = await queryBuilder;
 
+        // Dynamically compute hiringActivity status for each job
+        const jobsWithActivity = jobs.map(job => {
+            const jobObj = job.toObject();
+            const lastActivity = jobObj.companyId ? jobObj.companyId.lastActivity : null;
+            let hiringActivity = 'stale';
+            if (lastActivity) {
+                const diffTime = Math.abs(new Date() - new Date(lastActivity));
+                const diffDays = diffTime / (1000 * 60 * 60 * 24);
+                if (diffDays <= 7) {
+                    hiringActivity = 'active';
+                } else if (diffDays <= 21) {
+                    hiringActivity = 'slow';
+                }
+            }
+            jobObj.hiringActivity = hiringActivity;
+            return jobObj;
+        });
+
         res.json({
             success: true,
-            jobs,
+            jobs: jobsWithActivity,
             totalJobs,
             currentPage: parsedPage,
             totalPages: Math.ceil(totalJobs / parsedLimit)
@@ -73,17 +89,31 @@ export const getJobs = async (req, res) => {
 export const getJobById = async (req,res) => {
 
     try {
-     const {id} = req.params
+        const {id} = req.params
 
-   const job = await Job.findById(id).populate({
-    path:'companyId',
-    select:'-password'
-   })
-   if (!job) {
-    return res.json({success:false,message:"Job Not Found ! "})
-   }
+        const job = await Job.findById(id).populate({
+            path:'companyId',
+            select:'-password'
+        })
+        if (!job) {
+            return res.json({success:false,message:"Job Not Found ! "})
+        }
 
-   res.json({success:true,job})   
+        const jobObj = job.toObject();
+        const lastActivity = jobObj.companyId ? jobObj.companyId.lastActivity : null;
+        let hiringActivity = 'stale';
+        if (lastActivity) {
+            const diffTime = Math.abs(new Date() - new Date(lastActivity));
+            const diffDays = diffTime / (1000 * 60 * 60 * 24);
+            if (diffDays <= 7) {
+                hiringActivity = 'active';
+            } else if (diffDays <= 21) {
+                hiringActivity = 'slow';
+            }
+        }
+        jobObj.hiringActivity = hiringActivity;
+
+        res.json({success:true,job: jobObj})   
     } catch (error) {
         res.json({success:false,message:error.message})
     }

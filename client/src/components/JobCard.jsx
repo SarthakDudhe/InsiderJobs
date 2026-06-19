@@ -21,7 +21,31 @@ const JobCard = ({ job }) => {
             </div>
             <div>
               <p className='text-xs font-bold uppercase tracking-[0.14em] text-gray-400'>{job.companyId.name}</p>
-              <p className='text-xs font-semibold text-blue-600'>Verified role</p>
+              <div className='flex items-center gap-1.5 mt-0.5'>
+                <p className='text-xs font-semibold text-blue-600'>Verified role</p>
+                <span className='text-gray-300'>•</span>
+                {(job.hiringActivity || 'stale') === 'active' && (
+                  <span className='inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 uppercase tracking-wider'>
+                    <span className='relative flex h-1.5 w-1.5'>
+                      <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
+                      <span className='relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500'></span>
+                    </span>
+                    Active Hiring
+                  </span>
+                )}
+                {(job.hiringActivity || 'stale') === 'slow' && (
+                  <span className='inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 uppercase tracking-wider'>
+                    <span className='h-1.5 w-1.5 rounded-full bg-amber-500'></span>
+                    Slow Activity
+                  </span>
+                )}
+                {(job.hiringActivity || 'stale') === 'stale' && (
+                  <span className='inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 uppercase tracking-wider'>
+                    <span className='h-1.5 w-1.5 rounded-full bg-rose-500'></span>
+                    Likely Stale
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <span className='status-chip border border-blue-100 bg-blue-50 text-blue-700'>New</span>

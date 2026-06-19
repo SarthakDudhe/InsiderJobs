@@ -62,7 +62,9 @@ export const loginCompany = async (req,res) => {
     const {email,password} =req.body
     try {
         const company = await Company.findOne({email})
-        if (await bcrypt.compare(password,company.password)) {
+        if (company && await bcrypt.compare(password,company.password)) {
+            company.lastActivity = new Date();
+            await company.save();
             res.json({
                 success:true,company:{
                 _id:company._id,
