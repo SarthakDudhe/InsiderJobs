@@ -8,6 +8,7 @@ import { clerkWebHooks } from './controllers/webhooks.js';
 import companyRoutes from './routes/companyRoutes.js';
 import jobRoutes from "./routes/jobRoutes.js"
 import userRoutes from "./routes/userRoute.js"
+import adminRoutes from "./routes/adminRoutes.js"
 import connectCloudinary from './config/cloudinary.js';
 import { clerkMiddleware } from '@clerk/express'
 //initialize Express
@@ -38,6 +39,7 @@ app.get("/debug-sentry", function mainHandler(req, res) {
 
 app.post("/webhooks", clerkWebHooks)
 app.use('/api/company', companyRoutes)
+app.use('/api/admin', adminRoutes)
 app.use("/api/jobs", jobRoutes)
 app.use("/api/users", userRoutes)
 //Port

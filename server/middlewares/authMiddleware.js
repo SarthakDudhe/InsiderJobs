@@ -26,3 +26,19 @@ export const protectCompany = async (req, res, next) => {
     }
 
 }
+
+export const protectAdmin = async (req, res, next) => {
+    const token = req.headers.token
+    if (!token) {
+        return res.json({ success: false, message: "Not Authorized, Login Again !" })
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        if (decoded.role !== 'admin') {
+            return res.json({ success: false, message: "Not Authorized as Admin !" })
+        }
+        next()
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}
