@@ -7,6 +7,7 @@ const companySchema = new mongoose.Schema({
     image:{type:String,required:true},
     password:{type:String,required:true},
     lastActivity:{type:Date,default:Date.now},
+    isVerified:{type:Boolean,default:false},
 })
 
 const Company = mongoose.model("Company",companySchema)

@@ -17,6 +17,14 @@ export const registerCompany = async (req, res) => {
   if (!name || !email || !password || !imageFile) {
     return res.json({ success: false, message: "Missing Details" })
   }
+  
+  // Work domain validation
+  const publicDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'aol.com', 'icloud.com'];
+  const emailDomain = email.split('@')[1]?.toLowerCase();
+  if (publicDomains.includes(emailDomain)) {
+    return res.json({ success: false, message: "Corporate work email is required to register a company profile." })
+  }
+
   try {
     const companyExists = await Company.findOne({ email })
     if (companyExists) {
@@ -64,13 +72,20 @@ export const loginCompany = async (req,res) => {
         const company = await Company.findOne({email})
         if (company && await bcrypt.compare(password,company.password)) {
             company.lastActivity = new Date();
+            
+            // Auto-verify slack@demo.com
+            if (email === 'slack@demo.com' && !company.isVerified) {
+                company.isVerified = true;
+            }
+            
             await company.save();
             res.json({
                 success:true,company:{
                 _id:company._id,
                 name:company.name,
                 email:company.email,
-                image:company.image
+                image:company.image,
+                isVerified:company.isVerified
 },token:generateToken(company._id)
             })
         }else{
@@ -210,4 +225,20 @@ export const changeVisibility = async (req,res) => {
     } catch (error) {
          res.json({success:false,message:error.message})
     }
+}
+
+// Verify Company Workspace in Demo Mode
+export const verifyDemoCompany = async (req, res) => {
+  try {
+    const companyId = req.company._id;
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return res.json({ success: false, message: "Company not found" });
+    }
+    company.isVerified = true;
+    await company.save();
+    res.json({ success: true, message: "Company workspace verified successfully!", isVerified: true });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
 }

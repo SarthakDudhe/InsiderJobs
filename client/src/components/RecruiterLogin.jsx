@@ -27,6 +27,11 @@ const RecruiterLogin = () => {
     e.preventDefault()
 
     if (state === 'Sign Up' && !isTextDataSubmitted) {
+      const publicDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'aol.com', 'icloud.com'];
+      const emailDomain = email.split('@')[1]?.toLowerCase();
+      if (publicDomains.includes(emailDomain)) {
+        return toast.error("Corporate work email is required to register a company profile.")
+      }
       return setIsDataSubmitted(true)
     }
     try {

@@ -3,10 +3,30 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import { BriefcaseBusiness, ClipboardList, FilePlus2, LogOut, UsersRound } from 'lucide-react'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const Dashboard = () => {
   const navigate = useNavigate()
-  const { companyData, setcompanyData, setCompanyToken } = useContext(AppContext)
+  const { companyData, setcompanyData, setCompanyToken, companyToken, backendUrl } = useContext(AppContext)
+
+  const handleVerifyDemo = async () => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + '/api/company/verify-demo',
+        {},
+        { headers: { token: companyToken } }
+      )
+      if (data.success) {
+        toast.success(data.message)
+        setcompanyData(prev => ({ ...prev, isVerified: true }))
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
 
   const logout = () => {
     setCompanyToken(null)
@@ -65,6 +85,28 @@ const Dashboard = () => {
         </aside>
 
         <main className='min-w-0 flex-1 p-3 sm:p-6'>
+          {companyData && !companyData.isVerified && (
+            <div className='mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm transition-all duration-300'>
+              <div className='flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
+                <div className='flex items-start gap-3'>
+                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600 font-bold'>⚠️</span>
+                  <div>
+                    <h4 className='text-sm font-extrabold text-amber-900'>Workspace Pending Verification</h4>
+                    <p className='text-xs text-amber-700 mt-1 leading-relaxed max-w-2xl'>
+                      Your company profile is currently under review. Any jobs you post will remain as drafts and hidden from candidates until the workspace domain is verified.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type='button'
+                  onClick={handleVerifyDemo}
+                  className='cursor-pointer text-nowrap rounded-xl bg-amber-600 px-4 py-2 text-xs font-extrabold text-white transition-all hover:bg-amber-700 active:scale-95 shadow-sm'
+                >
+                  Verify Workspace (Demo Mode)
+                </button>
+              </div>
+            </div>
+          )}
           <Outlet />
         </main>
       </div>

@@ -1,5 +1,5 @@
 import Job from "../models/Job.js"
-
+import Company from "../models/Company.js"
 
 
 //Get all jobs
@@ -8,7 +8,11 @@ export const getJobs = async (req, res) => {
     try {
         const { page, limit, title = '', location = '', categories = '', locations = '' } = req.query;
 
-        const query = { visible: true };
+        // Filter out unverified companies
+        const verifiedCompanies = await Company.find({ isVerified: true }).select('_id');
+        const verifiedCompanyIds = verifiedCompanies.map(c => c._id);
+
+        const query = { visible: true, companyId: { $in: verifiedCompanyIds } };
 
         // Search by title
         if (title) {
