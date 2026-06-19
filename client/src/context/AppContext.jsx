@@ -32,15 +32,25 @@ export const AppcontextProvider = (props) => {
     const [companyData, setcompanyData] = useState(null)
     const [userData, setUserData] = useState(null)
     const [userApplications, setUserApplications] = useState([])
+    const [totalJobs, setTotalJobs] = useState(0)
 
 
     //  Function to fetch job data
 
-    const fetchJobs = async () => {
+    const fetchJobs = async (page = 1, limit = 6, title = '', location = '', categories = '', locations = '') => {
         try {
-            const { data } = await axios.get(backendUrl + '/api/jobs')
+            const params = new URLSearchParams()
+            if (page) params.append('page', page)
+            if (limit) params.append('limit', limit)
+            if (title) params.append('title', title)
+            if (location) params.append('location', location)
+            if (categories) params.append('categories', categories)
+            if (locations) params.append('locations', locations)
+
+            const { data } = await axios.get(`${backendUrl}/api/jobs?${params.toString()}`)
             if (data.success) {
                 setjobs(data.jobs)
+                setTotalJobs(data.totalJobs || 0)
                 console.log(data.jobs)
             }
             else {
@@ -146,7 +156,7 @@ export const AppcontextProvider = (props) => {
 
 
     const value = {
-        searchFilter, setSearchFilter, isSearched, setIsSearched, jobs, setjobs, showRecruiterLogin, setShowRecruiterLogin, companyToken, setCompanyToken, companyData, setcompanyData, backendUrl, userData, userApplications, setUserData, setUserApplications, fetchUserData, fetchUserApplications
+        searchFilter, setSearchFilter, isSearched, setIsSearched, jobs, setjobs, showRecruiterLogin, setShowRecruiterLogin, companyToken, setCompanyToken, companyData, setcompanyData, backendUrl, userData, userApplications, setUserData, setUserApplications, fetchUserData, fetchUserApplications, totalJobs, setTotalJobs, fetchJobs
     }
 
     return (

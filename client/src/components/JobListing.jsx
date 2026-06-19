@@ -5,33 +5,38 @@ import JobCard from './JobCard'
 import { Filter, X } from 'lucide-react'
 
 const JobListing = () => {
-  const { isSearched, searchFilter, setSearchFilter, jobs } = useContext(AppContext)
+  const { isSearched, searchFilter, setSearchFilter, jobs, totalJobs, fetchJobs } = useContext(AppContext)
   const [showFilter, setShowFilter] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedCategories, setSelectedCategories] = useState([])
   const [selectedLocation, setSelectedLocation] = useState([])
-  const [filteredJobs, setFilteredJobs] = useState(jobs)
 
   const handleCategorychange = (category) => {
     setSelectedCategories(prev => prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category])
+    setCurrentPage(1)
   }
 
   const handleLocationchange = (location) => {
     setSelectedLocation(prev => prev.includes(location) ? prev.filter(c => c !== location) : [...prev, location])
+    setCurrentPage(1)
   }
 
+  // Reset page when search filter changes
   useEffect(() => {
-    const matchesCategory = job => selectedCategories.length === 0 || selectedCategories.includes(job.category)
-    const matchesLocation = job => selectedLocation.length === 0 || selectedLocation.includes(job.location)
-    const matchesTitle = job => searchFilter.title === '' || job.title.toLowerCase().includes(searchFilter.title.toLowerCase())
-    const matchesSearchLocation = job => searchFilter.location === '' || job.location.toLowerCase().includes(searchFilter.location.toLowerCase())
-    const newFilteredJobs = jobs.slice().reverse().filter(
-      job => matchesCategory(job) && matchesLocation(job) && matchesTitle(job) && matchesSearchLocation(job)
-    )
-
-    setFilteredJobs(newFilteredJobs)
     setCurrentPage(1)
-  }, [jobs, selectedCategories, selectedLocation, searchFilter])
+  }, [searchFilter])
+
+  // Fetch jobs from server whenever filters or page change
+  useEffect(() => {
+    fetchJobs(
+      currentPage,
+      6,
+      searchFilter.title,
+      searchFilter.location,
+      selectedCategories.join(','),
+      selectedLocation.join(',')
+    )
+  }, [currentPage, selectedCategories, selectedLocation, searchFilter])
 
   return (
     <div className='ij-container flex flex-col gap-8 py-10 lg:flex-row lg:items-start'>
@@ -77,28 +82,28 @@ const JobListing = () => {
             <h3 className='mt-2 text-3xl font-extrabold text-gray-950' id='job-list'>Latest Jobs</h3>
             <p className='mt-2 text-gray-600'>Curated opportunities from verified hiring teams.</p>
           </div>
-          <span className='status-chip w-fit border border-gray-200 bg-white text-gray-600'>{filteredJobs.length} roles</span>
+          <span className='status-chip w-fit border border-gray-200 bg-white text-gray-600'>{totalJobs} roles</span>
         </div>
 
         <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3'>
-          {filteredJobs.slice((currentPage - 1) * 6, currentPage * 6).map((job, index) => (
+          {jobs.map((job, index) => (
             <JobCard key={index} job={job} />
           ))}
         </div>
 
-        {filteredJobs.length > 0 && (
+        {totalJobs > 0 && (
           <div className='mt-10 flex items-center justify-center gap-2'>
             <a onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))} href='#job-list' className='rounded-xl border border-gray-200 bg-white p-2 shadow-sm'>
               <img src={assets.left_arrow_icon} alt='Previous' />
             </a>
-            {Array.from({ length: Math.ceil(filteredJobs.length / 6) }).map((_, index) => (
+            {Array.from({ length: Math.ceil(totalJobs / 6) }).map((_, index) => (
               <a key={index} href='#job-list'>
                 <button onClick={() => setCurrentPage(index + 1)} className={`h-9 w-9 cursor-pointer rounded-xl border text-sm font-bold transition-all ${currentPage === index + 1 ? 'border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-100' : 'border-gray-200 bg-white text-gray-500 hover:text-gray-950'}`}>
                   {index + 1}
                 </button>
               </a>
             ))}
-            <a onClick={() => setCurrentPage(Math.min(currentPage + 1, Math.ceil(filteredJobs.length / 6)))} href='#job-list' className='rounded-xl border border-gray-200 bg-white p-2 shadow-sm'>
+            <a onClick={() => setCurrentPage(Math.min(currentPage + 1, Math.ceil(totalJobs / 6)))} href='#job-list' className='rounded-xl border border-gray-200 bg-white p-2 shadow-sm'>
               <img src={assets.right_arrow_icon} alt='Next' />
             </a>
           </div>
