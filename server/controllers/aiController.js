@@ -8,6 +8,66 @@ import { PDFParse } from "pdf-parse";
 export const getAIJobRecommendations = async (req, res) => {
     try {
         const userId = req.auth.userId;
+        const { keywords: customKeywordsParam } = req.query;
+
+        const serpApiKey = process.env.SERP_API_KEY;
+        const searchJobs = async (keyword) => {
+            try {
+                console.log(`[AI Recommender] Searching Google Jobs (India) via SerpApi for: "${keyword}"`);
+
+                const response = await axios.get('https://serpapi.com/search.json', {
+                    params: {
+                        engine: "google_jobs",
+                        q: keyword,
+                        location: "India",
+                        api_key: serpApiKey,
+                        hl: "en",
+                        gl: "in" // Targeted to India
+                    },
+                    timeout: 15000
+                });
+
+                if (response.data && response.data.jobs_results) {
+                    return response.data.jobs_results;
+                }
+                return [];
+            } catch (error) {
+                console.error(`[AI Recommender] SerpApi search error for "${keyword}":`, error.message);
+                return [];
+            }
+        };
+
+        // If custom keywords are supplied, bypass the LLM and search directly
+        if (customKeywordsParam) {
+            console.log(`[AI Recommender] Custom keywords provided: "${customKeywordsParam}". Bypassing LLM.`);
+            const customKeywords = customKeywordsParam.split(',').filter(Boolean);
+
+            let allJobs = [];
+            try {
+                const searchPromises = customKeywords.slice(0, 2).map(keyword => searchJobs(keyword));
+                const searchResults = await Promise.all(searchPromises);
+                allJobs = searchResults.flat();
+            } catch (searchError) {
+                console.error("[AI Recommender] Concurrent search error:", searchError.message);
+            }
+
+            const uniqueJobs = Array.from(new Map(allJobs.map(job => [job.job_id || job.title + job.company_name, job])).values()).slice(0, 15);
+
+            return res.json({
+                success: true,
+                keywords: customKeywords,
+                jobs: uniqueJobs.map(job => ({
+                    title: job.title || "Job Opportunity",
+                    company: job.company_name || 'Company Not Listed',
+                    location: job.location || 'India',
+                    url: job.related_links?.find(link => link.text?.includes("Apply"))?.link || job.share_link || job.related_links?.[0]?.link || "#",
+                    source: job.via || "Google Jobs",
+                    postedAt: job.detected_extensions?.posted_at || new Date().toISOString(),
+                    type: job.detected_extensions?.schedule_type || 'Full-time',
+                    salary: job.detected_extensions?.salary || null
+                }))
+            });
+        }
 
         const groqApiKey = process.env.GROK_API_KEY;
         if (!groqApiKey) {
@@ -85,35 +145,6 @@ export const getAIJobRecommendations = async (req, res) => {
         const skills = extractedData.skills || [];
         const combinedKeywords = [...roles, ...skills].slice(0, 5);
 
-        // 4. Search for jobs using SerpApi Google Jobs API
-        const serpApiKey = process.env.SERP_API_KEY;
-
-        const searchJobs = async (keyword) => {
-            try {
-                console.log(`[AI Recommender] Searching Google Jobs (India) via SerpApi for: "${keyword}"`);
-
-                const response = await axios.get('https://serpapi.com/search.json', {
-                    params: {
-                        engine: "google_jobs",
-                        q: keyword,
-                        location: "India",
-                        api_key: serpApiKey,
-                        hl: "en",
-                        gl: "in" // Targeted to India
-                    },
-                    timeout: 15000
-                });
-
-                if (response.data && response.data.jobs_results) {
-                    return response.data.jobs_results;
-                }
-                return [];
-            } catch (error) {
-                console.error(`[AI Recommender] SerpApi search error for "${keyword}":`, error.message);
-                return [];
-            }
-        };
-
         // Search for the top keywords concurrently
         let allJobs = [];
         try {
@@ -125,7 +156,6 @@ export const getAIJobRecommendations = async (req, res) => {
         }
 
         // Normalize and Deduplicate
-        // SerpApi uses different field names: job_id, title, company_name, location, via, etc.
         const uniqueJobs = Array.from(new Map(allJobs.map(job => [job.job_id || job.title + job.company_name, job])).values()).slice(0, 15);
 
         res.json({
@@ -147,4 +177,4 @@ export const getAIJobRecommendations = async (req, res) => {
         console.error("AI Recommendation Error:", error);
         res.json({ success: false, message: error.message });
     }
-};
+}

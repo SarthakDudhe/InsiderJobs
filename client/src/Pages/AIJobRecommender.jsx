@@ -17,8 +17,10 @@ const AIJobRecommender = () => {
   const [loading, setLoading] = useState(false)
   const [recommendations, setRecommendations] = useState(null)
   const [error, setError] = useState(null)
+  const [keywords, setKeywords] = useState([])
+  const [newKeywordInput, setNewKeywordInput] = useState("")
 
-  const fetchRecommendations = async () => {
+  const fetchRecommendations = async (customKeywordsList = null) => {
     if (!userData || !userData.resume) {
       setError("Please upload your resume in the Applications page first.")
       return
@@ -28,12 +30,17 @@ const AIJobRecommender = () => {
     setError(null)
     try {
       const token = await getToken()
-      const { data } = await axios.get(`${backendUrl}/api/users/ai-recommender`, {
+      const url = customKeywordsList && customKeywordsList.length > 0
+        ? `${backendUrl}/api/users/ai-recommender?keywords=${encodeURIComponent(customKeywordsList.join(','))}`
+        : `${backendUrl}/api/users/ai-recommender`
+
+      const { data } = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` }
       })
 
       if (data.success) {
         setRecommendations(data)
+        setKeywords(data.keywords || [])
         if (data.message) toast.info(data.message)
       } else {
         setError(data.message)
@@ -45,6 +52,19 @@ const AIJobRecommender = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleAddKeyword = (e) => {
+    e.preventDefault()
+    const trimmed = newKeywordInput.trim()
+    if (trimmed && !keywords.includes(trimmed)) {
+      setKeywords(prev => [...prev, trimmed])
+      setNewKeywordInput("")
+    }
+  }
+
+  const removeKeyword = (keywordToRemove) => {
+    setKeywords(prev => prev.filter(k => k !== keywordToRemove))
   }
 
   return (
@@ -86,16 +106,42 @@ const AIJobRecommender = () => {
                   <span className='rounded-xl bg-blue-500 p-2 text-white'><Sparkles size={18} /></span>
                   Resume Insights
                 </h3>
-                <p className='mb-6 text-sm leading-relaxed text-gray-400'>Keywords extracted from your resume and used against live job listings.</p>
+                <p className='mb-4 text-sm leading-relaxed text-gray-400'>Keywords extracted from your resume. Add or remove tags to refine job listings.</p>
+                
                 <div className='flex flex-wrap gap-2'>
-                  {recommendations.keywords.map((keyword, index) => (
-                    <span key={index} className='rounded-full border border-blue-400/20 bg-blue-400/10 px-3 py-1.5 text-sm font-bold text-blue-100'>
+                  {keywords.map((keyword, index) => (
+                    <span key={index} className='inline-flex items-center gap-1.5 rounded-full border border-blue-400/20 bg-blue-400/10 pl-3 pr-2 py-1.5 text-sm font-bold text-blue-100'>
                       {keyword}
+                      <button 
+                        onClick={() => removeKeyword(keyword)} 
+                        className='inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-blue-400/30 text-blue-300 hover:text-white transition-all text-xs font-normal'
+                        title="Remove Keyword"
+                      >
+                        ×
+                      </button>
                     </span>
                   ))}
                 </div>
-                <button onClick={fetchRecommendations} className='mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-white/15'>
-                  <RefreshCw size={16} /> Refresh Search
+
+                <form onSubmit={handleAddKeyword} className='mt-4 flex gap-2'>
+                  <input
+                    type='text'
+                    value={newKeywordInput}
+                    onChange={(e) => setNewKeywordInput(e.target.value)}
+                    placeholder='Add skill or role...'
+                    className='w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-blue-400 focus:outline-none'
+                  />
+                  <button type='submit' className='premium-button px-4 py-2 text-sm shrink-0'>
+                    Add
+                  </button>
+                </form>
+
+                <button onClick={() => fetchRecommendations(keywords)} className='mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-blue-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 shadow-md shadow-blue-500/20'>
+                  <RefreshCw size={16} /> Search Custom Keywords
+                </button>
+
+                <button onClick={() => fetchRecommendations(null)} className='mt-2 text-xs text-gray-400 hover:text-white transition-all underline w-full text-center'>
+                  Reset to Resume Keywords
                 </button>
               </div>
             </aside>
