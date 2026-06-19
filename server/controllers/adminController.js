@@ -68,3 +68,84 @@ export const verifyCompany = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 }
+
+// Get all reported jobs
+export const getReportedJobs = async (req, res) => {
+    try {
+        const reportedJobs = await Job.find({ "reports.0": { $exists: true } })
+            .populate("companyId", "name email image")
+            .sort({ date: -1 });
+        res.json({ success: true, reportedJobs });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+// Dismiss all reports from a job
+export const dismissJobReports = async (req, res) => {
+    const { id } = req.body;
+    try {
+        const job = await Job.findById(id);
+        if (!job) {
+            return res.json({ success: false, message: "Job not found" });
+        }
+        job.reports = [];
+        await job.save();
+        res.json({ success: true, message: "All reports dismissed successfully." });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+// Delete job posting
+export const deleteJob = async (req, res) => {
+    const { id } = req.body;
+    try {
+        const job = await Job.findById(id);
+        if (!job) {
+            return res.json({ success: false, message: "Job not found" });
+        }
+        await Job.findByIdAndDelete(id);
+        // Also remove applications for this job
+        await JobApplication.deleteMany({ jobId: id });
+        res.json({ success: true, message: "Job listing and associated applications deleted successfully." });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+// Get daily analytics for the last 7 days
+export const getAnalyticsData = async (req, res) => {
+    try {
+        const stats = [];
+        const now = new Date();
+        
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(now);
+            date.setDate(now.getDate() - i);
+            date.setHours(0, 0, 0, 0);
+            const startOfDay = date.getTime();
+            const endOfDay = startOfDay + (24 * 60 * 60 * 1000);
+            
+            const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            
+            const jobsCount = await Job.countDocuments({
+                date: { $gte: startOfDay, $lt: endOfDay }
+            });
+            
+            const applicationsCount = await JobApplication.countDocuments({
+                date: { $gte: startOfDay, $lt: endOfDay }
+            });
+            
+            stats.push({
+                date: dateString,
+                jobs: jobsCount,
+                applications: applicationsCount
+            });
+        }
+        
+        res.json({ success: true, stats });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}

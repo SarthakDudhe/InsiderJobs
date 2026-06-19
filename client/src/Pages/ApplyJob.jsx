@@ -10,7 +10,7 @@ import Footer from '../components/Footer'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useAuth, useClerk, useUser } from '@clerk/clerk-react'
-import { Briefcase, CalendarClock, MapPin, Users } from 'lucide-react'
+import { Briefcase, CalendarClock, MapPin, Users, X } from 'lucide-react'
 
 const ApplyJob = () => {
   const { id } = useParams()
@@ -20,7 +20,31 @@ const ApplyJob = () => {
   const navigate = useNavigate()
   const [jobData, setjobData] = useState(null)
   const [isAlreadyApplied, setIsAlreadyApplied] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportReason, setReportReason] = useState('')
+  const [submittingReport, setSubmittingReport] = useState(false)
   const { jobs, backendUrl, userData, userApplications, fetchUserApplications } = useContext(AppContext)
+
+  const submitReport = async () => {
+    setSubmittingReport(true)
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/jobs/${jobData._id}/report`, {
+        reason: reportReason,
+        userId: user ? user.id : 'Anonymous'
+      })
+      if (data.success) {
+        toast.success(data.message)
+        setShowReportModal(false)
+        setReportReason('')
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setSubmittingReport(false)
+    }
+  }
 
   const fetchjob = async () => {
     try {
@@ -134,9 +158,18 @@ const ApplyJob = () => {
           <article className='premium-panel rounded-[1.5rem] p-6 md:p-8'>
             <h2 className='mb-5 text-2xl font-extrabold text-gray-950'>Job description</h2>
             <div className='rich-text prose max-w-none text-gray-700' dangerouslySetInnerHTML={{ __html: jobData.description }} />
-            <button onClick={applyHandler} className={`mt-10 px-8 py-3.5 ${isAlreadyApplied ? 'rounded-xl bg-gray-200 font-extrabold text-gray-500' : 'premium-button cursor-pointer'}`}>
-              {isAlreadyApplied ? 'Already Applied' : 'Apply Now'}
-            </button>
+            <div className='mt-10 flex flex-wrap gap-4 items-center'>
+              <button onClick={applyHandler} className={`px-8 py-3.5 ${isAlreadyApplied ? 'rounded-xl bg-gray-200 font-extrabold text-gray-500' : 'premium-button cursor-pointer'}`}>
+                {isAlreadyApplied ? 'Already Applied' : 'Apply Now'}
+              </button>
+              <button 
+                type='button'
+                onClick={() => setShowReportModal(true)} 
+                className='cursor-pointer rounded-xl border border-rose-200 px-6 py-3.5 text-rose-600 font-bold hover:bg-rose-50 transition-all active:scale-95 text-sm flex items-center gap-1.5'
+              >
+                🚩 Report Listing
+              </button>
+            </div>
           </article>
 
           <aside>
@@ -151,6 +184,54 @@ const ApplyJob = () => {
             </div>
           </aside>
         </div>
+
+        {/* Reported Jobs Modal */}
+        {showReportModal && (
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-950/60 p-4 backdrop-blur-sm'>
+            <div className='relative w-full max-w-md overflow-hidden rounded-[2rem] border border-gray-200 bg-white p-7 shadow-2xl'>
+              <button
+                type='button'
+                onClick={() => setShowReportModal(false)}
+                className='absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors cursor-pointer'
+              >
+                <X size={16} />
+              </button>
+              
+              <div className='mb-6'>
+                <span className='inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 font-bold mb-3'>🚩</span>
+                <h3 className='text-lg font-extrabold text-gray-950'>Report Job Listing</h3>
+                <p className='text-xs text-gray-500 mt-1'>Help us keep the InsiderJobs workspace clean and verified.</p>
+              </div>
+
+              <div className='space-y-2.5 mb-6'>
+                {['Ghost Job (Recruiter inactive / No response)', 'Fake / Scam Posting', 'Inaccurate Location / CTC Details', 'Job already filled / Closed'].map((reason) => (
+                  <button
+                    key={reason}
+                    type='button'
+                    onClick={() => setReportReason(reason)}
+                    className={`w-full text-left p-3.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-between cursor-pointer ${
+                      reportReason === reason
+                        ? 'border-rose-500 bg-rose-50/50 text-rose-700'
+                        : 'border-gray-200 hover:bg-gray-50 text-gray-700'
+                    }`}
+                  >
+                    <span>{reason}</span>
+                    {reportReason === reason && <span className='h-2 w-2 rounded-full bg-rose-500'></span>}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type='button'
+                onClick={submitReport}
+                disabled={submittingReport || !reportReason}
+                className='w-full rounded-xl bg-rose-600 py-3.5 text-xs font-bold text-white shadow-md hover:bg-rose-700 active:scale-95 disabled:opacity-50 transition-all cursor-pointer'
+              >
+                {submittingReport ? 'Submitting Report...' : 'Submit Report'}
+              </button>
+            </div>
+          </div>
+        )}
       </main>
       <Footer />
     </div>

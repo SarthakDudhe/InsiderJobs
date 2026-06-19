@@ -1,5 +1,5 @@
 import express from "express";
-import { getJobById, getJobs } from "../controllers/jobController.js";
+import { getJobById, getJobs, reportJob } from "../controllers/jobController.js";
 
 
 const router = express.Router()
@@ -12,8 +12,7 @@ router.get("/",getJobs)
 
 router.get("/:id",getJobById)
 
-
-
-
+//Route to report a job posting
+router.post("/:id/report",reportJob)
 
 export default router;

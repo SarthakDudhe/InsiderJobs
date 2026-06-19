@@ -123,3 +123,25 @@ export const getJobById = async (req,res) => {
     }
    
 }
+
+// Report a Job
+export const reportJob = async (req, res) => {
+    const { id } = req.params;
+    const { reason, userId } = req.body;
+    try {
+        const job = await Job.findById(id);
+        if (!job) {
+            return res.json({ success: false, message: "Job not found" });
+        }
+        
+        job.reports.push({
+            userId: userId || 'Anonymous',
+            reason: reason || 'Unspecified Reason'
+        });
+        
+        await job.save();
+        res.json({ success: true, message: "Job reported successfully. Our admin team will review it." });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
