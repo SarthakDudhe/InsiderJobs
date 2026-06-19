@@ -5,6 +5,7 @@ import generateToken from "../utils/generateToken.js";
 import Job from "../models/Job.js";
 import JobApplication from '../models/JobApplication.js'
 import fs from 'fs';
+import mongoose from "mongoose";
 //Register a new Company
 
 
@@ -138,23 +139,35 @@ export const getCompanyJobApplication = async (req,res) => {
 //Get Company Posted Jobs
 
 
-export const getCompanyPostedJobs = async (req,res) => {
+export const getCompanyPostedJobs = async (req, res) => {
     try {
-        
-const companyId = req.company._id
-const jobs = await Job.find({companyId})
+        const companyId = req.company._id
+        const jobs = await Job.find({ companyId })
 
-// Adding No. of Applicants info in data
+        // Aggregate applicant counts in a single query to solve N+1 database bottleneck
+        const applicantCounts = await JobApplication.aggregate([
+            { $match: { companyId: new mongoose.Types.ObjectId(companyId) } },
+            { $group: { _id: "$jobId", count: { $sum: 1 } } }
+        ])
 
-const jobsData = await Promise.all(jobs.map(async (job) => {
-    const applicants = await JobApplication.find({jobId:job._id});
-    return {...job.toObject(),applicants:applicants.length}
-}))
+        // Map array results to a lookup map for instant access
+        const countMap = {}
+        applicantCounts.forEach(item => {
+            if (item._id) {
+                countMap[item._id.toString()] = item.count
+            }
+        })
 
-res.json({success:true,jobsData})
+        // Build final job listings data mapping applicant count
+        const jobsData = jobs.map(job => ({
+            ...job.toObject(),
+            applicants: countMap[job._id.toString()] || 0
+        }))
+
+        res.json({ success: true, jobsData })
 
     } catch (error) {
-         res.json({success:false,message:error.message})
+        res.json({ success: false, message: error.message })
     }
 }
 
