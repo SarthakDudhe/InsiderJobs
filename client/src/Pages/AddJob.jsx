@@ -55,9 +55,9 @@ const AddJob = () => {
       </div>
 
       <form onSubmit={onSubmitHandler} className='premium-panel overflow-hidden rounded-[1.5rem]'>
-        <div className='border-b border-gray-200 bg-gray-950 px-6 py-7 text-white sm:px-8'>
+        <div className='border-b border-slate-200 bg-gradient-to-br from-white via-slate-50 to-blue-50 px-6 py-7 text-slate-950 sm:px-8'>
           <h2 className='text-2xl font-extrabold'>Role details</h2>
-          <p className='mt-1 text-sm text-gray-300'>Keep the title clear and the description outcome-focused.</p>
+          <p className='mt-1 text-sm text-slate-600'>Keep the title clear and the description outcome-focused.</p>
         </div>
 
         <div className='space-y-8 p-6 sm:p-8'>

@@ -12,7 +12,7 @@ const Navbar = () => {
   const { setShowRecruiterLogin } = useContext(AppContext)
 
   return (
-    <div className='sticky top-0 z-40 border-b border-gray-200/80 bg-white/85 py-3 shadow-[0_10px_30px_rgba(17,24,39,0.04)] backdrop-blur-xl'>
+    <div className='sticky top-0 z-40 border-b border-slate-200/80 bg-white/82 py-3 shadow-[0_12px_40px_rgba(15,23,42,0.06)] backdrop-blur-xl'>
       <div className='ij-container flex items-center justify-between'>
         <img
           onClick={() => navigate('/')}
@@ -22,32 +22,32 @@ const Navbar = () => {
         />
 
         {user ? (
-          <div className='flex items-center gap-2 text-xs font-semibold text-gray-700 sm:gap-3 sm:text-sm'>
+          <div className='flex items-center gap-2 text-xs font-semibold text-slate-600 sm:gap-3 sm:text-sm'>
             <Link className='inline-flex items-center gap-1.5 rounded-full px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-700' to='/ai-recommender'>
               <BrainCircuit size={16} />
               <span className='max-sm:hidden'>AI Recommender</span>
               <span className='sm:hidden'>AI</span>
             </Link>
-            <Link className='text-nowrap rounded-full px-3 py-2 transition-colors hover:bg-gray-100 hover:text-gray-950' to='/opportunities'>
+            <Link className='text-nowrap rounded-full px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950' to='/opportunities'>
               Opportunities
             </Link>
-            <Link className='text-nowrap rounded-full px-3 py-2 transition-colors hover:bg-gray-100 hover:text-gray-950' to='/applications'>
+            <Link className='text-nowrap rounded-full px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950' to='/applications'>
               Applied <span className='max-sm:hidden'>Jobs</span>
             </Link>
-            <p className='pl-2 text-gray-500 max-md:hidden'>Hi, {user.firstName}</p>
+            <p className='pl-2 text-slate-500 max-md:hidden'>Hi, {user.firstName}</p>
             <UserButton />
           </div>
         ) : (
           <div className='flex items-center gap-3 sm:gap-4'>
             <button
               onClick={() => setShowRecruiterLogin(true)}
-              className='inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-950 sm:text-sm'
+              className='inline-flex cursor-pointer items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950 sm:text-sm'
             >
               <BriefcaseBusiness size={16} />
               <span className='max-sm:hidden'>Recruiter</span>
             </button>
-            <button onClick={() => openSignIn()} className='premium-button cursor-pointer px-5 py-2.5 text-xs sm:px-7 sm:text-sm'>
-              Login
+            <button onClick={() => openSignIn()} className='magic-button cursor-pointer px-5 py-2.5 text-xs sm:px-7 sm:text-sm'>
+              <span className='button-inner'>Login</span>
             </button>
           </div>
         )}

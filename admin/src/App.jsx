@@ -201,42 +201,42 @@ const App = () => {
   // Login view if unauthenticated
   if (!adminToken) {
     return (
-      <div className='relative flex min-h-screen items-center justify-center bg-gray-950 p-4 font-sans text-white overflow-hidden w-full'>
-        <ToastContainer theme="dark" />
-        <div className='absolute left-1/4 top-1/4 h-[350px] w-[350px] rounded-full bg-blue-600/10 blur-3xl' />
-        <div className='absolute right-1/4 bottom-1/4 h-[350px] w-[350px] rounded-full bg-purple-600/10 blur-3xl' />
+      <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f5f7fb] p-4 font-sans text-slate-950 w-full'>
+        <ToastContainer theme="light" />
+        <div className='absolute left-1/4 top-1/4 h-[350px] w-[350px] rounded-full bg-blue-300/20 blur-3xl' />
+        <div className='absolute right-1/4 bottom-1/4 h-[350px] w-[350px] rounded-full bg-cyan-300/20 blur-3xl' />
 
-        <div className='relative w-full max-w-md rounded-3xl border border-white/5 bg-white/5 p-8 shadow-2xl backdrop-blur-xl'>
+        <div className='relative w-full max-w-md rounded-3xl border border-slate-200 bg-white/88 p-8 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl'>
           <div className='mb-8 text-center'>
             <div className='mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.4)]'>
-              <ShieldAlert size={28} />
+              <ShieldAlert size={28} className='text-white' />
             </div>
             <h1 className='text-2xl font-extrabold tracking-tight'>Control Console</h1>
-            <p className='text-xs text-gray-400 mt-2'>Sign in with administrator credentials.</p>
+            <p className='text-xs text-slate-500 mt-2'>Sign in with administrator credentials.</p>
           </div>
 
           <form onSubmit={handleLogin} className='space-y-4'>
-            <div className='flex items-center gap-3 rounded-2xl border border-white/5 bg-white/5 px-4 py-3.5 focus-within:border-blue-500/50 transition-all'>
-              <Mail size={18} className='text-gray-400' />
+            <div className='flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 focus-within:border-blue-500/50 transition-all'>
+              <Mail size={18} className='text-slate-400' />
               <input
                 type='email'
                 placeholder='Admin Email'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className='w-full bg-transparent text-sm font-semibold outline-none placeholder:text-gray-500 text-white'
+                className='w-full bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400 text-slate-950'
               />
             </div>
 
-            <div className='flex items-center gap-3 rounded-2xl border border-white/5 bg-white/5 px-4 py-3.5 focus-within:border-blue-500/50 transition-all'>
-              <Lock size={18} className='text-gray-400' />
+            <div className='flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 focus-within:border-blue-500/50 transition-all'>
+              <Lock size={18} className='text-slate-400' />
               <input
                 type='password'
                 placeholder='Password'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className='w-full bg-transparent text-sm font-semibold outline-none placeholder:text-gray-500 text-white'
+                className='w-full bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400 text-slate-950'
               />
             </div>
 
@@ -254,22 +254,22 @@ const App = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gray-950 text-white font-sans selection:bg-blue-600 selection:text-white w-full'>
-      <ToastContainer theme="dark" />
+    <div className='min-h-screen bg-[#f5f7fb] text-slate-950 font-sans selection:bg-blue-600 selection:text-white w-full'>
+      <ToastContainer theme="light" />
       
       {/* Upper Navigation Bar */}
-      <header className='sticky top-0 z-40 border-b border-white/5 bg-gray-950/80 backdrop-blur-xl'>
+      <header className='sticky top-0 z-40 border-b border-slate-200 bg-white/86 shadow-[0_12px_40px_rgba(15,23,42,0.06)] backdrop-blur-xl'>
         <div className='flex items-center justify-between px-6 py-4 max-w-7xl mx-auto'>
           <div className='flex items-center gap-4'>
             <img className='w-32 opacity-95' src={logo} alt='InsiderJobs' />
-            <span className='rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-red-400'>
+            <span className='rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-red-600'>
               HQ Admin Console
             </span>
           </div>
 
           <button
             onClick={handleLogout}
-            className='flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold hover:bg-white/10 transition-colors'
+            className='flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors'
           >
             <LogOut size={14} /> Logout
           </button>
@@ -282,10 +282,10 @@ const App = () => {
         <section className='grid gap-6 lg:grid-cols-3 mb-8'>
           
           {/* Recharts Activity Graph */}
-          <div className='lg:col-span-2 rounded-3xl border border-white/5 bg-white/5 p-6 backdrop-blur-md flex flex-col justify-between min-h-[300px]'>
+          <div className='lg:col-span-2 rounded-3xl border border-slate-200 bg-white/88 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-md flex flex-col justify-between min-h-[300px]'>
             <div>
-              <h3 className='text-sm font-black tracking-tight text-gray-200'>7-Day Activity Trends</h3>
-              <p className='text-[10px] text-gray-400 mt-0.5'>Monitor daily jobs posted vs. candidate applications submitted.</p>
+              <h3 className='text-sm font-black tracking-tight text-slate-950'>7-Day Activity Trends</h3>
+              <p className='text-[10px] text-slate-500 mt-0.5'>Monitor daily jobs posted vs. candidate applications submitted.</p>
             </div>
             
             <div className='h-[200px] w-full mt-4'>
@@ -301,10 +301,10 @@ const App = () => {
                       <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} />
                   <YAxis stroke="#6b7280" fontSize={10} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#111827', borderColor: '#1f2937', borderRadius: '12px', fontSize: '11px', color: '#fff' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', fontSize: '11px', color: '#0f172a', boxShadow: '0 18px 40px rgba(15,23,42,0.12)' }} />
                   <Area type="monotone" dataKey="jobs" name="Jobs Posted" stroke="#10b981" fillOpacity={1} fill="url(#colorJobs)" strokeWidth={2.5} />
                   <Area type="monotone" dataKey="applications" name="Applications" stroke="#3b82f6" fillOpacity={1} fill="url(#colorApps)" strokeWidth={2.5} />
                 </AreaChart>
@@ -321,11 +321,11 @@ const App = () => {
         </section>
 
         {/* Tab Selection Row */}
-        <div className='flex border-b border-white/5 mb-6 gap-6'>
+        <div className='flex border-b border-slate-200 mb-6 gap-6'>
           <button
             onClick={() => setActiveTab('workspaces')}
             className={`pb-3 text-sm font-bold transition-all relative cursor-pointer ${
-              activeTab === 'workspaces' ? 'text-blue-500' : 'text-gray-400 hover:text-white'
+              activeTab === 'workspaces' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-950'
             }`}
           >
             Workspaces
@@ -334,7 +334,7 @@ const App = () => {
           <button
             onClick={() => setActiveTab('reported-jobs')}
             className={`pb-3 text-sm font-bold transition-all relative cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'reported-jobs' ? 'text-rose-500' : 'text-gray-400 hover:text-white'
+              activeTab === 'reported-jobs' ? 'text-rose-600' : 'text-slate-500 hover:text-slate-950'
             }`}
           >
             Reported Jobs
@@ -347,47 +347,47 @@ const App = () => {
 
         {/* Workspaces Moderation Tab Content */}
         {activeTab === 'workspaces' && (
-          <section className='rounded-3xl border border-white/5 bg-white/5 p-6 backdrop-blur-xl'>
+          <section className='rounded-3xl border border-slate-200 bg-white/88 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl'>
             <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6'>
               <div>
                 <h2 className='text-lg font-black tracking-tight'>Workspaces Moderation</h2>
-                <p className='text-xs text-gray-400 mt-1'>Review recruiter profiles and toggle domain verification state.</p>
+                <p className='text-xs text-slate-500 mt-1'>Review recruiter profiles and toggle domain verification state.</p>
               </div>
               
               {/* Search Box */}
-              <div className='flex items-center gap-2.5 rounded-xl border border-white/5 bg-white/5 px-3 py-2 w-full sm:max-w-xs focus-within:border-blue-500/30 transition-all'>
-                <Search size={16} className='text-gray-400' />
+              <div className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 w-full sm:max-w-xs focus-within:border-blue-500/30 transition-all'>
+                <Search size={16} className='text-slate-400' />
                 <input
                   type='text'
                   placeholder='Search by workspace...'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className='bg-transparent text-xs font-semibold outline-none text-white w-full placeholder:text-gray-500'
+                  className='bg-transparent text-xs font-semibold outline-none text-slate-950 w-full placeholder:text-slate-400'
                 />
               </div>
             </div>
 
-            <div className='overflow-x-auto rounded-2xl border border-white/5 bg-white/5'>
+            <div className='overflow-x-auto rounded-2xl border border-slate-200 bg-white'>
               <table className='w-full text-left border-collapse text-xs'>
                 <thead>
-                  <tr className='border-b border-white/5 bg-white/[0.02] font-extrabold text-gray-400'>
+                  <tr className='border-b border-slate-200 bg-slate-50 font-extrabold text-slate-500'>
                     <th className='p-4'>Company</th>
                     <th className='p-4'>Email Domain</th>
                     <th className='p-4'>Verification Status</th>
                     <th className='p-4 text-right'>Action</th>
                   </tr>
                 </thead>
-                <tbody className='divide-y divide-white/5'>
+                <tbody className='divide-y divide-slate-100'>
                   {filteredCompanies.length > 0 ? (
                     filteredCompanies.map((company) => (
-                      <tr key={company._id} className='hover:bg-white/[0.01] transition-colors'>
+                      <tr key={company._id} className='hover:bg-blue-50/40 transition-colors'>
                         <td className='p-4'>
                           <div className='flex items-center gap-3'>
                             <img src={company.image} alt={company.name} className='h-8 w-8 rounded-lg object-contain bg-white p-1' />
-                            <span className='font-bold text-gray-200'>{company.name}</span>
+                            <span className='font-bold text-slate-950'>{company.name}</span>
                           </div>
                         </td>
-                        <td className='p-4 font-semibold text-gray-400'>
+                        <td className='p-4 font-semibold text-slate-500'>
                           {company.email}
                         </td>
                         <td className='p-4'>
@@ -418,7 +418,7 @@ const App = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className='p-8 text-center text-gray-500 font-semibold'>
+                      <td colSpan={4} className='p-8 text-center text-slate-500 font-semibold'>
                         No workspace profiles match your search criteria.
                       </td>
                     </tr>

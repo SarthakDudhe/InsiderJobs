@@ -78,41 +78,41 @@ const RecruiterLogin = () => {
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-950/60 p-4 backdrop-blur-md'>
-      <div className='relative grid w-full max-w-4xl overflow-hidden rounded-[2rem] border border-white/10 bg-white shadow-2xl md:grid-cols-[0.9fr_1.1fr]'>
+      <div className='relative grid w-full max-w-4xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.22)] md:grid-cols-[0.9fr_1.1fr]'>
         
         {/* Left Side Pane - Recruiter Benefits & Stats */}
-        <div className='relative hidden bg-gray-950 p-8 text-white md:flex md:flex-col md:justify-between'>
-          <div className='absolute right-0 top-0 h-48 w-48 rounded-full bg-blue-500/20 blur-3xl' />
+        <div className='relative hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 p-8 text-slate-950 md:flex md:flex-col md:justify-between'>
+          <div className='absolute right-0 top-0 h-48 w-48 rounded-full bg-blue-400/20 blur-3xl' />
           
           <div className='relative z-10'>
             <div className='mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.4)]'>
               <Building2 size={24} />
             </div>
             <h2 className='text-3xl font-extrabold leading-tight'>Hire with a sharper command center.</h2>
-            <p className='mt-3 text-sm leading-relaxed text-gray-300'>
+            <p className='mt-3 text-sm leading-relaxed text-slate-600'>
               Post roles, review resumes, and move applicants through a clean professional pipeline.
             </p>
             
             {/* Features Checklists */}
             <div className='space-y-3.5 mt-8'>
-              <div className='flex items-center gap-3 rounded-xl bg-white/5 p-3 border border-white/5 hover:bg-white/10 transition-colors'>
+              <div className='flex items-center gap-3 rounded-xl bg-white/80 p-3 border border-slate-200 hover:bg-white transition-colors'>
                 <span className='flex h-5 w-5 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400 text-xs font-extrabold'>✓</span>
-                <p className='text-xs text-gray-200 font-semibold'>Real-time Hiring Activity Tracker</p>
+                <p className='text-xs text-slate-700 font-semibold'>Real-time Hiring Activity Tracker</p>
               </div>
-              <div className='flex items-center gap-3 rounded-xl bg-white/5 p-3 border border-white/5 hover:bg-white/10 transition-colors'>
+              <div className='flex items-center gap-3 rounded-xl bg-white/80 p-3 border border-slate-200 hover:bg-white transition-colors'>
                 <span className='flex h-5 w-5 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 text-xs font-extrabold'>✓</span>
-                <p className='text-xs text-gray-200 font-semibold'>ATS Resume Parser Integration</p>
+                <p className='text-xs text-slate-700 font-semibold'>ATS Resume Parser Integration</p>
               </div>
-              <div className='flex items-center gap-3 rounded-xl bg-white/5 p-3 border border-white/5 hover:bg-white/10 transition-colors'>
+              <div className='flex items-center gap-3 rounded-xl bg-white/80 p-3 border border-slate-200 hover:bg-white transition-colors'>
                 <span className='flex h-5 w-5 items-center justify-center rounded-lg bg-purple-500/20 text-purple-400 text-xs font-extrabold'>✓</span>
-                <p className='text-xs text-gray-200 font-semibold'>Instant Ghost-Job Prevention Shield</p>
+                <p className='text-xs text-slate-700 font-semibold'>Instant Ghost-Job Prevention Shield</p>
               </div>
             </div>
           </div>
 
-          <div className='relative z-10 rounded-2xl border border-white/10 bg-white/5 p-4 mt-6'>
-            <p className='text-xs font-bold uppercase tracking-[0.16em] text-blue-300'>Enterprise-grade Suite</p>
-            <p className='mt-2 text-xs text-gray-400 leading-relaxed'>
+          <div className='relative z-10 rounded-2xl border border-slate-200 bg-white/82 p-4 mt-6'>
+            <p className='text-xs font-bold uppercase tracking-[0.16em] text-blue-600'>Enterprise-grade Suite</p>
+            <p className='mt-2 text-xs text-slate-600 leading-relaxed'>
               Structured listings, verified company profiles, and faster candidate decisions all in one place.
             </p>
           </div>

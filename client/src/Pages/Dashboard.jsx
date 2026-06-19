@@ -42,8 +42,8 @@ const Dashboard = () => {
   }, [companyData])
 
   return (
-    <div className='min-h-screen bg-gray-100'>
-      <header className='sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur-xl'>
+    <div className='min-h-screen ij-shell'>
+      <header className='sticky top-0 z-30 border-b border-slate-200/80 bg-white/88 shadow-[0_12px_40px_rgba(15,23,42,0.05)] backdrop-blur-xl'>
         <div className='flex items-center justify-between px-5 py-4'>
           <div className='flex items-center gap-4'>
             <img onClick={() => navigate('/')} className='w-32 cursor-pointer sm:w-40' src={assets.logo} alt='InsiderJobs' />
@@ -71,16 +71,16 @@ const Dashboard = () => {
       </header>
 
       <div className='flex items-start'>
-        <aside className='sticky top-[73px] hidden min-h-[calc(100vh-73px)] w-72 border-r border-gray-200 bg-gray-950 p-4 text-white md:block'>
-          <div className='mb-6 rounded-2xl border border-white/10 bg-white/5 p-4'>
-            <BriefcaseBusiness className='mb-3 text-blue-300' size={22} />
+        <aside className='sticky top-[73px] hidden min-h-[calc(100vh-73px)] w-72 border-r border-slate-200 bg-white/78 p-4 text-slate-950 shadow-[12px_0_40px_rgba(15,23,42,0.04)] backdrop-blur-xl md:block'>
+          <div className='mb-6 rounded-2xl border border-blue-100 bg-blue-50/70 p-4'>
+            <BriefcaseBusiness className='mb-3 text-blue-600' size={22} />
             <p className='text-sm font-extrabold'>Executive hiring tools</p>
-            <p className='mt-1 text-xs leading-relaxed text-gray-400'>Post roles, review applicants, and keep pipeline decisions clean.</p>
+            <p className='mt-1 text-xs leading-relaxed text-slate-600'>Post roles, review applicants, and keep pipeline decisions clean.</p>
           </div>
           <DashboardNav />
         </aside>
 
-        <aside className='sticky top-[73px] min-h-[calc(100vh-73px)] border-r border-gray-200 bg-gray-950 p-2 text-white md:hidden'>
+        <aside className='sticky top-[73px] min-h-[calc(100vh-73px)] border-r border-slate-200 bg-white/82 p-2 text-slate-950 md:hidden'>
           <DashboardNav compact />
         </aside>
 
@@ -107,7 +107,9 @@ const Dashboard = () => {
               </div>
             </div>
           )}
-          <Outlet />
+          <div className='rounded-[1.75rem] border border-slate-200 bg-white/60 p-3 shadow-[0_18px_55px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:p-5'>
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
@@ -126,7 +128,7 @@ const DashboardNav = ({ compact = false }) => {
       {links.map(link => (
         <NavLink
           key={link.to}
-          className={({ isActive }) => `flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold transition-all ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-950/20' : 'text-gray-300 hover:bg-white/10 hover:text-white'} ${compact ? 'justify-center' : ''}`}
+          className={({ isActive }) => `flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-bold transition-all ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'} ${compact ? 'justify-center' : ''}`}
           to={link.to}
         >
           {React.cloneElement(link.icon, { size: 19 })}
