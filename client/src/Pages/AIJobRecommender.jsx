@@ -6,10 +6,12 @@ import { useAuth, useUser } from '@clerk/clerk-react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { BrainCircuit, Briefcase, RefreshCw, Sparkles } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 const AIJobRecommender = () => {
   const { getToken } = useAuth()
   const { backendUrl, userData } = useContext(AppContext)
+  const navigate = useNavigate()
   useUser()
 
   const [loading, setLoading] = useState(false)
@@ -72,7 +74,7 @@ const AIJobRecommender = () => {
         ) : error ? (
           <div className='mx-auto max-w-md rounded-[1.5rem] border border-red-400/20 bg-red-500/10 p-8 text-center'>
             <p className='mb-6 text-red-100'>{error}</p>
-            <button onClick={() => window.location.href = '/applications'} className='premium-button px-6 py-3'>
+            <button onClick={() => navigate('/applications')} className='premium-button px-6 py-3'>
               Go to Applications
             </button>
           </div>

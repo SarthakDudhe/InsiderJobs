@@ -24,13 +24,23 @@ export const getAIJobRecommendations = async (req, res) => {
         }
 
         // 2. Download resume and extract text
-        const response = await axios.get(user.resume, { responseType: 'arraybuffer' });
+        let resumeText = "";
+        try {
+            const response = await axios.get(user.resume, { responseType: 'arraybuffer' });
 
-        // Correct usage of pdf-parse (v2)
-        const parser = new PDFParse({ data: response.data });
-        const data = await parser.getText();
-        const resumeText = data.text;
-        await parser.destroy();
+            // Correct usage of pdf-parse (v2)
+            const parser = new PDFParse({ data: response.data });
+            const data = await parser.getText();
+            resumeText = data.text?.trim() || "";
+            await parser.destroy();
+        } catch (pdfError) {
+            console.error("[AI Recommender] PDF Parsing error:", pdfError.message);
+            return res.json({ success: false, message: "Failed to extract text from your resume. Please make sure it is a valid text-based PDF." });
+        }
+
+        if (!resumeText) {
+            return res.json({ success: false, message: "Your resume appears to be empty or an image-only file. Please upload a text-based PDF." });
+        }
 
         // 3. Extract keywords using Groq
         const prompt = `Based on the following resume text, identify the top 3-4 most appropriate JOB TITLES (e.g., "Full Stack Developer", "Backend Engineer") AND the top 3-4 coding skills (e.g., "React", "Node.js").
@@ -95,11 +105,14 @@ export const getAIJobRecommendations = async (req, res) => {
             }
         };
 
-        // Search for the top keywords
+        // Search for the top keywords concurrently
         let allJobs = [];
-        for (const role of roles.slice(0, 2)) {
-            const jobs = await searchJobs(role);
-            allJobs = allJobs.concat(jobs);
+        try {
+            const searchPromises = roles.slice(0, 2).map(role => searchJobs(role));
+            const searchResults = await Promise.all(searchPromises);
+            allJobs = searchResults.flat();
+        } catch (searchError) {
+            console.error("[AI Recommender] Concurrent search error:", searchError.message);
         }
 
         // Normalize and Deduplicate
