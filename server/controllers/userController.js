@@ -3,6 +3,8 @@ import JobApplication from "../models/JobApplication.js"
 import User from "../models/User.js"
 import { v2 as cloudinary } from "cloudinary"
 import { clerkClient } from "@clerk/express"
+import fs from 'fs'
+import { PDFParse } from "pdf-parse"
 
 export const getUserData = async (req, res) => {
     const userId = req.auth.userId
@@ -127,21 +129,39 @@ export const getUserJobApplication = async (req, res) => {
 export const updateUserResume = async (req, res) => {
     try {
         const userId = req.auth.userId
-
         const resumeFile = req.file
 
         const userData = await User.findById(userId)
+        if (!userData) {
+            return res.json({ success: false, message: "User not found" })
+        }
 
         if (resumeFile) {
             const resumeUpload = await cloudinary.uploader.upload(resumeFile.path)
             userData.resume = resumeUpload.secure_url
+
+            // Parse PDF text on upload and cache it
+            try {
+                const parser = new PDFParse({ data: fs.readFileSync(resumeFile.path) });
+                const data = await parser.getText();
+                userData.resumeText = data.text?.trim() || "";
+                await parser.destroy();
+            } catch (pdfError) {
+                console.error("[User Controller] PDF parsing failed on upload:", pdfError.message);
+                userData.resumeText = "";
+            }
         }
         await userData.save()
 
         return res.json({ success: true, message: "Resume Updated " })
 
-
     } catch (error) {
         res.json({ success: false, message: error.message })
+    } finally {
+        if (req.file?.path) {
+            fs.unlink(req.file.path, (err) => {
+                if (err) console.error("[User Controller] Temp file cleanup error:", err.message);
+            });
+        }
     }
 }

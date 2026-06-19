@@ -23,19 +23,28 @@ export const getAIJobRecommendations = async (req, res) => {
             return res.json({ success: false, message: "Please upload your resume first." });
         }
 
-        // 2. Download resume and extract text
-        let resumeText = "";
-        try {
-            const response = await axios.get(user.resume, { responseType: 'arraybuffer' });
+        // 2. Retrieve cached resume text or parse as fallback
+        let resumeText = user.resumeText;
+        if (!resumeText) {
+            console.log(`[AI Recommender] Resume text cache miss for user ${userId}. Downloading and parsing...`);
+            try {
+                const response = await axios.get(user.resume, { responseType: 'arraybuffer' });
 
-            // Correct usage of pdf-parse (v2)
-            const parser = new PDFParse({ data: response.data });
-            const data = await parser.getText();
-            resumeText = data.text?.trim() || "";
-            await parser.destroy();
-        } catch (pdfError) {
-            console.error("[AI Recommender] PDF Parsing error:", pdfError.message);
-            return res.json({ success: false, message: "Failed to extract text from your resume. Please make sure it is a valid text-based PDF." });
+                // Correct usage of pdf-parse (v2)
+                const parser = new PDFParse({ data: response.data });
+                const data = await parser.getText();
+                resumeText = data.text?.trim() || "";
+                await parser.destroy();
+
+                if (resumeText) {
+                    user.resumeText = resumeText;
+                    await user.save();
+                    console.log(`[AI Recommender] Successfully parsed and cached resume text for user ${userId}.`);
+                }
+            } catch (pdfError) {
+                console.error("[AI Recommender] Fallback PDF Parsing error:", pdfError.message);
+                return res.json({ success: false, message: "Failed to extract text from your resume. Please make sure it is a valid text-based PDF." });
+            }
         }
 
         if (!resumeText) {

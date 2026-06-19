@@ -4,45 +4,52 @@ import {v2 as cloudinary} from 'cloudinary'
 import generateToken from "../utils/generateToken.js";
 import Job from "../models/Job.js";
 import JobApplication from '../models/JobApplication.js'
+import fs from 'fs';
 //Register a new Company
 
 
 
 
-export const registerCompany =async (req,res)=>{
-  const {email,name,password} = req.body;
+export const registerCompany = async (req, res) => {
+  const { email, name, password } = req.body;
   const imageFile = req.file;
   if (!name || !email || !password || !imageFile) {
-    return res.json({success:false,message:"Missing Details"})
+    return res.json({ success: false, message: "Missing Details" })
   }
   try {
-    const companyExists = await Company.findOne({email})
+    const companyExists = await Company.findOne({ email })
     if (companyExists) {
-        return res.json({success:false,message:"Company Already Registered !"})
+      return res.json({ success: false, message: "Company Already Registered !" })
     }
    
     const salt = await bcrypt.genSalt(10);
-    const hashpassword = await bcrypt.hash(password,salt)
+    const hashpassword = await bcrypt.hash(password, salt)
 
-const imageUpload = await cloudinary.uploader.upload(imageFile.path)
+    const imageUpload = await cloudinary.uploader.upload(imageFile.path)
 
-const company = await Company.create({
-    name,email,password:hashpassword,
-    image:imageUpload.secure_url
-})
+    const company = await Company.create({
+      name, email, password: hashpassword,
+      image: imageUpload.secure_url
+    })
 
-res.json({success:true,company:{
-    _id:company._id,
-    name:company.name,
-    email:company.email,
-    image:company.image
-},
-token:generateToken(company._id)
-})
-
+    res.json({
+      success: true, company: {
+        _id: company._id,
+        name: company.name,
+        email: company.email,
+        image: company.image
+      },
+      token: generateToken(company._id)
+    })
 
   } catch (error) {
-    res.json({success:false,message:error.message})
+    res.json({ success: false, message: error.message })
+  } finally {
+    if (req.file?.path) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error("[Company Controller] Temp file cleanup error:", err.message);
+      });
+    }
   }
 }
 
