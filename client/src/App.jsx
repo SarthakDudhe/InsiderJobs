@@ -6,6 +6,7 @@ import Application from './Pages/Application'
 import AIJobRecommender from './Pages/AIJobRecommender'
 import Opportunities from './Pages/Opportunities'
 import RecruiterLogin from './components/RecruiterLogin'
+import UserLogin from './components/UserLogin'
 import { AppContext } from './context/AppContext'
 import Dashboard from './Pages/Dashboard'
 import AddJob from './Pages/AddJob'
@@ -15,11 +16,12 @@ import 'quill/dist/quill.snow.css'
 import { ToastContainer } from 'react-toastify';
 const App = () => {
 
-  const { showRecruiterLogin, companyToken } = useContext(AppContext)
+  const { showRecruiterLogin, showUserLogin, companyToken } = useContext(AppContext)
   return (
     <div>
       <ToastContainer />
       {showRecruiterLogin && <RecruiterLogin />}
+      {showUserLogin && <UserLogin />}
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/apply-job/:id' element={<ApplyJob />} />

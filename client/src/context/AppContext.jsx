@@ -1,21 +1,12 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useAuth, useUser } from "@clerk/clerk-react";
+
 export const AppContext = createContext()
-
-
-
 
 export const AppcontextProvider = (props) => {
 
-
     const backendUrl = import.meta.env.VITE_BACKEND_URL
-
-    const { user } = useUser()
-    const { getToken } = useAuth()
-
-
 
     const [searchFilter, setSearchFilter] = useState({
         title: "",
@@ -23,20 +14,19 @@ export const AppcontextProvider = (props) => {
     })
 
     const [isSearched, setIsSearched] = useState(false)
-
     const [jobs, setjobs] = useState([])
-
     const [showRecruiterLogin, setShowRecruiterLogin] = useState(false)
+    const [showUserLogin, setShowUserLogin] = useState(false)
 
     const [companyToken, setCompanyToken] = useState(null)
     const [companyData, setcompanyData] = useState(null)
+    
+    const [userToken, setUserToken] = useState(localStorage.getItem('userToken') || null)
     const [userData, setUserData] = useState(null)
     const [userApplications, setUserApplications] = useState([])
     const [totalJobs, setTotalJobs] = useState(0)
 
-
     //  Function to fetch job data
-
     const fetchJobs = async (page = 1, limit = 6, title = '', location = '', categories = '', locations = '') => {
         try {
             const params = new URLSearchParams()
@@ -59,11 +49,9 @@ export const AppcontextProvider = (props) => {
         } catch (error) {
             toast.error(error.message)
         }
-
     }
 
     //Function to fetch Company Data
-
     const fetchCompanyData = async () => {
         try {
             const { data } = await axios.get(backendUrl + "/api/company/company", { headers: { token: companyToken } })
@@ -78,57 +66,50 @@ export const AppcontextProvider = (props) => {
                     localStorage.removeItem('companyToken')
                 }
             }
-
-
         } catch (error) {
             toast.error(error.message)
         }
     }
 
-
     //Function to fetch User Data
-
     const fetchUserData = async () => {
         try {
-
-            const token = await getToken()
-
-            const { data } = await axios.get(backendUrl + '/api/users/user', { headers: { Authorization: `Bearer ${token}` } })
-
+            const { data } = await axios.get(backendUrl + '/api/users/user', { headers: { Authorization: `Bearer ${userToken}` } })
             if (data.success) {
                 setUserData(data.user)
             }
             else {
                 toast.error(data.message)
-                if (data.message === 'jwt expired' || data.message === "clerk_error") { // Adjust based on Clerk actual error string
+                if (data.message === 'jwt expired' || data.message === "Session Expired, Login Again") {
                     setUserData(null)
+                    setUserToken(null)
+                    localStorage.removeItem('userToken')
                 }
             }
-
         } catch (error) {
             toast.error(error.message)
         }
     }
+
     //Fetch user applied applications
     const fetchUserApplications = async () => {
         try {
-            const token = await getToken();
-
-            const { data } = await axios.get(backendUrl + '/api/users/applications', { headers: { Authorization: `Bearer ${token}` } })
+            const { data } = await axios.get(backendUrl + '/api/users/applications', { headers: { Authorization: `Bearer ${userToken}` } })
             if (data.success) {
                 setUserApplications(data.application)
             } else {
                 toast.error(data.message)
-                if (data.message === 'jwt expired' || data.message === "clerk_error") {
+                if (data.message === 'jwt expired' || data.message === "Session Expired, Login Again") {
                     setUserApplications([])
                     setUserData(null)
+                    setUserToken(null)
+                    localStorage.removeItem('userToken')
                 }
             }
         } catch (error) {
             toast.error(error.message)
         }
     }
-
 
     useEffect(() => {
         fetchJobs()
@@ -137,7 +118,6 @@ export const AppcontextProvider = (props) => {
         if (storedCompanyToken) {
             setCompanyToken(storedCompanyToken)
         }
-
     }, [])
 
     useEffect(() => {
@@ -146,17 +126,18 @@ export const AppcontextProvider = (props) => {
         }
     }, [companyToken])
 
-
     useEffect(() => {
-        if (user) {
+        if (userToken) {
             fetchUserData()
             fetchUserApplications()
+        } else {
+            setUserData(null)
+            setUserApplications([])
         }
-    }, [user])
-
+    }, [userToken])
 
     const value = {
-        searchFilter, setSearchFilter, isSearched, setIsSearched, jobs, setjobs, showRecruiterLogin, setShowRecruiterLogin, companyToken, setCompanyToken, companyData, setcompanyData, backendUrl, userData, userApplications, setUserData, setUserApplications, fetchUserData, fetchUserApplications, totalJobs, setTotalJobs, fetchJobs
+        searchFilter, setSearchFilter, isSearched, setIsSearched, jobs, setjobs, showRecruiterLogin, setShowRecruiterLogin, showUserLogin, setShowUserLogin, companyToken, setCompanyToken, companyData, setcompanyData, backendUrl, userToken, setUserToken, userData, userApplications, setUserData, setUserApplications, fetchUserData, fetchUserApplications, totalJobs, setTotalJobs, fetchJobs
     }
 
     return (

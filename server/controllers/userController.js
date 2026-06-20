@@ -2,9 +2,82 @@ import Job from "../models/Job.js"
 import JobApplication from "../models/JobApplication.js"
 import User from "../models/User.js"
 import { v2 as cloudinary } from "cloudinary"
-import { clerkClient } from "@clerk/express"
 import fs from 'fs'
 import { extractText, getDocumentProxy } from "unpdf"
+import bcrypt from "bcryptjs"
+import generateToken from "../utils/generateToken.js"
+
+// Register a new Candidate/User
+export const registerUser = async (req, res) => {
+    const { name, email, password } = req.body
+    if (!name || !email || !password) {
+        return res.json({ success: false, message: "Missing Details" })
+    }
+    try {
+        const userExists = await User.findOne({ email })
+        if (userExists) {
+            return res.json({ success: false, message: "User Already Registered !" })
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt)
+
+        // Generate a default avatar URL using UI Avatars
+        const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`
+
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword,
+            image: defaultAvatar
+        })
+
+        const token = generateToken(user._id)
+
+        res.json({
+            success: true,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                image: user.image,
+                resume: user.resume
+            },
+            token
+        })
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// Candidate/User Login
+export const loginUser = async (req, res) => {
+    const { email, password } = req.body
+    if (!email || !password) {
+        return res.json({ success: false, message: "Missing Details" })
+    }
+    try {
+        const user = await User.findOne({ email })
+        if (user && await bcrypt.compare(password, user.password)) {
+            const token = generateToken(user._id)
+            res.json({
+                success: true,
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    image: user.image,
+                    resume: user.resume
+                },
+                token
+            })
+        } else {
+            res.json({ success: false, message: "Invalid Email or Password" })
+        }
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}
 
 export const getUserData = async (req, res) => {
     const userId = req.auth?.userId
@@ -14,61 +87,12 @@ export const getUserData = async (req, res) => {
     }
 
     try {
-        const user = await User.findById(userId)
+        const user = await User.findById(userId).select('-password')
 
         if (!user) {
-            console.log("User not found in database, attempting to auto-create from Clerk...")
-            try {
-                const clerkUser = await clerkClient.users.getUser(userId)
-                const userData = {
-                    _id: userId,
-                    name: clerkUser.firstName + " " + clerkUser.lastName,
-                    email: clerkUser.emailAddresses[0].emailAddress,
-                    image: clerkUser.imageUrl,
-                    resume: ''
-                }
-                await User.create(userData)
-                return res.json({ success: true, user: userData })
-            } catch (error) {
-                // Handle Duplicate Key Error (E11000)
-                if (error.code === 11000) {
-                    console.log("Duplicate key error detected (likely email collision). Resolving...")
-
-                    // Fetch the conflicting user by email
-                    const clerkUser = await clerkClient.users.getUser(userId)
-                    const email = clerkUser.emailAddresses[0].emailAddress
-                    const existingUser = await User.findOne({ email })
-
-                    if (existingUser) {
-                        // Check if it's a race condition (ID matches) or a zombie account (ID mismatch)
-                        if (existingUser._id === userId) {
-                            console.log("Race condition detected: User already created. Returning existing user.")
-                            return res.json({ success: true, user: existingUser })
-                        } else {
-                            // ID Mismatch: Delete the old (stale) record and create the new one
-                            console.log(`ID Mismatch detected. Deleting stale user ${existingUser._id} and recreating...`)
-                            await User.findByIdAndDelete(existingUser._id)
-
-                            // Retry creation
-                            const userData = {
-                                _id: userId,
-                                name: clerkUser.firstName + " " + clerkUser.lastName,
-                                email: email,
-                                image: clerkUser.imageUrl,
-                                resume: ''
-                            }
-                            await User.create(userData)
-                            return res.json({ success: true, user: userData })
-                        }
-                    }
-                }
-
-                console.log("Failed to auto-create user:", error.message)
-                return res.json({ success: false, message: error.message })
-            }
+            return res.json({ success: false, message: "User not found" })
         }
         res.json({ success: true, user })
-
 
     } catch (error) {
         res.json({ success: false, message: error.message })

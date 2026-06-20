@@ -3,27 +3,24 @@ import Navbar from '../components/Navbar'
 import moment from 'moment'
 import Footer from '../components/Footer'
 import { AppContext } from '../context/AppContext'
-import { useAuth, useUser } from '@clerk/clerk-react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { FileText, UploadCloud } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const Application = () => {
-  const { user } = useUser()
-  const { getToken } = useAuth()
   const navigate = useNavigate()
   const [isEdit, setIsEdit] = useState(false)
   const [resume, setResume] = useState(null)
 
-  const { backendUrl, userData, userApplications, fetchUserData, fetchUserApplications } = useContext(AppContext)
+  const { backendUrl, userToken, userData, userApplications, fetchUserData, fetchUserApplications } = useContext(AppContext)
 
   const updateResume = async () => {
     try {
       const formData = new FormData()
       formData.append('resume', resume)
 
-      const token = await getToken()
+      const token = userToken
       const { data } = await axios.post(backendUrl + '/api/users/update-resume', formData, {
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -42,10 +39,10 @@ const Application = () => {
   }
 
   useEffect(() => {
-    if (user) {
+    if (userToken) {
       fetchUserApplications()
     }
-  }, [user])
+  }, [userToken])
 
   return (
     <div className='min-h-screen ij-shell'>

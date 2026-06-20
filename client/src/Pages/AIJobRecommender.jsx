@@ -2,17 +2,14 @@ import React, { useContext, useState } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { AppContext } from '../context/AppContext'
-import { useAuth, useUser } from '@clerk/clerk-react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { BrainCircuit, Briefcase, RefreshCw, Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const AIJobRecommender = () => {
-  const { getToken } = useAuth()
-  const { backendUrl, userData } = useContext(AppContext)
+  const { backendUrl, userData, userToken } = useContext(AppContext)
   const navigate = useNavigate()
-  useUser()
 
   const [loading, setLoading] = useState(false)
   const [recommendations, setRecommendations] = useState(null)
@@ -29,7 +26,7 @@ const AIJobRecommender = () => {
     setLoading(true)
     setError(null)
     try {
-      const token = await getToken()
+      const token = userToken
       const url = customKeywordsList && customKeywordsList.length > 0
         ? `${backendUrl}/api/users/ai-recommender?keywords=${encodeURIComponent(customKeywordsList.join(','))}`
         : `${backendUrl}/api/users/ai-recommender`

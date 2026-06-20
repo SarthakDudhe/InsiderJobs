@@ -9,28 +9,24 @@ import JobCard from '../components/JobCard'
 import Footer from '../components/Footer'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { useAuth, useClerk, useUser } from '@clerk/clerk-react'
 import { Briefcase, CalendarClock, MapPin, Users, X } from 'lucide-react'
 
 const ApplyJob = () => {
   const { id } = useParams()
-  const { getToken } = useAuth()
-  const { openSignIn } = useClerk()
-  const { user } = useUser()
   const navigate = useNavigate()
   const [jobData, setjobData] = useState(null)
   const [isAlreadyApplied, setIsAlreadyApplied] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportReason, setReportReason] = useState('')
   const [submittingReport, setSubmittingReport] = useState(false)
-  const { jobs, backendUrl, userData, userApplications, fetchUserApplications } = useContext(AppContext)
+  const { jobs, backendUrl, userData, userToken, setShowUserLogin, userApplications, fetchUserApplications } = useContext(AppContext)
 
   const submitReport = async () => {
     setSubmittingReport(true)
     try {
       const { data } = await axios.post(`${backendUrl}/api/jobs/${jobData._id}/report`, {
         reason: reportReason,
-        userId: user ? user.id : 'Anonymous'
+        userId: userData ? userData._id : 'Anonymous'
       })
       if (data.success) {
         toast.success(data.message)
@@ -61,14 +57,14 @@ const ApplyJob = () => {
 
   const applyHandler = async () => {
     try {
-      if (!user) return openSignIn()
+      if (!userToken) return setShowUserLogin(true)
       if (!userData) return toast.error('Login to apply for jobs')
       if (!userData.resume) {
         navigate('/applications')
         return toast.error('Upload Resume to Apply')
       }
 
-      const token = await getToken()
+      const token = userToken
       const { data } = await axios.post(
         backendUrl + '/api/users/apply',
         { jobId: jobData._id },

@@ -1,30 +1,30 @@
 import express from "express";
-import { applyForJob, getUserData, getUserJobApplication, updateUserResume } from "../controllers/userController.js";
+import { applyForJob, getUserData, getUserJobApplication, updateUserResume, registerUser, loginUser } from "../controllers/userController.js";
 import { getAIJobRecommendations } from "../controllers/aiController.js";
+import { protectUser } from "../middlewares/authMiddleware.js";
 import upload from "../config/multer.js";
-
-
 
 const router = express.Router()
 
-//Get User Data
-router.get("/user", getUserData)
+// Register Candidate
+router.post("/register", registerUser)
 
+// Login Candidate
+router.post("/login", loginUser)
+
+//Get User Data
+router.get("/user", protectUser, getUserData)
 
 //Apply for a job
-
-router.post("/apply", applyForJob)
-
+router.post("/apply", protectUser, applyForJob)
 
 //Get applied jobs data
-
-router.get("/applications", getUserJobApplication)
+router.get("/applications", protectUser, getUserJobApplication)
 
 //Update User profile
-
-router.post("/update-resume", upload.single('resume'), updateUserResume)
+router.post("/update-resume", protectUser, upload.single('resume'), updateUserResume)
 
 //AI Job Recommendations
-router.get("/ai-recommender", getAIJobRecommendations)
+router.get("/ai-recommender", protectUser, getAIJobRecommendations)
 
 export default router
