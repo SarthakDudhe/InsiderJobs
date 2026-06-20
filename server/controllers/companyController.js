@@ -226,19 +226,3 @@ export const changeVisibility = async (req,res) => {
          res.json({success:false,message:error.message})
     }
 }
-
-// Verify Company Workspace in Demo Mode
-export const verifyDemoCompany = async (req, res) => {
-  try {
-    const companyId = req.company._id;
-    const company = await Company.findById(companyId);
-    if (!company) {
-      return res.json({ success: false, message: "Company not found" });
-    }
-    company.isVerified = true;
-    await company.save();
-    res.json({ success: true, message: "Company workspace verified successfully!", isVerified: true });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-}
