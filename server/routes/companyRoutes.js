@@ -1,5 +1,5 @@
 import express from "express";
-import { ChangeJobApplicationStatus, changeVisibility, getCompanydata, getCompanyJobApplication, getCompanyPostedJobs, loginCompany, postjob, registerCompany, verifyCompanyEmail, resendCompanyVerificationEmail } from "../controllers/companyController.js";
+import { ChangeJobApplicationStatus, changeVisibility, getCompanydata, getCompanyJobApplication, getCompanyPostedJobs, loginCompany, postjob, registerCompany, verifyCompanyEmail, resendCompanyVerificationEmail, screenApplication } from "../controllers/companyController.js";
 import upload from "../config/multer.js";
 import { protectCompany } from "../middlewares/authMiddleware.js";
 
@@ -44,5 +44,8 @@ router.get("/verify-email", verifyCompanyEmail)
 
 // Resend Verification Email Link
 router.post("/resend-verification", protectCompany, resendCompanyVerificationEmail)
+
+// Screen Candidate Application with AI
+router.post("/screen-application", protectCompany, screenApplication)
 
 export default router;

@@ -1,6 +1,7 @@
 import Job from "../models/Job.js"
 import JobApplication from "../models/JobApplication.js"
 import User from "../models/User.js"
+import axios from "axios"
 import { Groq } from "groq-sdk"
 import { v2 as cloudinary } from "cloudinary"
 import fs from 'fs'
@@ -153,12 +154,62 @@ export const applyForJob = async (req, res) => {
         if (!jobData) {
             return res.json({ success: false, message: "Job Not Found ! " })
         }
-        await JobApplication.create({
+        
+        const application = await JobApplication.create({
             companyId: jobData.companyId,
             userId,
             jobId,
             date: Date.now()
         })
+
+        // Background AI pre-screening if resume text is cached
+        const user = await User.findById(userId);
+        const groqApiKey = process.env.GROK_API_KEY;
+        if (user && user.resumeText && groqApiKey) {
+            (async () => {
+                try {
+                    const groq = new Groq({ apiKey: groqApiKey });
+                    const prompt = `Compare the candidate's resume with the job description to assess fit.
+Job Title: ${jobData.title}
+Job Description: ${jobData.description}
+
+Candidate Resume:
+${user.resumeText}
+
+Analyze their experience, skills, and fit.
+Provide:
+1. An overall fit score between 0 and 100.
+2. A brief 1-2 sentence "Resume TL;DR" summary badge next to each candidate, summarizing their top highlights and fit (e.g., "5 years React/Node experience. Lacks requested Kubernetes experience. Worked at Amazon."). Keep it under 150 characters.
+3. exactly 3 tailored interview questions to ask this specific candidate based on gaps or interesting aspects of their profile.
+
+Return the result as a valid JSON object matching this structure exactly (do not output markdown or any other explanation):
+{
+  "score": 85,
+  "summary": "5 years React/Node experience. Lacks requested Kubernetes experience. Worked at Amazon.",
+  "questions": ["Question 1?", "Question 2?", "Question 3?"]
+}`;
+                    const chatCompletion = await groq.chat.completions.create({
+                        messages: [
+                            { role: "system", content: "You are a professional recruiting assistant. Return ONLY valid JSON." },
+                            { role: "user", content: prompt }
+                        ],
+                        model: "llama-3.3-70b-versatile",
+                        temperature: 0.3,
+                        response_format: { type: "json_object" }
+                    });
+                    const screenResult = JSON.parse(chatCompletion.choices[0]?.message?.content || '{}');
+                    
+                    await JobApplication.findByIdAndUpdate(application._id, {
+                        aiScore: screenResult.score ?? 50,
+                        aiSummary: screenResult.summary ?? "Screened with AI.",
+                        aiQuestions: screenResult.questions ?? []
+                    });
+                    console.log(`[Auto-Screener] Successfully pre-screened application ${application._id}`);
+                } catch (e) {
+                    console.error("[Auto-Screener] Error screening application:", e.message);
+                }
+            })();
+        }
 
         res.json({ success: true, message: "Applied Successfully 😊" })
 
@@ -168,7 +219,6 @@ export const applyForJob = async (req, res) => {
         }
         res.json({ success: false, message: error.message })
     }
-
 }
 
 //Get user applied applications
@@ -273,5 +323,110 @@ ${resumeText}`;
                 if (err) console.error("[User Controller] Temp file cleanup error:", err.message);
             });
         }
+    }
+}
+
+// Perform ATS Audit for a Job description vs user resume
+export const auditJobATS = async (req, res) => {
+    const { jobId } = req.params;
+    const userId = req.auth?.userId;
+
+    if (!userId) {
+        return res.json({ success: false, message: "Not Authorized, Login Again" });
+    }
+
+    try {
+        const job = await Job.findById(jobId);
+        if (!job) {
+            return res.json({ success: false, message: "Job Not Found" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.json({ success: false, message: "User Not Found" });
+        }
+
+        if (!user.resume) {
+            return res.json({ success: false, message: "Please upload your resume first on the Profile page." });
+        }
+
+        let resumeText = user.resumeText;
+        if (!resumeText) {
+            console.log(`[ATS Audit] Resume text cache miss for user ${userId}. Downloading and parsing...`);
+            try {
+                const response = await axios.get(user.resume, { responseType: 'arraybuffer' });
+                const pdf = await getDocumentProxy(new Uint8Array(response.data));
+                const { text } = await extractText(pdf, { mergePages: true });
+                resumeText = text?.trim() || "";
+
+                if (resumeText) {
+                    user.resumeText = resumeText;
+                    await user.save();
+                }
+            } catch (pdfError) {
+                console.error("[ATS Audit] Fallback PDF Parsing error:", pdfError.message);
+                return res.json({ success: false, message: "Failed to extract text from your resume. Make sure it is a valid text-based PDF." });
+            }
+        }
+
+        if (!resumeText) {
+            return res.json({ success: false, message: "Your resume appears to be empty. Please upload a valid text-based PDF." });
+        }
+
+        const groqApiKey = process.env.GROK_API_KEY;
+        if (!groqApiKey) {
+            return res.json({ success: false, message: "Missing Groq API Key on server. Contact support." });
+        }
+
+        const groq = new Groq({ apiKey: groqApiKey });
+        const prompt = `Compare the candidate's resume with the job description to perform an ATS (Applicant Tracking System) audit.
+Job Title: ${job.title}
+Job Description: ${job.description}
+
+Candidate Resume:
+${resumeText}
+
+Analyze the match.
+Provide:
+1. An overall ATS Match Score (0 - 100%).
+2. A list of critical missing skills or keywords that are requested in the job description but absent or weak in the resume.
+3. Tailoring Suggestions: Specific recommendations on how the candidate can optimize or rephrase their resume bullets to better align with the job requirements.
+
+Return the result as a valid JSON object matching this structure exactly (do not output markdown or any other explanation):
+{
+  "matchScore": 82,
+  "missingSkills": ["Skill 1", "Skill 2"],
+  "tailoringSuggestions": ["Suggestion 1", "Suggestion 2"]
+}`;
+
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                { role: "system", content: "You are a professional recruiting assistant. Return ONLY valid JSON." },
+                { role: "user", content: prompt }
+            ],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.3,
+            response_format: { type: "json_object" }
+        });
+
+        let auditResult;
+        try {
+            auditResult = JSON.parse(chatCompletion.choices[0]?.message?.content || '{}');
+        } catch (e) {
+            return res.json({ success: false, message: "Failed to parse AI response. Please try again." });
+        }
+
+        res.json({
+            success: true,
+            audit: {
+                matchScore: auditResult.matchScore ?? 50,
+                missingSkills: auditResult.missingSkills ?? [],
+                tailoringSuggestions: auditResult.tailoringSuggestions ?? []
+            }
+        });
+
+    } catch (error) {
+        console.error("ATS Audit Error:", error);
+        res.json({ success: false, message: error.message });
     }
 }

@@ -21,6 +21,30 @@ const ApplyJob = () => {
   const [submittingReport, setSubmittingReport] = useState(false)
   const { jobs, backendUrl, userData, userToken, setShowUserLogin, userApplications, fetchUserApplications } = useContext(AppContext)
 
+  const [atsReport, setAtsReport] = useState(null)
+  const [isAuditing, setIsAuditing] = useState(false)
+
+  const runAtsAudit = async () => {
+    setIsAuditing(true)
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/users/ats-audit/${jobData._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${userToken}` } }
+      )
+      if (data.success) {
+        setAtsReport(data.audit)
+        toast.success("ATS Audit complete!")
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setIsAuditing(false)
+    }
+  }
+
   const submitReport = async () => {
     setSubmittingReport(true)
     try {
@@ -163,22 +187,167 @@ const ApplyJob = () => {
         </section>
 
         <div className='grid gap-8 lg:grid-cols-[1fr_360px]'>
-          <article className='premium-panel rounded-[1.5rem] p-6 md:p-8'>
-            <h2 className='mb-5 text-2xl font-extrabold text-gray-950'>Job description</h2>
-            <div className='rich-text prose max-w-none text-gray-700' dangerouslySetInnerHTML={{ __html: jobData.description }} />
-            <div className='mt-10 flex flex-wrap gap-4 items-center'>
-              <button onClick={applyHandler} className={`px-8 py-3.5 ${isAlreadyApplied ? 'rounded-xl bg-gray-200 font-extrabold text-gray-500' : 'premium-button cursor-pointer'}`}>
-                {isAlreadyApplied ? 'Already Applied' : 'Apply Now'}
-              </button>
-              <button 
-                type='button'
-                onClick={() => setShowReportModal(true)} 
-                className='cursor-pointer rounded-xl border border-rose-200 px-6 py-3.5 text-rose-600 font-bold hover:bg-rose-50 transition-all active:scale-95 text-sm flex items-center gap-1.5'
-              >
-                🚩 Report Listing
-              </button>
+          <div className='space-y-8'>
+            <article className='premium-panel rounded-[1.5rem] p-6 md:p-8'>
+              <h2 className='mb-5 text-2xl font-extrabold text-gray-950'>Job description</h2>
+              <div className='rich-text prose max-w-none text-gray-700' dangerouslySetInnerHTML={{ __html: jobData.description }} />
+              <div className='mt-10 flex flex-wrap gap-4 items-center'>
+                <button onClick={applyHandler} className={`px-8 py-3.5 ${isAlreadyApplied ? 'rounded-xl bg-gray-200 font-extrabold text-gray-500' : 'premium-button cursor-pointer'}`}>
+                  {isAlreadyApplied ? 'Already Applied' : 'Apply Now'}
+                </button>
+                <button 
+                  type='button'
+                  onClick={() => setShowReportModal(true)} 
+                  className='cursor-pointer rounded-xl border border-rose-200 px-6 py-3.5 text-rose-600 font-bold hover:bg-rose-50 transition-all active:scale-95 text-sm flex items-center gap-1.5'
+                >
+                  🚩 Report Listing
+                </button>
+              </div>
+            </article>
+
+            {/* AI ATS Resume Auditor Card */}
+            <div className='premium-panel rounded-[1.5rem] p-6 md:p-8 border border-gray-100 bg-white/50 backdrop-blur-md shadow-sm transition-all duration-300'>
+              <div className='mb-6 flex items-center justify-between border-b border-gray-100 pb-4'>
+                <div className='flex items-center gap-3'>
+                  <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-700 shadow-sm'>
+                    <span className='font-bold text-lg'>✨</span>
+                  </div>
+                  <div>
+                    <h2 className='text-lg font-extrabold text-gray-950'>AI ATS Resume Fit Auditor</h2>
+                    <p className='text-xs text-gray-500'>Compare your resume against this job description in real-time.</p>
+                  </div>
+                </div>
+              </div>
+
+              {!userToken ? (
+                <div className='text-center py-6'>
+                  <p className='text-sm text-gray-500 font-semibold mb-4'>Log in as a candidate to audit your resume compatibility.</p>
+                  <button onClick={() => setShowUserLogin(true)} className='premium-button px-6 py-3 text-xs'>
+                    Candidate Login
+                  </button>
+                </div>
+              ) : !userData?.resume ? (
+                <div className='text-center py-6'>
+                  <p className='text-sm text-gray-500 font-semibold mb-4'>Please upload your resume first to run the AI ATS Audit.</p>
+                  <button onClick={() => navigate('/applications')} className='premium-button px-6 py-3 text-xs'>
+                    Upload Resume
+                  </button>
+                </div>
+              ) : isAuditing ? (
+                <div className='flex flex-col items-center justify-center py-10 space-y-4'>
+                  <div className='h-12 w-12 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600'></div>
+                  <p className='text-sm font-bold text-indigo-700 animate-pulse'>AI is auditing your resume against requirements...</p>
+                </div>
+              ) : !atsReport ? (
+                <div className='text-center py-6'>
+                  <p className='text-sm text-gray-500 font-semibold mb-4'>
+                    Click the button below to analyze your ATS match score, view missing skills, and get resume tailoring suggestions.
+                  </p>
+                  <button onClick={runAtsAudit} className='premium-button px-6 py-3.5 text-xs flex items-center gap-2 mx-auto'>
+                    ✨ Analyze Resume Fit
+                  </button>
+                </div>
+              ) : (
+                <div className='space-y-6'>
+                  <div className='flex flex-col items-center gap-6 rounded-2xl bg-slate-50/50 border border-slate-100 p-5 sm:flex-row'>
+                    {/* Circle Score Gauge */}
+                    <div className='relative flex h-24 w-24 shrink-0 items-center justify-center'>
+                      <svg className='h-full w-full -rotate-90' viewBox='0 0 100 100'>
+                        <circle cx='50' cy='50' r='40' className='stroke-gray-100 fill-none' strokeWidth='8' />
+                        <circle
+                          cx='50'
+                          cy='50'
+                          r='40'
+                          className={`fill-none transition-all duration-1000 ${
+                            atsReport.matchScore >= 75
+                              ? 'stroke-emerald-500'
+                              : atsReport.matchScore >= 50
+                              ? 'stroke-amber-500'
+                              : 'stroke-rose-500'
+                          }`}
+                          strokeWidth='8'
+                          strokeDasharray={2 * Math.PI * 40}
+                          strokeDashoffset={2 * Math.PI * 40 * (1 - atsReport.matchScore / 100)}
+                          strokeLinecap='round'
+                        />
+                      </svg>
+                      <span className={`absolute text-xl font-black ${
+                        atsReport.matchScore >= 75
+                          ? 'text-emerald-600'
+                          : atsReport.matchScore >= 50
+                          ? 'text-amber-600'
+                          : 'text-rose-600'
+                      }`}>
+                        {atsReport.matchScore}%
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className='text-sm font-extrabold text-gray-900'>
+                        {atsReport.matchScore >= 75
+                          ? 'High Match Potential!'
+                          : atsReport.matchScore >= 50
+                          ? 'Moderate Match Potential'
+                          : 'Low Compatibility Detected'}
+                      </h3>
+                      <p className='text-xs text-gray-500 mt-1 leading-relaxed max-w-lg'>
+                        {atsReport.matchScore >= 75
+                          ? 'Your resume is highly optimized for this role. You stand a great chance of passing the automated screening.'
+                          : atsReport.matchScore >= 50
+                          ? 'You satisfy many core requirements, but adding some of the missing skills or updating your resume bullets could significantly boost your visibility.'
+                          : 'Consider optimizing your resume using the suggestions below to match the job criteria before applying.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className='grid gap-6 md:grid-cols-[1fr_2fr]'>
+                    {/* Missing Skills */}
+                    <div className='space-y-4 border-b border-gray-100 pb-6 md:border-b-0 md:border-r md:pb-0 md:pr-6'>
+                      <h3 className='text-xs font-bold uppercase tracking-wider text-gray-400'>Missing Key Skills</h3>
+                      {atsReport.missingSkills?.length > 0 ? (
+                        <div className='flex flex-wrap gap-1.5'>
+                          {atsReport.missingSkills.map((skill, index) => (
+                            <span key={index} className='rounded-lg bg-rose-50 border border-rose-100 px-2.5 py-1 text-xs font-bold text-rose-700 flex items-center gap-1'>
+                              ⚠️ {skill}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className='text-xs font-bold text-emerald-600 flex items-center gap-1'>
+                          ✓ No critical missing skills!
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Optimization Suggestions */}
+                    <div className='space-y-4'>
+                      <h3 className='text-xs font-bold uppercase tracking-wider text-gray-400'>ATS Tailoring Suggestions</h3>
+                      {atsReport.tailoringSuggestions?.length > 0 ? (
+                        <ul className='space-y-2.5'>
+                          {atsReport.tailoringSuggestions.map((suggestion, index) => (
+                            <li key={index} className='flex items-start gap-2.5 text-xs text-gray-600 leading-relaxed rounded-xl bg-slate-50/50 border border-slate-100 p-3'>
+                              <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 font-black text-[10px]'>
+                                {index + 1}
+                              </span>
+                              <span>{suggestion}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className='text-xs text-gray-500 font-semibold'>No tailoring suggestions required.</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className='pt-4 border-t border-gray-100 flex justify-end'>
+                    <button onClick={runAtsAudit} className='cursor-pointer text-xs font-extrabold text-indigo-600 hover:text-indigo-700 transition-colors flex items-center gap-1'>
+                      🔄 Re-run AI Audit
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          </article>
+          </div>
 
           <aside>
             <div className='sticky top-24 space-y-6'>

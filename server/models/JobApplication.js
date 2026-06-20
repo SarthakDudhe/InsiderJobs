@@ -5,7 +5,10 @@ userId:{type:String,ref:'User',required:true},
 companyId:{type:mongoose.Schema.Types.ObjectId,ref:'Company',required:true},
 jobId:{type:mongoose.Schema.Types.ObjectId,ref:'Job',required:true},
 status:{type:String,default:"Pending"},
-date:{type:Number,required:true}
+date:{type:Number,required:true},
+aiScore:{type:Number},
+aiSummary:{type:String},
+aiQuestions:{type:[String]}
 }, { timestamps: true })
 
 JobApplicationSchema.index({ userId: 1, jobId: 1 }, { unique: true });

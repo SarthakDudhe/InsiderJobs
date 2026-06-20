@@ -7,6 +7,9 @@ import Job from "../models/Job.js";
 import JobApplication from '../models/JobApplication.js'
 import fs from 'fs';
 import mongoose from "mongoose";
+import { Groq } from "groq-sdk";
+import axios from "axios";
+import { extractText, getDocumentProxy } from "unpdf";
 //Register a new Company
 
 
@@ -297,4 +300,118 @@ export const resendCompanyVerificationEmail = async (req, res) => {
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
+}
+
+// Screen Candidate Application with AI (Score, Summary, and Custom Questions)
+export const screenApplication = async (req, res) => {
+    const { applicationId } = req.body;
+    const companyId = req.company._id;
+
+    try {
+        const application = await JobApplication.findById(applicationId)
+            .populate('userId', 'name email resume resumeText')
+            .populate('jobId', 'title description');
+
+        if (!application) {
+            return res.json({ success: false, message: "Application Not Found" });
+        }
+
+        // Verify this application belongs to the company calling the endpoint
+        if (application.companyId.toString() !== companyId.toString()) {
+            return res.json({ success: false, message: "Not Authorized to screen this application." });
+        }
+
+        const user = application.userId;
+        const job = application.jobId;
+
+        if (!user || !user.resume) {
+            return res.json({ success: false, message: "Candidate does not have a resume uploaded." });
+        }
+
+        let resumeText = user.resumeText;
+        if (!resumeText) {
+            console.log(`[Recruiter Screener] Resume text cache miss for user ${user._id}. Downloading and parsing...`);
+            try {
+                const response = await axios.get(user.resume, { responseType: 'arraybuffer' });
+                const pdf = await getDocumentProxy(new Uint8Array(response.data));
+                const { text } = await extractText(pdf, { mergePages: true });
+                resumeText = text?.trim() || "";
+
+                if (resumeText) {
+                    await mongoose.model('User').findByIdAndUpdate(user._id, { resumeText });
+                }
+            } catch (pdfError) {
+                console.error("[Recruiter Screener] Fallback PDF Parsing error:", pdfError.message);
+                return res.json({ success: false, message: "Failed to extract text from candidate resume. Invalid PDF." });
+            }
+        }
+
+        if (!resumeText) {
+            return res.json({ success: false, message: "Candidate resume text appears to be empty." });
+        }
+
+        const groqApiKey = process.env.GROK_API_KEY;
+        if (!groqApiKey) {
+            return res.json({ success: false, message: "Missing Groq API Key on server." });
+        }
+
+        const groq = new Groq({ apiKey: groqApiKey });
+        const prompt = `Compare the candidate's resume with the job description to assess fit.
+Job Title: ${job.title}
+Job Description: ${job.description}
+
+Candidate Resume:
+${resumeText}
+
+Analyze their experience, skills, and fit.
+Provide:
+1. An overall fit score between 0 and 100.
+2. A brief 1-2 sentence "Resume TL;DR" summary badge next to each candidate, summarizing their top highlights and fit (e.g., "5 years React/Node experience. Lacks requested Kubernetes experience. Worked at Amazon."). Keep it under 150 characters.
+3. exactly 3 tailored interview questions to ask this specific candidate based on gaps or interesting aspects of their profile.
+
+Return the result as a valid JSON object matching this structure exactly (do not output markdown or any other explanation):
+{
+  "score": 85,
+  "summary": "5 years React/Node experience. Lacks requested Kubernetes experience. Worked at Amazon.",
+  "questions": ["Question 1?", "Question 2?", "Question 3?"]
+}`;
+
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                { role: "system", content: "You are a professional recruiting assistant. Return ONLY valid JSON." },
+                { role: "user", content: prompt }
+            ],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.3,
+            response_format: { type: "json_object" }
+        });
+
+        let screenResult;
+        try {
+            screenResult = JSON.parse(chatCompletion.choices[0]?.message?.content || '{}');
+        } catch (e) {
+            return res.json({ success: false, message: "Failed to parse AI screener response. Please try again." });
+        }
+
+        application.aiScore = screenResult.score ?? 50;
+        application.aiSummary = screenResult.summary ?? "Screened with AI.";
+        application.aiQuestions = screenResult.questions ?? [];
+        await application.save();
+
+        res.json({
+            success: true,
+            message: "AI Screening complete!",
+            application: {
+                _id: application._id,
+                aiScore: application.aiScore,
+                aiSummary: application.aiSummary,
+                aiQuestions: application.aiQuestions,
+                status: application.status
+            }
+        });
+
+    } catch (error) {
+        console.error("AI Screen Application Error:", error);
+        res.json({ success: false, message: error.message });
+    }
 }

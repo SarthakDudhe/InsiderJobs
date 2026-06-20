@@ -1,5 +1,5 @@
 import express from "express";
-import { applyForJob, getUserData, getUserJobApplication, updateUserResume, registerUser, loginUser } from "../controllers/userController.js";
+import { applyForJob, getUserData, getUserJobApplication, updateUserResume, registerUser, loginUser, auditJobATS } from "../controllers/userController.js";
 import { getAIJobRecommendations } from "../controllers/aiController.js";
 import { protectUser } from "../middlewares/authMiddleware.js";
 import upload from "../config/multer.js";
@@ -26,5 +26,8 @@ router.post("/update-resume", protectUser, upload.single('resume'), updateUserRe
 
 //AI Job Recommendations
 router.get("/ai-recommender", protectUser, getAIJobRecommendations)
+
+//ATS Audit for resume vs job
+router.post("/ats-audit/:jobId", protectUser, auditJobATS)
 
 export default router
