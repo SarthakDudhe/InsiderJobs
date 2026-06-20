@@ -22,7 +22,12 @@ connectCloudinary()
 
 //Middlewares
 
-app.use(cors())
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'token']
+}))
 app.use(express.json())
 app.use(clerkMiddleware())
 
@@ -47,7 +52,7 @@ app.use("/api/users", userRoutes)
 const PORT = process.env.PORT || 5000
 Sentry.setupExpressErrorHandler(app);
 
-if (process.env.NODE_ENV !== 'production') {
+if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log("Server is running at port ", PORT)
   })
