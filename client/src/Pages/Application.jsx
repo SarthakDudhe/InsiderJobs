@@ -5,13 +5,14 @@ import Footer from '../components/Footer'
 import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { FileText, UploadCloud } from 'lucide-react'
+import { FileText, UploadCloud, BarChart3, TrendingUp, Clock, AlertTriangle, CheckCircle2, XCircle, Hourglass, Target, ArrowUpRight, ChevronDown, ChevronUp } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const Application = () => {
   const navigate = useNavigate()
   const [isEdit, setIsEdit] = useState(false)
   const [resume, setResume] = useState(null)
+  const [insightsOpen, setInsightsOpen] = useState(true)
 
   const { backendUrl, userToken, userData, userApplications, fetchUserData, fetchUserApplications } = useContext(AppContext)
 
@@ -186,6 +187,332 @@ const Application = () => {
             </div>
           </section>
         )}
+
+        {/* ═══════════ APPLICATION INSIGHTS DASHBOARD ═══════════ */}
+        {userApplications.length > 0 && (() => {
+          const total = userApplications.length
+          const pending = userApplications.filter(a => a.status === 'Pending').length
+          const accepted = userApplications.filter(a => a.status === 'Accepted').length
+          const rejected = userApplications.filter(a => a.status === 'Rejected').length
+          const acceptRate = total ? Math.round((accepted / total) * 100) : 0
+          const pendingRate = total ? Math.round((pending / total) * 100) : 0
+          const rejectedRate = total ? Math.round((rejected / total) * 100) : 0
+
+          // Most applied category
+          const categoryCount = {}
+          userApplications.forEach(app => {
+            if (app.jobId?.category) {
+              categoryCount[app.jobId.category] = (categoryCount[app.jobId.category] || 0) + 1
+            }
+          })
+          const topCategory = Object.entries(categoryCount).sort((a, b) => b[1] - a[1])[0]
+
+          // Most applied location
+          const locationCount = {}
+          userApplications.forEach(app => {
+            if (app.jobId?.location) {
+              locationCount[app.jobId.location] = (locationCount[app.jobId.location] || 0) + 1
+            }
+          })
+          const topLocation = Object.entries(locationCount).sort((a, b) => b[1] - a[1])[0]
+
+          // Stale applications (14+ days with no decision)
+          const now = Date.now()
+          const staleApps = userApplications.filter(a => {
+            if (a.status !== 'Pending') return false
+            const appliedDate = a.date || new Date(a.createdAt).getTime()
+            const daysSince = (now - appliedDate) / (1000 * 60 * 60 * 24)
+            return daysSince >= 14
+          })
+
+          // Average response time (only for resolved applications)
+          const resolvedApps = userApplications.filter(a => (a.status === 'Accepted' || a.status === 'Rejected') && a.updatedAt && a.date)
+          let avgResponseDays = null
+          if (resolvedApps.length > 0) {
+            const totalDays = resolvedApps.reduce((sum, a) => {
+              const applied = a.date || new Date(a.createdAt).getTime()
+              const resolved = new Date(a.updatedAt).getTime()
+              return sum + (resolved - applied) / (1000 * 60 * 60 * 24)
+            }, 0)
+            avgResponseDays = Math.round(totalDays / resolvedApps.length)
+          }
+
+          // Oldest pending application
+          const pendingApps = userApplications.filter(a => a.status === 'Pending')
+          let oldestPendingDays = 0
+          if (pendingApps.length > 0) {
+            const oldest = pendingApps.reduce((min, a) => {
+              const d = a.date || new Date(a.createdAt).getTime()
+              return d < min ? d : min
+            }, Infinity)
+            oldestPendingDays = Math.round((now - oldest) / (1000 * 60 * 60 * 24))
+          }
+
+          // Ring chart math (CSS conic gradient)
+          const segments = []
+          let offset = 0
+          if (accepted > 0) { segments.push(`#22c55e ${offset}deg ${offset + (accepted / total) * 360}deg`); offset += (accepted / total) * 360 }
+          if (pending > 0) { segments.push(`#f59e0b ${offset}deg ${offset + (pending / total) * 360}deg`); offset += (pending / total) * 360 }
+          if (rejected > 0) { segments.push(`#ef4444 ${offset}deg ${offset + (rejected / total) * 360}deg`); offset += (rejected / total) * 360 }
+          const conicGradient = `conic-gradient(${segments.join(', ')})`
+
+          return (
+            <section className='premium-panel mb-8 rounded-[1.5rem] overflow-hidden'>
+              {/* Header */}
+              <button
+                onClick={() => setInsightsOpen(!insightsOpen)}
+                className='w-full flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50/50 transition-colors'
+              >
+                <div className='flex items-center gap-3'>
+                  <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-50 to-indigo-50 text-indigo-700 shadow-sm'>
+                    <BarChart3 size={21} />
+                  </div>
+                  <div className='text-left'>
+                    <h2 className='text-xl font-extrabold text-gray-950'>Application Insights</h2>
+                    <p className='text-sm text-gray-500'>Your hiring funnel at a glance — {total} application{total !== 1 ? 's' : ''} tracked.</p>
+                  </div>
+                </div>
+                <div className='flex items-center gap-3'>
+                  {staleApps.length > 0 && (
+                    <span className='hidden sm:inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-amber-700 text-[10px] font-bold uppercase tracking-wider'>
+                      <AlertTriangle size={12} />
+                      {staleApps.length} stale
+                    </span>
+                  )}
+                  <span className='flex h-8 w-8 items-center justify-center rounded-xl bg-gray-100 text-gray-500'>
+                    {insightsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </span>
+                </div>
+              </button>
+
+              {/* Collapsible Body */}
+              <div className={`transition-all duration-500 ease-in-out overflow-hidden ${insightsOpen ? 'max-h-[1200px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className='px-6 pb-6 space-y-6 border-t border-gray-100'>
+
+                  {/* ──── ROW 1: KPI Stat Cards ──── */}
+                  <div className='grid grid-cols-2 gap-3 pt-5 sm:grid-cols-4'>
+                    {/* Total Applications */}
+                    <div className='group relative rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-slate-50/50 p-4 shadow-sm transition-all hover:shadow-md hover:border-blue-100'>
+                      <div className='flex items-center justify-between mb-3'>
+                        <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600'>
+                          <Target size={17} />
+                        </span>
+                        <ArrowUpRight size={14} className='text-gray-300 group-hover:text-blue-400 transition-colors' />
+                      </div>
+                      <p className='text-2xl font-black text-gray-950 tracking-tight'>{total}</p>
+                      <p className='text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-0.5'>Total Applied</p>
+                    </div>
+
+                    {/* Accepted */}
+                    <div className='group relative rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-emerald-50/30 p-4 shadow-sm transition-all hover:shadow-md hover:border-emerald-100'>
+                      <div className='flex items-center justify-between mb-3'>
+                        <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600'>
+                          <CheckCircle2 size={17} />
+                        </span>
+                        <span className='text-[10px] font-black text-emerald-600'>{acceptRate}%</span>
+                      </div>
+                      <p className='text-2xl font-black text-gray-950 tracking-tight'>{accepted}</p>
+                      <p className='text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-0.5'>Accepted</p>
+                    </div>
+
+                    {/* Pending */}
+                    <div className='group relative rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-amber-50/30 p-4 shadow-sm transition-all hover:shadow-md hover:border-amber-100'>
+                      <div className='flex items-center justify-between mb-3'>
+                        <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600'>
+                          <Hourglass size={17} />
+                        </span>
+                        <span className='text-[10px] font-black text-amber-600'>{pendingRate}%</span>
+                      </div>
+                      <p className='text-2xl font-black text-gray-950 tracking-tight'>{pending}</p>
+                      <p className='text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-0.5'>Pending</p>
+                    </div>
+
+                    {/* Rejected */}
+                    <div className='group relative rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-rose-50/30 p-4 shadow-sm transition-all hover:shadow-md hover:border-rose-100'>
+                      <div className='flex items-center justify-between mb-3'>
+                        <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-600'>
+                          <XCircle size={17} />
+                        </span>
+                        <span className='text-[10px] font-black text-rose-600'>{rejectedRate}%</span>
+                      </div>
+                      <p className='text-2xl font-black text-gray-950 tracking-tight'>{rejected}</p>
+                      <p className='text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-0.5'>Rejected</p>
+                    </div>
+                  </div>
+
+                  {/* ──── ROW 2: Ring Chart + Detailed Insights ──── */}
+                  <div className='grid gap-5 md:grid-cols-[200px_1fr]'>
+                    {/* Left: Ring chart */}
+                    <div className='flex flex-col items-center justify-center rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-slate-50/40 p-5 shadow-sm'>
+                      <div
+                        className='relative h-32 w-32 rounded-full'
+                        style={{ background: conicGradient }}
+                      >
+                        <div className='absolute inset-3 rounded-full bg-white flex flex-col items-center justify-center shadow-inner'>
+                          <span className='text-xl font-black text-gray-950'>{acceptRate}%</span>
+                          <span className='text-[9px] font-bold uppercase tracking-wider text-gray-400'>Success</span>
+                        </div>
+                      </div>
+                      <div className='mt-4 flex items-center gap-4 text-[10px] font-bold'>
+                        <span className='flex items-center gap-1.5'>
+                          <span className='h-2 w-2 rounded-full bg-emerald-500'></span>
+                          <span className='text-gray-500'>Accepted</span>
+                        </span>
+                        <span className='flex items-center gap-1.5'>
+                          <span className='h-2 w-2 rounded-full bg-amber-500'></span>
+                          <span className='text-gray-500'>Pending</span>
+                        </span>
+                        <span className='flex items-center gap-1.5'>
+                          <span className='h-2 w-2 rounded-full bg-rose-500'></span>
+                          <span className='text-gray-500'>Rejected</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right: Deep Insights */}
+                    <div className='space-y-3'>
+                      {/* Status funnel bars */}
+                      <div className='rounded-2xl border border-gray-100 bg-white p-4 shadow-sm'>
+                        <h4 className='text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-3'>Application Funnel</h4>
+                        <div className='space-y-3'>
+                          <div>
+                            <div className='flex justify-between items-center mb-1'>
+                              <span className='text-xs font-bold text-gray-700'>Pending</span>
+                              <span className='text-[10px] font-black text-amber-600'>{pending} of {total}</span>
+                            </div>
+                            <div className='h-2 w-full rounded-full bg-gray-100 overflow-hidden'>
+                              <div className='h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-700' style={{ width: `${pendingRate}%` }}></div>
+                            </div>
+                          </div>
+                          <div>
+                            <div className='flex justify-between items-center mb-1'>
+                              <span className='text-xs font-bold text-gray-700'>Accepted</span>
+                              <span className='text-[10px] font-black text-emerald-600'>{accepted} of {total}</span>
+                            </div>
+                            <div className='h-2 w-full rounded-full bg-gray-100 overflow-hidden'>
+                              <div className='h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-700' style={{ width: `${acceptRate}%` }}></div>
+                            </div>
+                          </div>
+                          <div>
+                            <div className='flex justify-between items-center mb-1'>
+                              <span className='text-xs font-bold text-gray-700'>Rejected</span>
+                              <span className='text-[10px] font-black text-rose-600'>{rejected} of {total}</span>
+                            </div>
+                            <div className='h-2 w-full rounded-full bg-gray-100 overflow-hidden'>
+                              <div className='h-full rounded-full bg-gradient-to-r from-rose-400 to-rose-500 transition-all duration-700' style={{ width: `${rejectedRate}%` }}></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Info chips row */}
+                      <div className='grid grid-cols-1 gap-3 sm:grid-cols-3'>
+                        {/* Top Category */}
+                        {topCategory && (
+                          <div className='rounded-2xl border border-gray-100 bg-white p-4 shadow-sm'>
+                            <div className='flex items-center gap-2 mb-2'>
+                              <span className='flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600'>
+                                <TrendingUp size={14} />
+                              </span>
+                              <span className='text-[10px] font-bold uppercase tracking-wider text-gray-400'>Top Category</span>
+                            </div>
+                            <p className='text-sm font-extrabold text-gray-900 truncate'>{topCategory[0]}</p>
+                            <p className='text-[10px] text-gray-400 font-semibold'>{topCategory[1]} application{topCategory[1] !== 1 ? 's' : ''}</p>
+                          </div>
+                        )}
+
+                        {/* Top Location */}
+                        {topLocation && (
+                          <div className='rounded-2xl border border-gray-100 bg-white p-4 shadow-sm'>
+                            <div className='flex items-center gap-2 mb-2'>
+                              <span className='flex h-7 w-7 items-center justify-center rounded-lg bg-teal-50 text-teal-600'>
+                                <Target size={14} />
+                              </span>
+                              <span className='text-[10px] font-bold uppercase tracking-wider text-gray-400'>Top Location</span>
+                            </div>
+                            <p className='text-sm font-extrabold text-gray-900 truncate'>{topLocation[0]}</p>
+                            <p className='text-[10px] text-gray-400 font-semibold'>{topLocation[1]} application{topLocation[1] !== 1 ? 's' : ''}</p>
+                          </div>
+                        )}
+
+                        {/* Avg Response Time */}
+                        <div className='rounded-2xl border border-gray-100 bg-white p-4 shadow-sm'>
+                          <div className='flex items-center gap-2 mb-2'>
+                            <span className='flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-600'>
+                              <Clock size={14} />
+                            </span>
+                            <span className='text-[10px] font-bold uppercase tracking-wider text-gray-400'>Avg Response</span>
+                          </div>
+                          {avgResponseDays !== null ? (
+                            <>
+                              <p className='text-sm font-extrabold text-gray-900'>{avgResponseDays} day{avgResponseDays !== 1 ? 's' : ''}</p>
+                              <p className='text-[10px] text-gray-400 font-semibold'>From {resolvedApps.length} resolved</p>
+                            </>
+                          ) : (
+                            <>
+                              <p className='text-sm font-extrabold text-gray-500'>—</p>
+                              <p className='text-[10px] text-gray-400 font-semibold'>No decisions yet</p>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ──── ROW 3: Stale Applications Warning ──── */}
+                  {staleApps.length > 0 && (
+                    <div className='rounded-2xl border border-amber-100 bg-gradient-to-r from-amber-50/60 to-orange-50/40 p-5'>
+                      <div className='flex items-start gap-3'>
+                        <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700'>
+                          <AlertTriangle size={17} />
+                        </span>
+                        <div className='flex-1 min-w-0'>
+                          <h4 className='text-sm font-extrabold text-amber-900'>
+                            {staleApps.length} application{staleApps.length !== 1 ? 's' : ''} with no response in 14+ days
+                          </h4>
+                          <p className='text-xs text-amber-700/70 mt-0.5 mb-3'>
+                            These applications may be inactive. Consider following up or exploring other opportunities.
+                          </p>
+                          <div className='flex flex-wrap gap-2'>
+                            {staleApps.slice(0, 5).map((app, i) => (
+                              <span key={i} className='inline-flex items-center gap-1.5 rounded-lg border border-amber-200/80 bg-white/60 px-2.5 py-1.5 text-[11px] font-bold text-amber-800 backdrop-blur-sm'>
+                                <img className='h-4 w-4 rounded object-contain' src={app.companyId?.image} alt='' />
+                                {app.jobId?.title?.length > 28 ? app.jobId.title.slice(0, 28) + '…' : app.jobId?.title}
+                              </span>
+                            ))}
+                            {staleApps.length > 5 && (
+                              <span className='inline-flex items-center rounded-lg border border-amber-200/80 bg-white/60 px-2.5 py-1.5 text-[11px] font-bold text-amber-600'>
+                                +{staleApps.length - 5} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ──── ROW 4: Quick summary sentence ──── */}
+                  <div className='rounded-2xl border border-gray-100 bg-gradient-to-r from-slate-50/80 to-blue-50/40 p-4 flex items-start gap-3'>
+                    <span className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 mt-0.5'>
+                      <TrendingUp size={15} />
+                    </span>
+                    <div>
+                      <p className='text-xs text-gray-600 leading-relaxed'>
+                        <span className='font-extrabold text-gray-900'>Pipeline Summary:</span>{' '}
+                        You've applied to <span className='font-extrabold text-blue-600'>{total}</span> job{total !== 1 ? 's' : ''}.{' '}
+                        {accepted > 0 && <><span className='font-extrabold text-emerald-600'>{accepted}</span> accepted. </>}
+                        {rejected > 0 && <><span className='font-extrabold text-rose-600'>{rejected}</span> rejected. </>}
+                        {pending > 0 && <><span className='font-extrabold text-amber-600'>{pending}</span> still awaiting response. </>}
+                        {oldestPendingDays > 0 && <>Your oldest pending application is <span className='font-extrabold text-gray-900'>{oldestPendingDays} day{oldestPendingDays !== 1 ? 's' : ''}</span> old.</>}
+                      </p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </section>
+          )
+        })()}
 
         <section className='premium-panel overflow-hidden rounded-[1.5rem]'>
           <div className='border-b border-gray-200 p-6'>

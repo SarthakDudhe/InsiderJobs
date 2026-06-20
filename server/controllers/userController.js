@@ -22,23 +22,51 @@ export const registerUser = async (req, res) => {
             if (!userExists.password) {
                 const salt = await bcrypt.genSalt(10);
                 const hashedPassword = await bcrypt.hash(password, salt)
-                
-                userExists.name = name
-                userExists.password = hashedPassword
-                if (!userExists.image || userExists.image.startsWith('https://images.clerk.dev')) {
-                    userExists.image = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`
-                }
-                await userExists.save()
 
-                const token = generateToken(userExists._id)
+                // Preserve data from the old Clerk account
+                const oldId = userExists._id
+                const oldResume = userExists.resume || ""
+                const oldResumeText = userExists.resumeText || ""
+                const oldSkills = userExists.skills || []
+                const oldExperience = userExists.experience || []
+                const oldEducation = userExists.education || []
+                const oldLinks = userExists.links || {}
+                const oldImage = (!userExists.image || userExists.image.startsWith('https://images.clerk.dev'))
+                    ? `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`
+                    : userExists.image
+
+                // Delete the old Clerk document (its _id is a string, not an ObjectId)
+                await User.collection.deleteOne({ _id: oldId })
+
+                // Create a fresh user with a proper MongoDB ObjectId
+                const newUser = await User.create({
+                    name,
+                    email,
+                    password: hashedPassword,
+                    image: oldImage,
+                    resume: oldResume,
+                    resumeText: oldResumeText,
+                    skills: oldSkills,
+                    experience: oldExperience,
+                    education: oldEducation,
+                    links: oldLinks
+                })
+
+                // Migrate any existing job applications from old Clerk _id to new ObjectId
+                await JobApplication.updateMany(
+                    { userId: String(oldId) },
+                    { $set: { userId: String(newUser._id) } }
+                )
+
+                const token = generateToken(newUser._id)
                 return res.json({
                     success: true,
                     user: {
-                        _id: userExists._id,
-                        name: userExists.name,
-                        email: userExists.email,
-                        image: userExists.image,
-                        resume: userExists.resume
+                        _id: newUser._id,
+                        name: newUser.name,
+                        email: newUser.email,
+                        image: newUser.image,
+                        resume: newUser.resume
                     },
                     token
                 })
