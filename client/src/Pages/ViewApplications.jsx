@@ -29,7 +29,22 @@ const ViewApplications = () => {
       )
       if (data.success) {
         toast.success(data.message)
-        fetchCompanyJobs()
+        // Direct local state update to prevent caching/fetch lag and ensure instant UI updates
+        setApplicants(prev => {
+          if (!prev) return prev;
+          return prev.map(app => {
+            if (app._id === applicationId) {
+              return {
+                ...app,
+                aiScore: data.application.aiScore,
+                aiSummary: data.application.aiSummary,
+                aiQuestions: data.application.aiQuestions,
+                aiAnswers: data.application.aiAnswers,
+              }
+            }
+            return app;
+          })
+        })
       } else {
         toast.error(data.message)
       }

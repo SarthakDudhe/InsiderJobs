@@ -387,16 +387,26 @@ const App = () => {
                 <p className='text-xs text-slate-500 mt-1'>Review recruiter profiles and toggle domain verification state.</p>
               </div>
               
-              {/* Search Box */}
-              <div className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 w-full sm:max-w-xs focus-within:border-blue-500/30 transition-all'>
-                <Search size={16} className='text-slate-400' />
-                <input
-                  type='text'
-                  placeholder='Search by workspace...'
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className='bg-transparent text-xs font-semibold outline-none text-slate-950 w-full placeholder:text-slate-400'
-                />
+              {/* Actions Box */}
+              <div className='flex items-center gap-3 w-full sm:w-auto'>
+                <div className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 w-full sm:max-w-xs focus-within:border-blue-500/30 transition-all'>
+                  <Search size={16} className='text-slate-400' />
+                  <input
+                    type='text'
+                    placeholder='Search by workspace...'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className='bg-transparent text-xs font-semibold outline-none text-slate-950 w-full placeholder:text-slate-400'
+                  />
+                </div>
+                <button
+                  type='button'
+                  onClick={fetchCompanies}
+                  className='flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition-all active:scale-95 shadow-sm'
+                  title='Refresh Workspaces'
+                >
+                  <RefreshCw size={16} />
+                </button>
               </div>
             </div>
 
@@ -555,11 +565,21 @@ const App = () => {
         {/* Reported Jobs Tab Content */}
         {activeTab === 'reported-jobs' && (
           <section className='rounded-3xl border border-rose-200 bg-white/88 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl'>
-            <div className='mb-6'>
-              <h2 className='text-lg font-black tracking-tight text-rose-400 flex items-center gap-2'>
-                <AlertTriangle size={20} /> Reported Listings Queue
-              </h2>
-              <p className='text-xs text-slate-500 mt-1'>Audit suspect job listings flagged by candidates for inactivity or scams.</p>
+            <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6'>
+              <div>
+                <h2 className='text-lg font-black tracking-tight text-rose-400 flex items-center gap-2'>
+                  <AlertTriangle size={20} /> Reported Listings Queue
+                </h2>
+                <p className='text-xs text-slate-500 mt-1'>Audit suspect job listings flagged by candidates for inactivity or scams.</p>
+              </div>
+              <button
+                type='button'
+                onClick={fetchReportedJobs}
+                className='flex cursor-pointer items-center justify-center rounded-xl border border-rose-200 bg-white p-2.5 text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-all active:scale-95 shadow-sm h-fit self-end sm:self-center'
+                title='Refresh Reported Jobs'
+              >
+                <RefreshCw size={16} />
+              </button>
             </div>
 
             <div className='overflow-x-auto rounded-2xl border border-slate-200 bg-white'>
