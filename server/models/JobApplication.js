@@ -8,7 +8,8 @@ status:{type:String,default:"Pending"},
 date:{type:Number,required:true},
 aiScore:{type:Number},
 aiSummary:{type:String},
-aiQuestions:{type:[String]}
+aiQuestions:{type:[String]},
+aiAnswers:{type:[String]}
 }, { timestamps: true })
 
 JobApplicationSchema.index({ userId: 1, jobId: 1 }, { unique: true });

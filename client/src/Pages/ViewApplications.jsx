@@ -4,7 +4,7 @@ import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Loader from '../LoaderFront/Loader'
-import { Check, RotateCcw, UsersRound, X } from 'lucide-react'
+import { Check, RotateCcw, UsersRound, X, Eye, EyeOff } from 'lucide-react'
 
 const ViewApplications = () => {
   const { backendUrl, companyToken } = useContext(AppContext)
@@ -12,6 +12,12 @@ const ViewApplications = () => {
   const [sortBy, setSortBy] = useState('date')
   const [expandedId, setExpandedId] = useState(null)
   const [screeningIds, setScreeningIds] = useState({})
+  const [revealedAnswers, setRevealedAnswers] = useState({})
+
+  const toggleAnswer = (applicantId, idx) => {
+    const key = `${applicantId}-${idx}`
+    setRevealedAnswers(prev => ({ ...prev, [key]: !prev[key] }))
+  }
 
   const handleScreenApplication = async (applicationId) => {
     setScreeningIds(prev => ({ ...prev, [applicationId]: true }))
@@ -271,15 +277,41 @@ const ViewApplications = () => {
                                 <div className='space-y-2.5'>
                                   <h4 className='text-[10px] font-bold uppercase tracking-wider text-gray-400'>Tailored Interview Questions</h4>
                                   {applicant.aiQuestions?.length > 0 ? (
-                                    <ul className='space-y-2'>
-                                      {applicant.aiQuestions.map((q, idx) => (
-                                        <li key={idx} className='flex items-start gap-2.5 text-xs text-gray-600 leading-relaxed bg-white border border-gray-100 p-3 rounded-xl shadow-sm'>
-                                          <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded bg-indigo-50 text-indigo-600 font-extrabold text-[10px]'>
-                                            {idx + 1}
-                                          </span>
-                                          <span>{q}</span>
-                                        </li>
-                                      ))}
+                                    <ul className='space-y-3'>
+                                      {applicant.aiQuestions.map((q, idx) => {
+                                        const answerKey = `${applicant._id}-${idx}`
+                                        const isRevealed = revealedAnswers[answerKey]
+                                        const hasAnswer = applicant.aiAnswers?.[idx]
+                                        return (
+                                          <li key={idx} className='text-xs text-gray-600 bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden'>
+                                            <div className='flex items-start gap-2.5 p-3'>
+                                              <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded bg-indigo-50 text-indigo-600 font-extrabold text-[10px]'>
+                                                {idx + 1}
+                                              </span>
+                                              <span className='flex-1 leading-relaxed'>{q}</span>
+                                              {hasAnswer && (
+                                                <button
+                                                  onClick={() => toggleAnswer(applicant._id, idx)}
+                                                  title={isRevealed ? 'Hide ideal answer' : 'Show ideal answer'}
+                                                  className={`shrink-0 rounded-lg p-1.5 transition-all cursor-pointer ${
+                                                    isRevealed
+                                                      ? 'bg-violet-100 text-violet-700'
+                                                      : 'bg-gray-100 text-gray-500 hover:bg-violet-50 hover:text-violet-600'
+                                                  }`}
+                                                >
+                                                  {isRevealed ? <EyeOff size={13} /> : <Eye size={13} />}
+                                                </button>
+                                              )}
+                                            </div>
+                                            {isRevealed && hasAnswer && (
+                                              <div className='mx-3 mb-3 rounded-lg border border-violet-100 bg-violet-50 px-3 py-2.5'>
+                                                <p className='text-[10px] font-extrabold uppercase tracking-wider text-violet-500 mb-1'>💡 Ideal Answer</p>
+                                                <p className='text-xs text-violet-800 leading-relaxed'>{applicant.aiAnswers[idx]}</p>
+                                              </div>
+                                            )}
+                                          </li>
+                                        )
+                                      })}
                                     </ul>
                                   ) : (
                                     <p className='text-xs text-gray-500 font-semibold'>No questions generated.</p>

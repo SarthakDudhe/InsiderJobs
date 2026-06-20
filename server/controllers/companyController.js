@@ -367,13 +367,15 @@ Analyze their experience, skills, and fit.
 Provide:
 1. An overall fit score between 0 and 100.
 2. A brief 1-2 sentence "Resume TL;DR" summary badge next to each candidate, summarizing their top highlights and fit (e.g., "5 years React/Node experience. Lacks requested Kubernetes experience. Worked at Amazon."). Keep it under 150 characters.
-3. exactly 3 tailored interview questions to ask this specific candidate based on gaps or interesting aspects of their profile.
+3. Exactly 3 tailored interview questions to ask this specific candidate based on gaps or interesting aspects of their profile.
+4. A model answer for each of those 3 questions (2-4 sentences each). These are example ideal answers a strong candidate would give — useful for the recruiter to benchmark against.
 
 Return the result as a valid JSON object matching this structure exactly (do not output markdown or any other explanation):
 {
   "score": 85,
   "summary": "5 years React/Node experience. Lacks requested Kubernetes experience. Worked at Amazon.",
-  "questions": ["Question 1?", "Question 2?", "Question 3?"]
+  "questions": ["Question 1?", "Question 2?", "Question 3?"],
+  "answers": ["Ideal answer for Q1.", "Ideal answer for Q2.", "Ideal answer for Q3."]
 }`;
 
         const chatCompletion = await groq.chat.completions.create({
@@ -396,6 +398,7 @@ Return the result as a valid JSON object matching this structure exactly (do not
         application.aiScore = screenResult.score ?? 50;
         application.aiSummary = screenResult.summary ?? "Screened with AI.";
         application.aiQuestions = screenResult.questions ?? [];
+        application.aiAnswers = screenResult.answers ?? [];
         await application.save();
 
         res.json({
@@ -406,6 +409,7 @@ Return the result as a valid JSON object matching this structure exactly (do not
                 aiScore: application.aiScore,
                 aiSummary: application.aiSummary,
                 aiQuestions: application.aiQuestions,
+                aiAnswers: application.aiAnswers,
                 status: application.status
             }
         });
