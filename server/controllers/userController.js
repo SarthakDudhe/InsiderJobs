@@ -23,8 +23,11 @@ export const registerUser = async (req, res) => {
                 const salt = await bcrypt.genSalt(10);
                 const hashedPassword = await bcrypt.hash(password, salt)
 
+                // Fetch the raw document from the MongoDB driver to get the uncasted string _id
+                const rawUser = await User.collection.findOne({ email });
+                const oldId = rawUser ? rawUser._id : userExists._id; // Fallback just in case
+                
                 // Preserve data from the old Clerk account
-                const oldId = userExists._id
                 const oldResume = userExists.resume || ""
                 const oldResumeText = userExists.resumeText || ""
                 const oldSkills = userExists.skills || []
@@ -35,8 +38,8 @@ export const registerUser = async (req, res) => {
                     ? `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`
                     : userExists.image
 
-                // Delete the old Clerk document (its _id is a string, not an ObjectId)
-                await User.collection.deleteOne({ _id: oldId })
+                // Delete the old Clerk document using the raw string _id (or by email to be safe)
+                await User.collection.deleteOne({ email: email })
 
                 // Create a fresh user with a proper MongoDB ObjectId
                 const newUser = await User.create({
@@ -53,10 +56,12 @@ export const registerUser = async (req, res) => {
                 })
 
                 // Migrate any existing job applications from old Clerk _id to new ObjectId
-                await JobApplication.updateMany(
-                    { userId: String(oldId) },
-                    { $set: { userId: String(newUser._id) } }
-                )
+                if (oldId) {
+                    await JobApplication.updateMany(
+                        { userId: String(oldId) },
+                        { $set: { userId: String(newUser._id) } }
+                    )
+                }
 
                 const token = generateToken(newUser._id)
                 return res.json({
