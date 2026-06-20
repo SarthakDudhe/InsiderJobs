@@ -10,6 +10,23 @@ const Dashboard = () => {
   const navigate = useNavigate()
   const { companyData, setcompanyData, setCompanyToken, companyToken, backendUrl } = useContext(AppContext)
 
+  const handleResendVerification = async () => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + '/api/company/resend-verification',
+        {},
+        { headers: { token: companyToken } }
+      )
+      if (data.success) {
+        toast.success(data.message)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
   const logout = () => {
     setCompanyToken(null)
     localStorage.removeItem('companyToken')
@@ -67,14 +84,37 @@ const Dashboard = () => {
         </aside>
 
         <main className='min-w-0 flex-1 p-3 sm:p-6'>
-          {companyData && !companyData.isVerified && (
+          {companyData && !companyData.isEmailVerified && (
+            <div className='mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 shadow-sm transition-all duration-300'>
+              <div className='flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
+                <div className='flex items-start gap-3'>
+                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600 font-bold'>✉</span>
+                  <div>
+                    <h4 className='text-sm font-extrabold text-red-900'>Work Email Verification Required</h4>
+                    <p className='text-xs text-red-700 mt-1 leading-relaxed max-w-2xl'>
+                      Please verify your recruiter workspace email. A verification link has been logged in the server console. You cannot post active job listings until this is verified.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type='button'
+                  onClick={handleResendVerification}
+                  className='cursor-pointer text-nowrap rounded-xl bg-red-600 px-4 py-2 text-xs font-extrabold text-white transition-all hover:bg-red-700 active:scale-95 shadow-sm'
+                >
+                  Resend Verification Link
+                </button>
+              </div>
+            </div>
+          )}
+
+          {companyData && companyData.isEmailVerified && !companyData.isVerified && (
             <div className='mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm transition-all duration-300'>
               <div className='flex items-start gap-3'>
                 <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600 font-bold'>⚠️</span>
                 <div>
-                  <h4 className='text-sm font-extrabold text-amber-900'>Workspace Pending Verification</h4>
+                  <h4 className='text-sm font-extrabold text-amber-900'>Workspace Pending Admin Approval</h4>
                   <p className='text-xs text-amber-700 mt-1 leading-relaxed max-w-2xl'>
-                    Your company profile is currently under review. Any jobs you post will remain as drafts and hidden from candidates until the workspace domain is verified.
+                    Your work email has been verified. Your company profile is currently under review by our admin team. Any jobs you post will remain hidden from candidates until approved.
                   </p>
                 </div>
               </div>

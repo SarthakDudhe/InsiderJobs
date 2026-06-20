@@ -1,6 +1,7 @@
 import Job from "../models/Job.js"
 import JobApplication from "../models/JobApplication.js"
 import User from "../models/User.js"
+import { Groq } from "groq-sdk"
 import { v2 as cloudinary } from "cloudinary"
 import fs from 'fs'
 import { extractText, getDocumentProxy } from "unpdf"
@@ -214,10 +215,50 @@ export const updateUserResume = async (req, res) => {
             try {
                 const pdf = await getDocumentProxy(new Uint8Array(fs.readFileSync(resumeFile.path)));
                 const { text } = await extractText(pdf, { mergePages: true });
-                userData.resumeText = text?.trim() || "";
+                const resumeText = text?.trim() || "";
+                userData.resumeText = resumeText;
+
+                // Extract structured profile details using Groq
+                const groqApiKey = process.env.GROK_API_KEY;
+                if (resumeText && groqApiKey) {
+                    console.log(`[User Controller] Extracting structured profile for user ${userId} using Groq LLM...`);
+                    const groq = new Groq({ apiKey: groqApiKey });
+                    const prompt = `Extract structured profile information from this resume text.
+Return ONLY a valid JSON object matching the following structure exactly (do not output markdown or any other explanation):
+{
+  "skills": ["Skill1", "Skill2", ...],
+  "experience": [{"role": "Role Name", "company": "Company Name", "duration": "Duration (e.g. 2 years)"}],
+  "education": [{"degree": "Degree", "school": "School/University", "year": "Graduation Year (e.g. 2024)"}],
+  "github": "Github profile URL or empty string",
+  "linkedin": "Linkedin profile URL or empty string",
+  "portfolio": "Portfolio URL or empty string"
+}
+
+Resume Text:
+${resumeText}`;
+
+                    const chatCompletion = await groq.chat.completions.create({
+                        messages: [
+                            { role: "system", content: "You are a professional recruiting assistant. Return ONLY valid JSON." },
+                            { role: "user", content: prompt }
+                        ],
+                        model: "llama-3.3-70b-versatile",
+                        temperature: 0.2,
+                        response_format: { type: "json_object" }
+                    });
+
+                    const parsedData = JSON.parse(chatCompletion.choices[0]?.message?.content || '{}');
+                    userData.skills = parsedData.skills || [];
+                    userData.experience = parsedData.experience || [];
+                    userData.education = parsedData.education || [];
+                    userData.links = {
+                        github: parsedData.github || "",
+                        linkedin: parsedData.linkedin || "",
+                        portfolio: parsedData.portfolio || ""
+                    };
+                }
             } catch (pdfError) {
-                console.error("[User Controller] PDF parsing failed on upload:", pdfError.message);
-                userData.resumeText = "";
+                console.error("[User Controller] PDF parsing / profile extraction failed:", pdfError.message);
             }
         }
         await userData.save()

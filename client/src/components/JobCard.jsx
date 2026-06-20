@@ -51,6 +51,21 @@ const JobCard = ({ job }) => {
           <span className='status-chip border border-blue-100 bg-blue-50 text-blue-700'>New</span>
         </div>
 
+        {/* Response Stats Badge */}
+        <div className='mb-4 flex flex-wrap items-center gap-2'>
+          {job.companyId?.hasApplicants ? (
+            <span className='inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700 border border-blue-100'>
+              <span className='text-blue-500 font-bold'>✓</span> {job.companyId.responseRate}% Response Rate
+              <span className='text-gray-300'>|</span>
+              {job.companyId.averageDecisionDays}d Decisions
+            </span>
+          ) : (
+            <span className='inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-2.5 py-1 text-[11px] font-bold text-indigo-700 border border-indigo-100'>
+              <span className='text-indigo-500'>★</span> Highly Active Workspace
+            </span>
+          )}
+        </div>
+
         <h4 className='mb-3 line-clamp-2 text-lg font-extrabold leading-snug text-gray-950 transition-colors group-hover:text-blue-700 sm:text-xl'>{job.title}</h4>
 
         <div className='mb-5 flex flex-wrap items-center gap-2'>

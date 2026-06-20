@@ -2,6 +2,7 @@ import Company from "../models/Company.js";
 import bcrypt from "bcryptjs";
 import {v2 as cloudinary} from 'cloudinary'
 import generateToken from "../utils/generateToken.js";
+import crypto from "crypto";
 import Job from "../models/Job.js";
 import JobApplication from '../models/JobApplication.js'
 import fs from 'fs';
@@ -36,17 +37,29 @@ export const registerCompany = async (req, res) => {
 
     const imageUpload = await cloudinary.uploader.upload(imageFile.path)
 
+    const verificationToken = crypto.randomBytes(32).toString('hex')
+
     const company = await Company.create({
-      name, email, password: hashpassword,
-      image: imageUpload.secure_url
+      name, 
+      email, 
+      password: hashpassword,
+      image: imageUpload.secure_url,
+      emailVerificationToken: verificationToken,
+      emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
     })
 
+    console.log("=== EMAIL VERIFICATION TOKEN FOR RECRIUTER ===");
+    console.log(`Verify link: http://localhost:5000/api/company/verify-email?token=${verificationToken}`);
+
     res.json({
-      success: true, company: {
+      success: true, 
+      company: {
         _id: company._id,
         name: company.name,
         email: company.email,
-        image: company.image
+        image: company.image,
+        isEmailVerified: false,
+        isVerified: false
       },
       token: generateToken(company._id)
     })
@@ -74,19 +87,23 @@ export const loginCompany = async (req,res) => {
             company.lastActivity = new Date();
             
             // Auto-verify slack@demo.com
-            if (email === 'slack@demo.com' && !company.isVerified) {
+            if (email === 'slack@demo.com') {
+                company.isEmailVerified = true;
                 company.isVerified = true;
             }
             
             await company.save();
             res.json({
-                success:true,company:{
-                _id:company._id,
-                name:company.name,
-                email:company.email,
-                image:company.image,
-                isVerified:company.isVerified
-},token:generateToken(company._id)
+                success:true,
+                company:{
+                    _id:company._id,
+                    name:company.name,
+                    email:company.email,
+                    image:company.image,
+                    isVerified:company.isVerified,
+                    isEmailVerified:company.isEmailVerified
+                },
+                token:generateToken(company._id)
             })
         }else{
             res.json({success:false,message:"Invalid Email or Password"})
@@ -118,6 +135,14 @@ export const getCompanydata = async (req,res) => {
 export const postjob = async (req,res) => {
     const {title,description,location,salary,level,category} = req.body;
     const companyId = req.company._id
+    
+    if (!req.company.isEmailVerified) {
+        return res.json({ success: false, message: "Please verify your work email first before posting jobs." });
+    }
+    if (!req.company.isVerified) {
+        return res.json({ success: false, message: "Your workspace is pending admin approval. You cannot post jobs publicly yet." });
+    }
+
    try {
     const newJob = await Job.create({
         title,description,
@@ -225,4 +250,51 @@ export const changeVisibility = async (req,res) => {
     } catch (error) {
          res.json({success:false,message:error.message})
     }
+}
+
+// Verify Company Email
+export const verifyCompanyEmail = async (req, res) => {
+  const { token } = req.query;
+  try {
+    const company = await Company.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpires: { $gt: Date.now() }
+    });
+    if (!company) {
+      return res.status(400).send("<h1>Verification link is invalid or has expired.</h1>");
+    }
+    company.isEmailVerified = true;
+    company.emailVerificationToken = undefined;
+    company.emailVerificationExpires = undefined;
+    await company.save();
+    res.send("<h1>Email verified successfully! You can now access your recruiter console.</h1>");
+  } catch (error) {
+    res.status(500).send(`<h1>Server Error: ${error.message}</h1>`);
+  }
+}
+
+// Resend Email Verification Link
+export const resendCompanyVerificationEmail = async (req, res) => {
+  try {
+    const companyId = req.company._id;
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return res.json({ success: false, message: "Company not found" });
+    }
+    if (company.isEmailVerified) {
+      return res.json({ success: false, message: "Email is already verified" });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    company.emailVerificationToken = token;
+    company.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
+    await company.save();
+
+    console.log("=== EMAIL VERIFICATION TOKEN FOR RECRIUTER ===");
+    console.log(`Verify link: http://localhost:5000/api/company/verify-email?token=${token}`);
+
+    res.json({ success: true, message: "Verification link generated! Check server logs." });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
 }

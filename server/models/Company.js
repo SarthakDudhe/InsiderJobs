@@ -8,6 +8,9 @@ const companySchema = new mongoose.Schema({
     password:{type:String,required:true},
     lastActivity:{type:Date,default:Date.now},
     isVerified:{type:Boolean,default:false},
+    emailVerificationToken: {type:String},
+    emailVerificationExpires: {type:Date},
+    isEmailVerified: {type:Boolean,default:false}
 })
 
 const Company = mongoose.model("Company",companySchema)

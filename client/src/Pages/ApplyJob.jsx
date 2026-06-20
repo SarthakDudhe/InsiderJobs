@@ -137,6 +137,18 @@ const ApplyJob = () => {
                       <span className='text-xs font-bold uppercase tracking-wider'>Likely Stale</span>
                     </span>
                   )}
+
+                  {jobData.companyId?.hasApplicants ? (
+                    <span className='inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-blue-700 shadow-sm'>
+                      <span className='text-blue-500 font-bold'>✓</span>
+                      <span className='text-xs font-bold'>{jobData.companyId.responseRate}% Response Rate | {jobData.companyId.averageDecisionDays}d Decisions</span>
+                    </span>
+                  ) : (
+                    <span className='inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-indigo-700 shadow-sm'>
+                      <span className='text-indigo-500'>★</span>
+                      <span className='text-xs font-bold'>Highly Active Workspace</span>
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -169,13 +181,71 @@ const ApplyJob = () => {
           </article>
 
           <aside>
-            <div className='sticky top-24'>
-              <h2 className='mb-4 text-xl font-extrabold text-gray-950'>More jobs from {jobData.companyId.name}</h2>
-              <div className='space-y-5'>
-                {jobs.filter(job => job._id !== jobData._id && job.companyId._id === jobData.companyId._id).filter(job => {
-                  const appliedJobsIds = new Set(userApplications.map(app => app.jobId && app.jobId._id))
-                  return !appliedJobsIds.has(job._id)
-                }).slice(0, 4).map((job, index) => <JobCard key={index} job={job} />)}
+            <div className='sticky top-24 space-y-6'>
+              {/* Company Info Sidebar Card */}
+              <div className='premium-panel rounded-[1.5rem] p-6 border border-gray-100 bg-white/50 backdrop-blur-md shadow-sm'>
+                <div className='flex items-center gap-4 mb-4'>
+                  <div className='flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 p-2 shadow-sm'>
+                    <img className='h-10 w-10 object-contain' src={jobData.companyId.image} alt={jobData.companyId.name} />
+                  </div>
+                  <div>
+                    <h3 className='text-lg font-extrabold text-gray-950'>{jobData.companyId.name}</h3>
+                    <p className='text-xs text-gray-400 font-semibold uppercase tracking-wider'>Verified Workspace</p>
+                  </div>
+                </div>
+
+                <div className='space-y-3 pt-3 border-t border-gray-100'>
+                  <div className='flex justify-between items-center text-sm'>
+                    <span className='text-gray-500 font-semibold'>Hiring Status:</span>
+                    {(jobData.hiringActivity || 'stale') === 'active' && (
+                      <span className='inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 uppercase tracking-wider'>
+                        <span className='relative flex h-1.5 w-1.5'>
+                          <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
+                          <span className='relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500'></span>
+                        </span>
+                        Active Hiring
+                      </span>
+                    )}
+                    {(jobData.hiringActivity || 'stale') === 'slow' && (
+                      <span className='inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 uppercase tracking-wider'>
+                        <span className='h-1.5 w-1.5 rounded-full bg-amber-500'></span>
+                        Slow Activity
+                      </span>
+                    )}
+                    {(jobData.hiringActivity || 'stale') === 'stale' && (
+                      <span className='inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 uppercase tracking-wider'>
+                        <span className='h-1.5 w-1.5 rounded-full bg-rose-500'></span>
+                        Likely Stale
+                      </span>
+                    )}
+                  </div>
+
+                  <div className='flex justify-between items-center text-sm'>
+                    <span className='text-gray-500 font-semibold'>Response Rate:</span>
+                    {jobData.companyId.hasApplicants ? (
+                      <span className='font-extrabold text-blue-600'>{jobData.companyId.responseRate}%</span>
+                    ) : (
+                      <span className='font-extrabold text-indigo-600'>★ Highly Active</span>
+                    )}
+                  </div>
+
+                  {jobData.companyId.hasApplicants && (
+                    <div className='flex justify-between items-center text-sm'>
+                      <span className='text-gray-500 font-semibold'>Avg. Decision Time:</span>
+                      <span className='font-extrabold text-blue-600'>{jobData.companyId.averageDecisionDays} days</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h2 className='mb-4 text-xl font-extrabold text-gray-950'>More jobs from {jobData.companyId.name}</h2>
+                <div className='space-y-5'>
+                  {jobs.filter(job => job._id !== jobData._id && job.companyId._id === jobData.companyId._id).filter(job => {
+                    const appliedJobsIds = new Set(userApplications.map(app => app.jobId && app.jobId._id))
+                    return !appliedJobsIds.has(job._id)
+                  }).slice(0, 4).map((job, index) => <JobCard key={index} job={job} />)}
+                </div>
               </div>
             </div>
           </aside>
