@@ -3,7 +3,7 @@ import User from "../models/User.js";
 import axios from "axios";
 import { Groq } from "groq-sdk";
 import { ApifyClient } from "apify-client";
-import { PDFParse } from "pdf-parse";
+import { extractText, getDocumentProxy } from "unpdf";
 
 export const getAIJobRecommendations = async (req, res) => {
     try {
@@ -93,11 +93,9 @@ export const getAIJobRecommendations = async (req, res) => {
             try {
                 const response = await axios.get(user.resume, { responseType: 'arraybuffer' });
 
-                // Correct usage of pdf-parse (v2)
-                const parser = new PDFParse({ data: response.data });
-                const data = await parser.getText();
-                resumeText = data.text?.trim() || "";
-                await parser.destroy();
+                const pdf = await getDocumentProxy(new Uint8Array(response.data));
+                const { text } = await extractText(pdf, { mergePages: true });
+                resumeText = text?.trim() || "";
 
                 if (resumeText) {
                     user.resumeText = resumeText;

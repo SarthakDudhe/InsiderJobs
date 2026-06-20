@@ -4,7 +4,7 @@ import User from "../models/User.js"
 import { v2 as cloudinary } from "cloudinary"
 import { clerkClient } from "@clerk/express"
 import fs from 'fs'
-import { PDFParse } from "pdf-parse"
+import { extractText, getDocumentProxy } from "unpdf"
 
 export const getUserData = async (req, res) => {
     const userId = req.auth?.userId
@@ -155,10 +155,9 @@ export const updateUserResume = async (req, res) => {
 
             // Parse PDF text on upload and cache it
             try {
-                const parser = new PDFParse({ data: fs.readFileSync(resumeFile.path) });
-                const data = await parser.getText();
-                userData.resumeText = data.text?.trim() || "";
-                await parser.destroy();
+                const pdf = await getDocumentProxy(new Uint8Array(fs.readFileSync(resumeFile.path)));
+                const { text } = await extractText(pdf, { mergePages: true });
+                userData.resumeText = text?.trim() || "";
             } catch (pdfError) {
                 console.error("[User Controller] PDF parsing failed on upload:", pdfError.message);
                 userData.resumeText = "";
