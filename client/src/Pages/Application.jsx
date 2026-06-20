@@ -532,7 +532,7 @@ const Application = () => {
                 </tr>
               </thead>
               <tbody className='divide-y divide-gray-100'>
-                {userApplications.map((job, index) => (
+                {userApplications.filter(job => job.companyId && job.jobId).map((job, index) => (
                   <tr key={index} className='transition-colors hover:bg-blue-50/30'>
                     <td className='px-4 py-5'>
                       <div className='flex items-center gap-3'>
@@ -553,7 +553,7 @@ const Application = () => {
           </div>
 
           <div className='space-y-4 p-4 md:hidden'>
-            {userApplications.map((job, index) => (
+            {userApplications.filter(job => job.companyId && job.jobId).map((job, index) => (
               <div key={index} className='rounded-2xl border border-gray-200 bg-gray-50/70 p-4'>
                 <div className='mb-3 flex items-center gap-3'>
                   <img className='h-12 w-12 rounded-xl border border-gray-200 bg-white object-contain p-1' src={job.companyId.image} alt='' />
