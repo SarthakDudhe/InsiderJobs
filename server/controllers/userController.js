@@ -7,7 +7,11 @@ import fs from 'fs'
 import { PDFParse } from "pdf-parse"
 
 export const getUserData = async (req, res) => {
-    const userId = req.auth.userId
+    const userId = req.auth?.userId
+
+    if (!userId) {
+        return res.json({ success: false, message: "Not Authorized, Login Again" })
+    }
 
     try {
         const user = await User.findById(userId)
@@ -75,7 +79,7 @@ export const getUserData = async (req, res) => {
 
 export const applyForJob = async (req, res) => {
     const { jobId } = req.body
-    const { userId } = req.auth
+    const userId = req.auth?.userId
 
     if (!userId) {
         return res.json({ success: false, message: "Not Authorized, Login Again" })
@@ -114,7 +118,10 @@ export const applyForJob = async (req, res) => {
 
 export const getUserJobApplication = async (req, res) => {
     try {
-        const userId = req.auth.userId
+        const userId = req.auth?.userId
+        if (!userId) {
+            return res.json({ success: false, message: "Not Authorized, Login Again" })
+        }
 
         const application = await JobApplication.find({ userId }).populate('companyId', 'name email image').populate('jobId', 'title description location category level salary').exec()
         if (!application) {
@@ -131,7 +138,10 @@ export const getUserJobApplication = async (req, res) => {
 
 export const updateUserResume = async (req, res) => {
     try {
-        const userId = req.auth.userId
+        const userId = req.auth?.userId
+        if (!userId) {
+            return res.json({ success: false, message: "Not Authorized, Login Again" })
+        }
         const resumeFile = req.file
 
         const userData = await User.findById(userId)

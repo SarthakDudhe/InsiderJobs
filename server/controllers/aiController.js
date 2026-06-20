@@ -7,7 +7,10 @@ import { PDFParse } from "pdf-parse";
 
 export const getAIJobRecommendations = async (req, res) => {
     try {
-        const userId = req.auth.userId;
+        const userId = req.auth?.userId;
+        if (!userId) {
+            return res.json({ success: false, message: "Not Authorized, Login Again" });
+        }
         const { keywords: customKeywordsParam } = req.query;
 
         const serpApiKey = process.env.SERP_API_KEY;

@@ -29,7 +29,20 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'token']
 }))
 app.use(express.json())
-app.use(clerkMiddleware())
+
+// Conditional Clerk middleware to prevent crashes on routes that do not need Clerk authentication
+let userClerkMiddleware;
+if (process.env.CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY) {
+  userClerkMiddleware = clerkMiddleware();
+} else {
+  console.warn("WARNING: Clerk credentials (CLERK_PUBLISHABLE_KEY or CLERK_SECRET_KEY) are missing in environment variables. User authentication routes will return an error.");
+  userClerkMiddleware = (req, res, next) => {
+    res.status(500).json({
+      success: false,
+      message: "Clerk credentials are not configured on the server. Please add CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY to your environment variables."
+    });
+  };
+}
 
 
 //Routes
@@ -46,7 +59,7 @@ app.post("/webhooks", clerkWebHooks)
 app.use('/api/company', companyRoutes)
 app.use('/api/admin', adminRoutes)
 app.use("/api/jobs", jobRoutes)
-app.use("/api/users", userRoutes)
+app.use("/api/users", userClerkMiddleware, userRoutes)
 //Port
 
 const PORT = process.env.PORT || 5000
