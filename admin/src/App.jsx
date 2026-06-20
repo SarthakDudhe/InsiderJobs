@@ -15,7 +15,8 @@ import {
   XCircle,
   AlertTriangle,
   MapPin,
-  Tag
+  Tag,
+  RefreshCw
 } from 'lucide-react'
 import logo from './assets/logo.svg'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -470,16 +471,26 @@ const App = () => {
                 <p className='text-xs text-slate-500 mt-1'>Review all active jobs and delete any inappropriate or stale listings.</p>
               </div>
               
-              {/* Search Box */}
-              <div className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 w-full sm:max-w-xs focus-within:border-blue-500/30 transition-all'>
-                <Search size={16} className='text-slate-400' />
-                <input
-                  type='text'
-                  placeholder='Search by job title or company...'
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className='bg-transparent text-xs font-semibold outline-none text-slate-950 w-full placeholder:text-slate-400'
-                />
+              {/* Actions Box */}
+              <div className='flex items-center gap-3 w-full sm:w-auto'>
+                <div className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 w-full sm:max-w-xs focus-within:border-blue-500/30 transition-all'>
+                  <Search size={16} className='text-slate-400' />
+                  <input
+                    type='text'
+                    placeholder='Search by job title or company...'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className='bg-transparent text-xs font-semibold outline-none text-slate-950 w-full placeholder:text-slate-400'
+                  />
+                </div>
+                <button
+                  type='button'
+                  onClick={fetchAllJobs}
+                  className='flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition-all active:scale-95 shadow-sm'
+                  title='Refresh Jobs'
+                >
+                  <RefreshCw size={16} />
+                </button>
               </div>
             </div>
 

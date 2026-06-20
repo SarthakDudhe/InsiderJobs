@@ -62,6 +62,10 @@ export const verifyCompany = async (req, res) => {
             return res.json({ success: false, message: "Company not found" });
         }
         company.isVerified = isVerified;
+        // If admin is manually verifying the company, bypass the email verification loop
+        if (isVerified) {
+            company.isEmailVerified = true;
+        }
         await company.save();
         res.json({ success: true, message: `Company verification updated successfully!`, company });
     } catch (error) {

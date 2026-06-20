@@ -4,7 +4,7 @@ import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Loader from '../LoaderFront/Loader'
-import { Check, RotateCcw, UsersRound, X, Eye, EyeOff } from 'lucide-react'
+import { Check, RotateCcw, UsersRound, X, Eye, EyeOff, RefreshCw } from 'lucide-react'
 
 const ViewApplications = () => {
   const { backendUrl, companyToken } = useContext(AppContext)
@@ -89,7 +89,7 @@ const ViewApplications = () => {
           <p className='mt-2 text-gray-600'>Review resumes and rank candidates using the AI Recruiter Screener.</p>
         </div>
 
-        {/* Sorting Toggles */}
+        {/* Sorting Toggles & Actions */}
         <div className='flex items-center gap-2 rounded-xl border border-gray-200 bg-white p-1 shadow-sm h-fit self-end sm:self-center'>
           <button
             onClick={() => setSortBy('date')}
@@ -110,6 +110,14 @@ const ViewApplications = () => {
             }`}
           >
             ✨ Rank by AI Fit Score
+          </button>
+          <div className='w-[1px] h-6 bg-gray-200 mx-1'></div>
+          <button
+            onClick={fetchCompanyJobs}
+            className='cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition-all'
+            title='Refresh Applications'
+          >
+            <RefreshCw size={16} />
           </button>
         </div>
       </div>

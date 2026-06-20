@@ -205,38 +205,7 @@ const RecruiterLogin = () => {
               {state === 'Login' ? 'Login' : isTextDataSubmitted ? 'Create Account' : 'Next'}
             </button>
 
-            {/* Social Logins */}
-            {state === 'Login' && (
-              <>
-                <div className='relative my-5 flex items-center justify-center'>
-                  <div className='absolute inset-0 flex items-center'>
-                    <div className='w-full border-t border-gray-100'></div>
-                  </div>
-                  <span className='relative bg-white px-3 text-[10px] font-bold uppercase tracking-widest text-gray-400'>
-                    Or enterprise login
-                  </span>
-                </div>
 
-                <div className='grid grid-cols-2 gap-3'>
-                  <button
-                    type='button'
-                    onClick={() => toast.info('LinkedIn Recruiter login is a production-only integration.')}
-                    className='flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-200 py-2.5 text-xs font-bold text-gray-700 transition-all hover:bg-gray-50 active:scale-95'
-                  >
-                    <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' className='h-4 w-4' alt='LinkedIn' />
-                    LinkedIn
-                  </button>
-                  <button
-                    type='button'
-                    onClick={() => toast.info('Google Workspace Single Sign-On is a production-only integration.')}
-                    className='flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-200 py-2.5 text-xs font-bold text-gray-700 transition-all hover:bg-gray-50 active:scale-95'
-                  >
-                    <img src='https://cdn-icons-png.flaticon.com/512/2991/2991148.png' className='h-4 w-4' alt='Google' />
-                    Google SSO
-                  </button>
-                </div>
-              </>
-            )}
 
             <div className='pt-5 text-center'>
               {state === 'Login' ? (
