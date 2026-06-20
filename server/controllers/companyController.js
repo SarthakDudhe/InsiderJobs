@@ -70,7 +70,7 @@ export const loginCompany = async (req,res) => {
     const {email,password} =req.body
     try {
         const company = await Company.findOne({email})
-        if (company && await bcrypt.compare(password,company.password)) {
+        if (company && company.password && await bcrypt.compare(password,company.password)) {
             company.lastActivity = new Date();
             
             // Auto-verify slack@demo.com

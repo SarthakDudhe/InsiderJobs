@@ -16,6 +16,31 @@ export const registerUser = async (req, res) => {
     try {
         const userExists = await User.findOne({ email })
         if (userExists) {
+            // Handle migration of users created under Clerk (they have no password)
+            if (!userExists.password) {
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(password, salt)
+                
+                userExists.name = name
+                userExists.password = hashedPassword
+                if (!userExists.image || userExists.image.startsWith('https://images.clerk.dev')) {
+                    userExists.image = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`
+                }
+                await userExists.save()
+
+                const token = generateToken(userExists._id)
+                return res.json({
+                    success: true,
+                    user: {
+                        _id: userExists._id,
+                        name: userExists.name,
+                        email: userExists.email,
+                        image: userExists.image,
+                        resume: userExists.resume
+                    },
+                    token
+                })
+            }
             return res.json({ success: false, message: "User Already Registered !" })
         }
 
@@ -58,7 +83,15 @@ export const loginUser = async (req, res) => {
     }
     try {
         const user = await User.findOne({ email })
-        if (user && await bcrypt.compare(password, user.password)) {
+        if (!user) {
+            return res.json({ success: false, message: "Invalid Email or Password" })
+        }
+        
+        if (!user.password) {
+            return res.json({ success: false, message: "This account has no password set (migrated from Clerk). Please Sign Up with this email to set your password." })
+        }
+
+        if (await bcrypt.compare(password, user.password)) {
             const token = generateToken(user._id)
             res.json({
                 success: true,
