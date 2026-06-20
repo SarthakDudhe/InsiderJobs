@@ -36,6 +36,7 @@ const App = () => {
   
   const [companies, setCompanies] = useState([])
   const [reportedJobs, setReportedJobs] = useState([])
+  const [allJobs, setAllJobs] = useState([])
   const [analyticsData, setAnalyticsData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState('workspaces')
@@ -109,6 +110,20 @@ const App = () => {
     }
   }
 
+  // Fetch All Jobs
+  const fetchAllJobs = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/admin/jobs`, {
+        headers: { token: adminToken }
+      })
+      if (data.success) {
+        setAllJobs(data.jobs)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   // Fetch 7-day Analytics Data
   const fetchAnalytics = async () => {
     try {
@@ -173,6 +188,7 @@ const App = () => {
       if (data.success) {
         toast.success(data.message)
         fetchReportedJobs()
+        fetchAllJobs()
         fetchStats()
         fetchAnalytics()
       } else {
@@ -188,6 +204,7 @@ const App = () => {
       fetchStats()
       fetchCompanies()
       fetchReportedJobs()
+      fetchAllJobs()
       fetchAnalytics()
     }
   }, [adminToken])
@@ -196,6 +213,12 @@ const App = () => {
   const filteredCompanies = companies.filter((c) =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.email.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  // Filtered jobs based on search
+  const filteredJobs = allJobs.filter((job) =>
+    job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (job.companyId && job.companyId.name.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   // Login view if unauthenticated
@@ -332,6 +355,15 @@ const App = () => {
             {activeTab === 'workspaces' && <span className='absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 rounded-full'></span>}
           </button>
           <button
+            onClick={() => setActiveTab('active-postings')}
+            className={`pb-3 text-sm font-bold transition-all relative cursor-pointer ${
+              activeTab === 'active-postings' ? 'text-emerald-600' : 'text-slate-500 hover:text-slate-950'
+            }`}
+          >
+            Active Postings
+            {activeTab === 'active-postings' && <span className='absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full'></span>}
+          </button>
+          <button
             onClick={() => setActiveTab('reported-jobs')}
             className={`pb-3 text-sm font-bold transition-all relative cursor-pointer flex items-center gap-1.5 ${
               activeTab === 'reported-jobs' ? 'text-rose-600' : 'text-slate-500 hover:text-slate-950'
@@ -420,6 +452,86 @@ const App = () => {
                     <tr>
                       <td colSpan={4} className='p-8 text-center text-slate-500 font-semibold'>
                         No workspace profiles match your search criteria.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* Active Postings Tab Content */}
+        {activeTab === 'active-postings' && (
+          <section className='rounded-3xl border border-slate-200 bg-white/88 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl'>
+            <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6'>
+              <div>
+                <h2 className='text-lg font-black tracking-tight'>Active Postings Moderation</h2>
+                <p className='text-xs text-slate-500 mt-1'>Review all active jobs and delete any inappropriate or stale listings.</p>
+              </div>
+              
+              {/* Search Box */}
+              <div className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 w-full sm:max-w-xs focus-within:border-blue-500/30 transition-all'>
+                <Search size={16} className='text-slate-400' />
+                <input
+                  type='text'
+                  placeholder='Search by job title or company...'
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className='bg-transparent text-xs font-semibold outline-none text-slate-950 w-full placeholder:text-slate-400'
+                />
+              </div>
+            </div>
+
+            <div className='overflow-x-auto rounded-2xl border border-slate-200 bg-white'>
+              <table className='w-full text-left border-collapse text-xs'>
+                <thead>
+                  <tr className='border-b border-slate-200 bg-slate-50 font-extrabold text-slate-500'>
+                    <th className='p-4'>Job Title & Company</th>
+                    <th className='p-4'>Details</th>
+                    <th className='p-4'>Listed Date</th>
+                    <th className='p-4 text-right'>Action</th>
+                  </tr>
+                </thead>
+                <tbody className='divide-y divide-slate-100'>
+                  {filteredJobs.length > 0 ? (
+                    filteredJobs.map((job) => (
+                      <tr key={job._id} className='hover:bg-blue-50/40 transition-colors'>
+                        <td className='p-4'>
+                          <div className='flex items-center gap-3'>
+                            {job.companyId ? (
+                              <img src={job.companyId.image} alt='' className='h-8 w-8 rounded-lg object-contain bg-white p-1' />
+                            ) : (
+                              <span className='h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center'>HQ</span>
+                            )}
+                            <div>
+                              <p className='font-bold text-slate-950'>{job.title}</p>
+                              <p className='text-[10px] text-slate-500 mt-0.5'>{job.companyId ? job.companyId.name : 'Unknown Company'}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className='p-4 text-slate-500 space-y-1'>
+                          <p className='flex items-center gap-1.5'><MapPin size={12} className='text-slate-400' /> {job.location}</p>
+                          <p className='flex items-center gap-1.5'><Tag size={12} className='text-slate-400' /> {job.category}</p>
+                        </td>
+                        <td className='p-4 font-semibold text-slate-500'>
+                          {new Date(job.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </td>
+                        <td className='p-4 text-right'>
+                          <button
+                            type='button'
+                            onClick={() => handleDeleteJob(job._id)}
+                            className='cursor-pointer rounded-lg bg-rose-600 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-rose-700 active:scale-95 transition-all shadow-sm'
+                          >
+                            Delete Listing
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className='p-8 text-center text-slate-500 font-semibold'>
+                        No active job postings match your search criteria.
                       </td>
                     </tr>
                   )}

@@ -1,5 +1,5 @@
 import express from "express";
-import { adminLogin, getDashboardStats, getAllCompanies, verifyCompany, getReportedJobs, dismissJobReports, deleteJob, getAnalyticsData } from "../controllers/adminController.js";
+import { adminLogin, getDashboardStats, getAllCompanies, verifyCompany, getReportedJobs, dismissJobReports, deleteJob, getAnalyticsData, getAllJobs } from "../controllers/adminController.js";
 import { protectAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
@@ -12,6 +12,9 @@ router.get("/stats", protectAdmin, getDashboardStats);
 
 // List all companies
 router.get("/companies", protectAdmin, getAllCompanies);
+
+// List all jobs
+router.get("/jobs", protectAdmin, getAllJobs);
 
 // Verify / Unverify Company
 router.post("/verify", protectAdmin, verifyCompany);

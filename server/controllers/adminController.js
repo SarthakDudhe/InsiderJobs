@@ -149,3 +149,15 @@ export const getAnalyticsData = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 }
+
+// Get all jobs for admin moderation
+export const getAllJobs = async (req, res) => {
+    try {
+        const jobs = await Job.find()
+            .populate("companyId", "name email image")
+            .sort({ date: -1 });
+        res.json({ success: true, jobs });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
