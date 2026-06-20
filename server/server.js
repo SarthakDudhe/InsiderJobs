@@ -14,7 +14,12 @@ import connectCloudinary from './config/cloudinary.js';
 const app = express()
 
 // connect to database
-connectDB()
+try {
+  await connectDB()
+} catch (error) {
+  console.error("Database connection failed on startup:", error.message)
+  process.exit(1)
+}
 connectCloudinary()
 
 
