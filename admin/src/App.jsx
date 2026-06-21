@@ -82,6 +82,21 @@ const App = () => {
     toast.info('Logged out of Admin Portal.')
   }
 
+  // Refresh all data
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const refreshAll = async () => {
+    setIsRefreshing(true)
+    await Promise.all([
+      fetchStats(),
+      fetchCompanies(),
+      fetchReportedJobs(),
+      fetchAllJobs(),
+      fetchAnalytics()
+    ])
+    setIsRefreshing(false)
+    toast.success('Dashboard refreshed!')
+  }
+
   // Fetch Dashboard Statistics
   const fetchStats = async () => {
     try {
@@ -220,6 +235,16 @@ const App = () => {
       fetchReportedJobs()
       fetchAllJobs()
       fetchAnalytics()
+
+      // Auto-refresh every 30 seconds
+      const interval = setInterval(() => {
+        fetchStats()
+        fetchCompanies()
+        fetchReportedJobs()
+        fetchAllJobs()
+        fetchAnalytics()
+      }, 30000)
+      return () => clearInterval(interval)
     }
   }, [adminToken])
 
@@ -320,12 +345,23 @@ const App = () => {
             </span>
           </div>
 
-          <button
-            onClick={handleLogout}
-            className='flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors'
-          >
-            <LogOut size={14} /> Logout
-          </button>
+          <div className='flex items-center gap-2'>
+            <button
+              onClick={refreshAll}
+              disabled={isRefreshing}
+              title='Refresh Dashboard'
+              className='flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed'
+            >
+              <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+              {isRefreshing ? 'Refreshing…' : 'Refresh'}
+            </button>
+            <button
+              onClick={handleLogout}
+              className='flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors'
+            >
+              <LogOut size={14} /> Logout
+            </button>
+          </div>
         </div>
       </header>
 
