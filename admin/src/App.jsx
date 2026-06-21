@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import axios from 'axios'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -24,6 +24,18 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 const App = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"
   const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken') || null)
+  // Separate pagination states for each tab
+  const [pageCompanies, setPageCompanies] = useState(1);
+  const [pageJobs, setPageJobs] = useState(1);
+  const [pageReported, setPageReported] = useState(1);
+  const rowsPerPage = 10;
+  // Reset page numbers when search query or active tab changes
+  useEffect(() => {
+    setPageCompanies(1);
+    setPageJobs(1);
+    setPageReported(1);
+  }, [searchQuery, activeTab]);
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -221,6 +233,22 @@ const App = () => {
     job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (job.companyId && job.companyId.name.toLowerCase().includes(searchQuery.toLowerCase()))
   )
+
+  // Pagination slices (memoized for performance)
+  const paginatedCompanies = useMemo(() => {
+    const start = (pageCompanies - 1) * rowsPerPage;
+    return filteredCompanies.slice(start, start + rowsPerPage);
+  }, [filteredCompanies, pageCompanies, rowsPerPage]);
+
+  const paginatedJobs = useMemo(() => {
+    const start = (pageJobs - 1) * rowsPerPage;
+    return filteredJobs.slice(start, start + rowsPerPage);
+  }, [filteredJobs, pageJobs, rowsPerPage]);
+
+  const paginatedReported = useMemo(() => {
+    const start = (pageReported - 1) * rowsPerPage;
+    return reportedJobs.slice(start, start + rowsPerPage);
+  }, [reportedJobs, pageReported, rowsPerPage]);
 
   // Login view if unauthenticated
   if (!adminToken) {
@@ -422,8 +450,8 @@ const App = () => {
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-slate-100'>
-                  {filteredCompanies.length > 0 ? (
-                    filteredCompanies.map((company) => (
+                  {paginatedCompanies.length > 0 ? (
+                    paginatedCompanies.map((company) => (
                       <tr key={company._id} className='hover:bg-blue-50/40 transition-colors'>
                         <td className='p-4'>
                           <div className='flex items-center gap-3'>
@@ -438,12 +466,10 @@ const App = () => {
                           <div className='flex flex-col'>
                             <span className='font-bold text-slate-950'>{company.recruiterName || 'N/A'}</span>
                             {company.linkedin ? (
-                              <a
-                                href={company.linkedin.startsWith('http') ? company.linkedin : `https://${company.linkedin}`}
-                                target='_blank'
-                                rel='noopener noreferrer'
-                                className='inline-flex items-center gap-0.5 text-[10px] text-blue-500 hover:underline font-semibold mt-0.5 w-fit'
-                              >
+                              <a href={company.linkedin.startsWith('http') ? company.linkedin : `https://${company.linkedin}`}
+                                 target='_blank'
+                                 rel='noopener noreferrer'
+                                 className='inline-flex items-center gap-0.5 text-[10px] text-blue-500 hover:underline font-semibold mt-0.5 w-fit'>
                                 LinkedIn Profile ↗
                               </a>
                             ) : (
@@ -463,15 +489,8 @@ const App = () => {
                           )}
                         </td>
                         <td className='p-4 text-right'>
-                          <button
-                            type='button'
-                            onClick={() => toggleVerification(company._id, company.isVerified)}
-                            className={`cursor-pointer rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all active:scale-95 ${
-                              company.isVerified
-                                ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/10'
-                                : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/10'
-                            }`}
-                          >
+                          <button type='button' onClick={() => toggleVerification(company._id, company.isVerified)}
+                                  className={`cursor-pointer rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all active:scale-95 ${company.isVerified ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/10' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/10'}`}>
                             {company.isVerified ? 'Revoke Approval' : 'Approve Domain'}
                           </button>
                         </td>
@@ -481,6 +500,19 @@ const App = () => {
                     <tr>
                       <td colSpan={5} className='p-8 text-center text-slate-500 font-semibold'>
                         No workspace profiles match your search criteria.
+                      </td>
+                    </tr>
+                  )}
+                  {/* Pagination Controls */}
+                  {filteredCompanies.length > rowsPerPage && (
+                    <tr>
+                      <td colSpan={5} className='p-4 flex justify-center space-x-2'>
+                        <button onClick={() => setPageCompanies(p => Math.max(p - 1, 1))} disabled={pageCompanies === 1}
+                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Prev</button>
+                        <span className='px-2 text-slate-500 flex items-center'>Page {pageCompanies} of {Math.ceil(filteredCompanies.length / rowsPerPage)}</span>
+                        <button onClick={() => setPageCompanies(p => Math.min(p + 1, Math.ceil(filteredCompanies.length / rowsPerPage)))}
+                                disabled={pageCompanies >= Math.ceil(filteredCompanies.length / rowsPerPage)}
+                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Next</button>
                       </td>
                     </tr>
                   )}
@@ -507,7 +539,7 @@ const App = () => {
                     type='text'
                     placeholder='Search by job title or company...'
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => { setSearchQuery(e.target.value); setPageJobs(1); }}
                     className='bg-transparent text-xs font-semibold outline-none text-slate-950 w-full placeholder:text-slate-400'
                   />
                 </div>
@@ -533,8 +565,8 @@ const App = () => {
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-slate-100'>
-                  {filteredJobs.length > 0 ? (
-                    filteredJobs.map((job) => (
+                  {paginatedJobs.length > 0 ? (
+                    paginatedJobs.map((job) => (
                       <tr key={job._id} className='hover:bg-blue-50/40 transition-colors'>
                         <td className='p-4'>
                           <div className='flex items-center gap-3'>
@@ -557,11 +589,8 @@ const App = () => {
                           {new Date(job.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </td>
                         <td className='p-4 text-right'>
-                          <button
-                            type='button'
-                            onClick={() => handleDeleteJob(job._id)}
-                            className='cursor-pointer rounded-lg bg-rose-600 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-rose-700 active:scale-95 transition-all shadow-sm'
-                          >
+                          <button type='button' onClick={() => handleDeleteJob(job._id)}
+                                  className='cursor-pointer rounded-lg bg-rose-600 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-rose-700 active:scale-95 transition-all shadow-sm'>
                             Delete Listing
                           </button>
                         </td>
@@ -571,6 +600,19 @@ const App = () => {
                     <tr>
                       <td colSpan={4} className='p-8 text-center text-slate-500 font-semibold'>
                         No active job postings match your search criteria.
+                      </td>
+                    </tr>
+                  )}
+                  {/* Pagination Controls */}
+                  {filteredJobs.length > rowsPerPage && (
+                    <tr>
+                      <td colSpan={4} className='p-4 flex justify-center space-x-2'>
+                        <button onClick={() => setPageJobs(p => Math.max(p - 1, 1))} disabled={pageJobs === 1}
+                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Prev</button>
+                        <span className='px-2 text-slate-500 flex items-center'>Page {pageJobs} of {Math.ceil(filteredJobs.length / rowsPerPage)}</span>
+                        <button onClick={() => setPageJobs(p => Math.min(p + 1, Math.ceil(filteredJobs.length / rowsPerPage)))}
+                                disabled={pageJobs >= Math.ceil(filteredJobs.length / rowsPerPage)}
+                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Next</button>
                       </td>
                     </tr>
                   )}
@@ -611,8 +653,8 @@ const App = () => {
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-slate-100'>
-                  {reportedJobs.length > 0 ? (
-                    reportedJobs.map((job) => (
+                  {paginatedReported.length > 0 ? (
+                    paginatedReported.map((job) => (
                       <tr key={job._id} className='hover:bg-rose-50/40 transition-colors'>
                         <td className='p-4 align-top'>
                           <div className='flex items-center gap-3'>
@@ -642,20 +684,10 @@ const App = () => {
                           </div>
                         </td>
                         <td className='p-4 text-right align-top space-x-2'>
-                          <button
-                            type='button'
-                            onClick={() => dismissReports(job._id)}
-                            className='cursor-pointer rounded-lg bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 active:scale-95 transition-all'
-                          >
-                            Dismiss Flags
-                          </button>
-                          <button
-                            type='button'
-                            onClick={() => handleDeleteJob(job._id)}
-                            className='cursor-pointer rounded-lg bg-rose-600 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-rose-700 active:scale-95 transition-all shadow-sm'
-                          >
-                            Delete Listing
-                          </button>
+                          <button type='button' onClick={() => dismissReports(job._id)}
+                                  className='cursor-pointer rounded-lg bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 active:scale-95 transition-all'>Dismiss Flags</button>
+                          <button type='button' onClick={() => handleDeleteJob(job._id)}
+                                  className='cursor-pointer rounded-lg bg-rose-600 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-rose-700 active:scale-95 transition-all shadow-sm'>Delete Listing</button>
                         </td>
                       </tr>
                     ))
@@ -663,6 +695,19 @@ const App = () => {
                     <tr>
                       <td colSpan={4} className='p-8 text-center text-slate-500 font-semibold'>
                         No reported job listings found in the queue.
+                      </td>
+                    </tr>
+                  )}
+                  {/* Pagination Controls */}
+                  {reportedJobs.length > rowsPerPage && (
+                    <tr>
+                      <td colSpan={4} className='p-4 flex justify-center space-x-2'>
+                        <button onClick={() => setPageReported(p => Math.max(p - 1, 1))} disabled={pageReported === 1}
+                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Prev</button>
+                        <span className='px-2 text-slate-500 flex items-center'>Page {pageReported} of {Math.ceil(reportedJobs.length / rowsPerPage)}</span>
+                        <button onClick={() => setPageReported(p => Math.min(p + 1, Math.ceil(reportedJobs.length / rowsPerPage)))}
+                                disabled={pageReported >= Math.ceil(reportedJobs.length / rowsPerPage)}
+                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Next</button>
                       </td>
                     </tr>
                   )}
