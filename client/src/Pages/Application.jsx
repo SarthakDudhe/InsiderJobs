@@ -14,6 +14,7 @@ const Application = () => {
   const [resume, setResume] = useState(null)
   const { userData, userToken, backendUrl, fetchUserData, fetchUserApplications, userApplications } = useContext(AppContext)
   const [editLinks, setEditLinks] = useState(false);
+  const [insightsOpen, setInsightsOpen] = useState(false);
   const [githubLink, setGithubLink] = useState(userData?.links?.github || '');
   const [linkedinLink, setLinkedinLink] = useState(userData?.links?.linkedin || '');
   const [portfolioLink, setPortfolioLink] = useState(userData?.links?.portfolio || '');
@@ -157,17 +158,17 @@ const Application = () => {
                     </a>
                   )}
                 </div>
-                               {/* Edit Links UI */}
-                <div>
+                {/* Edit Links UI */}
+                <div className='flex flex-col items-end gap-2'>
                   <button onClick={() => setEditLinks(!editLinks)} className='rounded-xl bg-gray-100 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-200'>
                     {editLinks ? 'Cancel' : 'Edit Links'}
                   </button>
                   {editLinks && (
                     <div className='mt-2 flex flex-col gap-2'>
-                      <input type='url' placeholder='GitHub URL' value={githubLink} onChange={e => setGithubLink(e.target.value)} className='rounded-lg border border-gray-200 p-2 text-sm' />
-                      <input type='url' placeholder='LinkedIn URL' value={linkedinLink} onChange={e => setLinkedinLink(e.target.value)} className='rounded-lg border border-gray-200 p-2 text-sm' />
-                      <input type='url' placeholder='Portfolio URL' value={portfolioLink} onChange={e => setPortfolioLink(e.target.value)} className='rounded-lg border border-gray-200 p-2 text-sm' />
-                      <button onClick={updateLinks} className='mt-1 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700'>Save Changes</button>
+                      <input type="url" placeholder="GitHub URL" value={githubLink} onChange={e => setGithubLink(e.target.value)} className="rounded-lg border border-gray-200 p-2 text-sm" />
+                      <input type="url" placeholder="LinkedIn URL" value={linkedinLink} onChange={e => setLinkedinLink(e.target.value)} className="rounded-lg border border-gray-200 p-2 text-sm" />
+                      <input type="url" placeholder="Portfolio URL" value={portfolioLink} onChange={e => setPortfolioLink(e.target.value)} className="rounded-lg border border-gray-200 p-2 text-sm" />
+                      <button onClick={updateLinks} className="mt-1 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700">Save Changes</button>
                     </div>
                   )}
                 </div>
