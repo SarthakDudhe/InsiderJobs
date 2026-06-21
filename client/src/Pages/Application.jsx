@@ -5,7 +5,7 @@ import Footer from '../components/Footer'
 import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { FileText, UploadCloud, BarChart3, TrendingUp, Clock, AlertTriangle, CheckCircle2, XCircle, Hourglass, Target, ArrowUpRight, ChevronDown, ChevronUp } from 'lucide-react'
+import { FileText, UploadCloud, BarChart3, TrendingUp, Clock, AlertTriangle, CheckCircle2, XCircle, Hourglass, Target, ArrowUpRight, ChevronDown, ChevronUp, Folder } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const Application = () => {
@@ -152,8 +152,8 @@ const Application = () => {
                     </a>
                   )}
                   {userData.links?.portfolio && (
-                    <a href={userData.links.portfolio} target='_blank' rel='noopener noreferrer' className='flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 border border-purple-100 text-purple-700 hover:bg-purple-100 transition-colors font-bold text-xs' title='Portfolio'>
-                      W
+                    <a href={userData.links.portfolio} target='_blank' rel='noopener noreferrer' className='flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 border border-purple-100 text-purple-700 hover:bg-purple-100 transition-colors' title='Portfolio'>
+                      <Folder size={16} />
                     </a>
                   )}
                 </div>
