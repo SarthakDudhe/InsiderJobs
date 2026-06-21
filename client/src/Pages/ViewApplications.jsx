@@ -4,7 +4,7 @@ import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Loader from '../LoaderFront/Loader'
-import { Check, RotateCcw, UsersRound, X, Eye, EyeOff, RefreshCw } from 'lucide-react'
+import { Check, RotateCcw, UsersRound, X, Eye, EyeOff, RefreshCw, Github, Linkedin, Globe } from 'lucide-react'
 
 const ViewApplications = () => {
   const { backendUrl, companyToken } = useContext(AppContext)
@@ -145,6 +145,7 @@ const ViewApplications = () => {
                 <th className='px-6 py-4 max-sm:hidden'>#</th>
                 <th className='px-6 py-4'>Candidate</th>
                 <th className='px-6 py-4 max-sm:hidden'>Applied For</th>
+                <th className='px-6 py-4 max-sm:hidden'>Links</th>
                 <th className='px-6 py-4'>Resume</th>
                 <th className='px-6 py-4'>Status / Action</th>
               </tr>
@@ -191,6 +192,47 @@ const ViewApplications = () => {
                         <div>
                           <div className='text-sm font-bold text-gray-800'>{applicant.jobId.title}</div>
                           <div className='mt-0.5 text-xs text-gray-400'>{applicant.jobId.location}</div>
+                        </div>
+                      </td>
+                      {/* Social Links */}
+                      <td className='px-6 py-5 max-sm:hidden'>
+                        <div className='flex items-center gap-2'>
+                          {applicant.userId?.links?.github && (
+                            <a
+                              href={applicant.userId.links.github}
+                              target='_blank'
+                              rel='noreferrer'
+                              title='GitHub Profile'
+                              className='flex h-7 w-7 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-600 transition-all hover:border-gray-400 hover:bg-gray-100 hover:text-gray-900'
+                            >
+                              <Github size={13} />
+                            </a>
+                          )}
+                          {applicant.userId?.links?.linkedin && (
+                            <a
+                              href={applicant.userId.links.linkedin}
+                              target='_blank'
+                              rel='noreferrer'
+                              title='LinkedIn Profile'
+                              className='flex h-7 w-7 items-center justify-center rounded-lg border border-blue-100 bg-blue-50 text-blue-600 transition-all hover:bg-blue-100 hover:text-blue-700'
+                            >
+                              <Linkedin size={13} />
+                            </a>
+                          )}
+                          {applicant.userId?.links?.portfolio && (
+                            <a
+                              href={applicant.userId.links.portfolio}
+                              target='_blank'
+                              rel='noreferrer'
+                              title='Portfolio'
+                              className='flex h-7 w-7 items-center justify-center rounded-lg border border-violet-100 bg-violet-50 text-violet-600 transition-all hover:bg-violet-100 hover:text-violet-700'
+                            >
+                              <Globe size={13} />
+                            </a>
+                          )}
+                          {!applicant.userId?.links?.github && !applicant.userId?.links?.linkedin && !applicant.userId?.links?.portfolio && (
+                            <span className='text-[10px] text-gray-400 font-semibold'>—</span>
+                          )}
                         </div>
                       </td>
                       <td className='px-6 py-5'>
