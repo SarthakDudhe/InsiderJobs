@@ -139,22 +139,38 @@ const Application = () => {
               </div>
               
               {/* Profile Social Links */}
-              <div className='flex gap-2'>
-                {userData.links?.github && (
-                  <a href={userData.links.github} target='_blank' rel='noopener noreferrer' className='flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors' title='GitHub'>
-                    <svg className='h-4 w-4 fill-current' viewBox='0 0 24 24'><path d='M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z'/></svg>
-                  </a>
-                )}
-                {userData.links?.linkedin && (
-                  <a href={userData.links.linkedin} target='_blank' rel='noopener noreferrer' className='flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 border border-blue-100 text-blue-700 hover:bg-blue-100 transition-colors' title='LinkedIn'>
-                    <svg className='h-4 w-4 fill-current' viewBox='0 0 24 24'><path d='M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z'/></svg>
-                  </a>
-                )}
-                {userData.links?.portfolio && (
-                  <a href={userData.links.portfolio} target='_blank' rel='noopener noreferrer' className='flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 border border-purple-100 text-purple-700 hover:bg-purple-100 transition-colors font-bold text-xs' title='Portfolio'>
-                    W
-                  </a>
-                )}
+              <div className='flex flex-col items-end gap-2'>
+                <div className='flex gap-2'>
+                  {userData.links?.github && (
+                    <a href={userData.links.github} target='_blank' rel='noopener noreferrer' className='flex h-9 w-9 items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors' title='GitHub'>
+                      <svg className='h-4 w-4 fill-current' viewBox='0 0 24 24'><path d='M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z'/></svg>
+                    </a>
+                  )}
+                  {userData.links?.linkedin && (
+                    <a href={userData.links.linkedin} target='_blank' rel='noopener noreferrer' className='flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 border border-blue-100 text-blue-700 hover:bg-blue-100 transition-colors' title='LinkedIn'>
+                      <svg className='h-4 w-4 fill-current' viewBox='0 0 24 24'><path d='M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z'/></svg>
+                    </a>
+                  )}
+                  {userData.links?.portfolio && (
+                    <a href={userData.links.portfolio} target='_blank' rel='noopener noreferrer' className='flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 border border-purple-100 text-purple-700 hover:bg-purple-100 transition-colors font-bold text-xs' title='Portfolio'>
+                      W
+                    </a>
+                  )}
+                </div>
+                               {/* Edit Links UI */}
+                <div>
+                  <button onClick={() => setEditLinks(!editLinks)} className='rounded-xl bg-gray-100 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-600 hover:bg-gray-200'>
+                    {editLinks ? 'Cancel' : 'Edit Links'}
+                  </button>
+                  {editLinks && (
+                    <div className='mt-2 flex flex-col gap-2'>
+                      <input type='url' placeholder='GitHub URL' value={githubLink} onChange={e => setGithubLink(e.target.value)} className='rounded-lg border border-gray-200 p-2 text-sm' />
+                      <input type='url' placeholder='LinkedIn URL' value={linkedinLink} onChange={e => setLinkedinLink(e.target.value)} className='rounded-lg border border-gray-200 p-2 text-sm' />
+                      <input type='url' placeholder='Portfolio URL' value={portfolioLink} onChange={e => setPortfolioLink(e.target.value)} className='rounded-lg border border-gray-200 p-2 text-sm' />
+                      <button onClick={updateLinks} className='mt-1 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700'>Save Changes</button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
