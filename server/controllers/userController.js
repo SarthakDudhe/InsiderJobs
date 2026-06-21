@@ -275,6 +275,34 @@ export const getUserJobApplication = async (req, res) => {
     }
 }
 
+// Update user profile links (LinkedIn, GitHub, Portfolio)
+export const updateUserLinks = async (req, res) => {
+    try {
+        const userId = req.auth?.userId
+        if (!userId) {
+            return res.json({ success: false, message: "Not Authorized, Login Again" })
+        }
+
+        const { github, linkedin, portfolio } = req.body
+
+        const userData = await User.findById(userId)
+        if (!userData) {
+            return res.json({ success: false, message: "User not found" })
+        }
+
+        userData.links = {
+            github: github ?? userData.links?.github ?? "",
+            linkedin: linkedin ?? userData.links?.linkedin ?? "",
+            portfolio: portfolio ?? userData.links?.portfolio ?? ""
+        }
+        await userData.save()
+
+        return res.json({ success: true, message: "Profile links updated" })
+    } catch (error) {
+        res.json({ success: false, message: error.message })
+    }
+}
+
 //Update user profile (RESUME)
 
 export const updateUserResume = async (req, res) => {

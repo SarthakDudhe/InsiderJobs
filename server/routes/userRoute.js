@@ -22,7 +22,9 @@ router.post("/apply", protectUser, applyForJob)
 router.get("/applications", protectUser, getUserJobApplication)
 
 //Update User profile
-router.post("/update-resume", protectUser, upload.single('resume'), updateUserResume)
+// Update profile links (GitHub, LinkedIn, Portfolio)
+router.post("/update-links", protectUser, updateUserLinks);
+
 
 //AI Job Recommendations
 router.get("/ai-recommender", protectUser, getAIJobRecommendations)

@@ -12,9 +12,37 @@ const Application = () => {
   const navigate = useNavigate()
   const [isEdit, setIsEdit] = useState(false)
   const [resume, setResume] = useState(null)
-  const [insightsOpen, setInsightsOpen] = useState(true)
+  const [editLinks, setEditLinks] = useState(false);
+  const [githubLink, setGithubLink] = useState(userData?.links?.github || '');
+  const [linkedinLink, setLinkedinLink] = useState(userData?.links?.linkedin || '');
+  const [portfolioLink, setPortfolioLink] = useState(userData?.links?.portfolio || '');
 
-  const { backendUrl, userToken, userData, userApplications, fetchUserData, fetchUserApplications } = useContext(AppContext)
+  // Sync state when userData loads/updates
+  useEffect(() => {
+    setGithubLink(userData?.links?.github || '');
+    setLinkedinLink(userData?.links?.linkedin || '');
+    setPortfolioLink(userData?.links?.portfolio || '');
+  }, [userData]);
+
+  const updateLinks = async () => {
+    try {
+      const token = userToken;
+      const { data } = await axios.post(
+        backendUrl + '/api/users/update-links',
+        { github: githubLink, linkedin: linkedinLink, portfolio: portfolioLink },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        await fetchUserData();
+        setEditLinks(false);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   const updateResume = async () => {
     try {
