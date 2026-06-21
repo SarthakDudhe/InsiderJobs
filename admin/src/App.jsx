@@ -416,6 +416,7 @@ const App = () => {
                   <tr className='border-b border-slate-200 bg-slate-50 font-extrabold text-slate-500'>
                     <th className='p-4'>Company</th>
                     <th className='p-4'>Email Domain</th>
+                    <th className='p-4'>Recruiter Profile</th>
                     <th className='p-4'>Verification Status</th>
                     <th className='p-4 text-right'>Action</th>
                   </tr>
@@ -432,6 +433,23 @@ const App = () => {
                         </td>
                         <td className='p-4 font-semibold text-slate-500'>
                           {company.email}
+                        </td>
+                        <td className='p-4'>
+                          <div className='flex flex-col'>
+                            <span className='font-bold text-slate-950'>{company.recruiterName || 'N/A'}</span>
+                            {company.linkedin ? (
+                              <a
+                                href={company.linkedin.startsWith('http') ? company.linkedin : `https://${company.linkedin}`}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='inline-flex items-center gap-0.5 text-[10px] text-blue-500 hover:underline font-semibold mt-0.5 w-fit'
+                              >
+                                LinkedIn Profile ↗
+                              </a>
+                            ) : (
+                              <span className='text-[10px] text-slate-400'>No LinkedIn</span>
+                            )}
+                          </div>
                         </td>
                         <td className='p-4'>
                           {company.isVerified ? (
@@ -461,7 +479,7 @@ const App = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className='p-8 text-center text-slate-500 font-semibold'>
+                      <td colSpan={5} className='p-8 text-center text-slate-500 font-semibold'>
                         No workspace profiles match your search criteria.
                       </td>
                     </tr>

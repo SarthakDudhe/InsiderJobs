@@ -16,9 +16,9 @@ import { extractText, getDocumentProxy } from "unpdf";
 
 
 export const registerCompany = async (req, res) => {
-  const { email, name, password } = req.body;
+  const { email, name, password, recruiterName, linkedin } = req.body;
   const imageFile = req.file;
-  if (!name || !email || !password || !imageFile) {
+  if (!name || !email || !password || !imageFile || !recruiterName || !linkedin) {
     return res.json({ success: false, message: "Missing Details" })
   }
   
@@ -47,6 +47,8 @@ export const registerCompany = async (req, res) => {
       email, 
       password: hashpassword,
       image: imageUpload.secure_url,
+      recruiterName,
+      linkedin,
       emailVerificationToken: verificationToken,
       emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
     })
@@ -61,6 +63,8 @@ export const registerCompany = async (req, res) => {
         name: company.name,
         email: company.email,
         image: company.image,
+        recruiterName: company.recruiterName,
+        linkedin: company.linkedin,
         isEmailVerified: false,
         isVerified: false
       },
@@ -103,6 +107,8 @@ export const loginCompany = async (req,res) => {
                     name:company.name,
                     email:company.email,
                     image:company.image,
+                    recruiterName:company.recruiterName,
+                    linkedin:company.linkedin,
                     isVerified:company.isVerified,
                     isEmailVerified:company.isEmailVerified
                 },

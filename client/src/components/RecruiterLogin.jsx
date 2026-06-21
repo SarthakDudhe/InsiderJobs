@@ -3,7 +3,7 @@ import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { Building2, Mail, Shield, UploadCloud, X, Eye, EyeOff } from 'lucide-react'
+import { Building2, Mail, Shield, UploadCloud, X, Eye, EyeOff, User, Link2 } from 'lucide-react'
 
 const RecruiterLogin = () => {
   const navigate = useNavigate()
@@ -12,6 +12,8 @@ const RecruiterLogin = () => {
   const [password, setPassword] = useState('')
   const [email, setemail] = useState('')
   const [image, setImage] = useState(false)
+  const [recruiterName, setRecruiterName] = useState('')
+  const [linkedin, setLinkedin] = useState('')
   const [isTextDataSubmitted, setIsDataSubmitted] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const { setShowRecruiterLogin, backendUrl, setcompanyData, setCompanyToken } = useContext(AppContext)
@@ -27,6 +29,12 @@ const RecruiterLogin = () => {
     e.preventDefault()
 
     if (state === 'Sign Up' && !isTextDataSubmitted) {
+      if (!name || !email || !password || !recruiterName || !linkedin) {
+        return toast.error("Please fill in all details.")
+      }
+      if (!linkedin.includes("linkedin.com")) {
+        return toast.error("Please enter a valid LinkedIn profile URL.")
+      }
       const publicDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'aol.com', 'icloud.com'];
       const emailDomain = email.split('@')[1]?.toLowerCase();
       if (publicDomains.includes(emailDomain)) {
@@ -52,6 +60,8 @@ const RecruiterLogin = () => {
         formData.append('password', password)
         formData.append('email', email)
         formData.append('image', image)
+        formData.append('recruiterName', recruiterName)
+        formData.append('linkedin', linkedin)
 
         const { data } = await axios.post(backendUrl + '/api/company/register', formData)
         if (data.success) {
@@ -171,7 +181,11 @@ const RecruiterLogin = () => {
             ) : (
               <div className='space-y-3.5'>
                 {state !== 'Login' && (
-                  <Field icon={<Building2 />} value={name} onChange={setName} type='text' placeholder='Company Name' />
+                  <>
+                    <Field icon={<Building2 />} value={name} onChange={setName} type='text' placeholder='Company Name' />
+                    <Field icon={<User />} value={recruiterName} onChange={setRecruiterName} type='text' placeholder='Your Full Name (Recruiter)' />
+                    <Field icon={<Link2 />} value={linkedin} onChange={setLinkedin} type='text' placeholder='LinkedIn Profile URL' />
+                  </>
                 )}
                 <Field icon={<Mail />} value={email} onChange={setemail} type='email' placeholder='Email Address' />
                 
