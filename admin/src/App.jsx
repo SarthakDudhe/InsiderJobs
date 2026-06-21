@@ -29,12 +29,6 @@ const App = () => {
   const [pageJobs, setPageJobs] = useState(1);
   const [pageReported, setPageReported] = useState(1);
   const rowsPerPage = 10;
-  // Reset page numbers when search query or active tab changes
-  useEffect(() => {
-    setPageCompanies(1);
-    setPageJobs(1);
-    setPageReported(1);
-  }, [searchQuery, activeTab]);
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -53,6 +47,13 @@ const App = () => {
   const [analyticsData, setAnalyticsData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState('workspaces')
+
+  // Reset page numbers when search query or active tab changes
+  useEffect(() => {
+    setPageCompanies(1);
+    setPageJobs(1);
+    setPageReported(1);
+  }, [searchQuery, activeTab]);
 
   // Handle Login
   const handleLogin = async (e) => {
