@@ -341,7 +341,7 @@ const App = () => {
           <div className='flex items-center gap-4'>
             <img className='w-32 opacity-95' src={logo} alt='InsiderJobs' />
             <span className='rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-red-600'>
-              HQ Admin Console
+               Admin Console
             </span>
           </div>
 
