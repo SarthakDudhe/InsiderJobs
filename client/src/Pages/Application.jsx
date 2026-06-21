@@ -12,6 +12,7 @@ const Application = () => {
   const navigate = useNavigate()
   const [isEdit, setIsEdit] = useState(false)
   const [resume, setResume] = useState(null)
+  const { userData, userToken, backendUrl, fetchUserData } = useContext(AppContext)
   const [editLinks, setEditLinks] = useState(false);
   const [githubLink, setGithubLink] = useState(userData?.links?.github || '');
   const [linkedinLink, setLinkedinLink] = useState(userData?.links?.linkedin || '');
