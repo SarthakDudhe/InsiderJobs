@@ -49,6 +49,10 @@ const ManageJobs = () => {
   useEffect(() => {
     if (companyToken) {
       fetchCompanyJobs()
+      const interval = setInterval(() => {
+        fetchCompanyJobs()
+      }, 30000)
+      return () => clearInterval(interval)
     }
   }, [companyToken])
 

@@ -84,7 +84,13 @@ const ViewApplications = () => {
   }
 
   useEffect(() => {
-    fetchCompanyJobs()
+    if (companyToken) {
+      fetchCompanyJobs()
+      const interval = setInterval(() => {
+        fetchCompanyJobs()
+      }, 30000)
+      return () => clearInterval(interval)
+    }
   }, [companyToken])
 
   return applicants ? applicants.length === 0 ? (
