@@ -21,7 +21,7 @@ export const AppcontextProvider = (props) => {
     const [companyToken, setCompanyToken] = useState(null)
     const [companyData, setcompanyData] = useState(null)
     
-    const [userToken, setUserToken] = useState(localStorage.getItem('userToken') || null)
+    const [userToken, setUserToken] = useState(null)
     const [userData, setUserData] = useState(null)
     const [userApplications, setUserApplications] = useState([])
     const [totalJobs, setTotalJobs] = useState(0)
@@ -60,7 +60,8 @@ export const AppcontextProvider = (props) => {
             }
             else {
                 toast.error(data.message)
-                if (data.message === 'jwt expired' || data.message === "Session Expired, Login Again") {
+                const authErrors = ['jwt expired', 'Session Expired, Login Again', 'Not Authorized, Login Again !', 'Company not found', 'jwt malformed']
+                if (authErrors.includes(data.message)) {
                     setCompanyToken(null)
                     setcompanyData(null)
                     localStorage.removeItem('companyToken')
@@ -80,7 +81,8 @@ export const AppcontextProvider = (props) => {
             }
             else {
                 toast.error(data.message)
-                if (data.message === 'jwt expired' || data.message === "Session Expired, Login Again") {
+                const authErrors = ['jwt expired', 'Session Expired, Login Again', 'Not Authorized, Login Again !', 'User not found', 'jwt malformed']
+                if (authErrors.includes(data.message)) {
                     setUserData(null)
                     setUserToken(null)
                     localStorage.removeItem('userToken')
@@ -99,7 +101,8 @@ export const AppcontextProvider = (props) => {
                 setUserApplications(data.application)
             } else {
                 toast.error(data.message)
-                if (data.message === 'jwt expired' || data.message === "Session Expired, Login Again") {
+                const authErrors = ['jwt expired', 'Session Expired, Login Again', 'Not Authorized, Login Again !', 'User not found', 'jwt malformed']
+                if (authErrors.includes(data.message)) {
                     setUserApplications([])
                     setUserData(null)
                     setUserToken(null)
@@ -117,6 +120,11 @@ export const AppcontextProvider = (props) => {
         const storedCompanyToken = localStorage.getItem('companyToken')
         if (storedCompanyToken) {
             setCompanyToken(storedCompanyToken)
+        }
+
+        const storedUserToken = localStorage.getItem('userToken')
+        if (storedUserToken) {
+            setUserToken(storedUserToken)
         }
     }, [])
 
