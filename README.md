@@ -1,424 +1,272 @@
 <div align="center">
+  <!-- BANNER PLACEHOLDER -->
+  <img src="https://via.placeholder.com/1200x300/0f172a/3b82f6?text=[Animated+Hero+Banner+Here]+Recommended:+1200x300px" alt="InsiderJobs Banner" width="100%" />
 
-<!-- Hero Animated Banner -->
-<img src="https://placehold.co/1600x520/0F172A/38BDF8?text=InsiderJobs+Full-Stack+Enterprise+Product+Walkthrough" alt="InsiderJobs animated product banner" width="100%" />
+  <br />
+  <br />
 
-<br />
-<br />
+  <!-- LOGO PLACEHOLDER -->
+  <img src="https://via.placeholder.com/150x150/ffffff/0f172a?text=[Logo]" alt="InsiderJobs Logo" width="120" height="120" />
 
-<!-- Project Logo -->
-<img src="https://placehold.co/140x140/0F172A/38BDF8?text=IJ" alt="InsiderJobs Logo" width="120" height="120" />
+  <h1 align="center">InsiderJobs</h1>
+  <p align="center"><strong>Next-Generation AI-Powered Recruitment & Career Command Center</strong></p>
 
-# InsiderJobs
+  <p align="center">
+    A premium Applicant Tracking System (ATS) and Job Board built with React, Node.js, and Groq LLMs. Bridging the gap between top talent and leading companies through intelligent AI matching, automated resume parsing, and seamless hiring pipelines.
+  </p>
 
-### A Production-Grade Multi-Tenant Job Marketplace featuring AI-Assisted Recommendation Pipelines, Verified Recruiter Workspaces, and Standalone Admin Operations.
+  <!-- BADGES -->
+  <p align="center">
+    <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+    <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
+    <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
+    <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" />
+    <img src="https://img.shields.io/badge/AI_Powered-Groq-f59e0b?style=for-the-badge" alt="AI Powered" />
+  </p>
 
-InsiderJobs is a multi-tenant hiring platform built on React 19, Vite, Express 5, and MongoDB. It integrates Clerk identity verification for candidates, corporate email validations, custom JWT sessions for recruiters, automatic resume PDF extraction, Groq AI keyword recommendation, reported job moderation, and interactive Recharts administration panels.
-
-<br />
-
-[![Build Status](https://img.shields.io/badge/Build-passing-22C55E?style=flat-square)](#)
-[![License](https://img.shields.io/badge/License-MIT-34D399?style=flat-square)](#license)
-[![Version](https://img.shields.io/badge/Version-1.0.0-60A5FA?style=flat-square)](file:///c:/Users/saksh/Desktop/MY%20PROJECTS/InsiderJobs/server/package.json)
-
-<br />
-
-[Product Gallery](#-visual-product-gallery) • [Why This Project Matters](#-why-this-project-matters) • [Features](#-discovered-features--workflows) • [Architecture](#-system-architecture--communication-flow) • [Tech Stack](#-technology-ecosystem) • [Setup Guide](#-local-installation--developer-guide)
-
+  <p align="center">
+    <!-- STATS PLACEHOLDERS -->
+    <img src="https://img.shields.io/github/stars/SarthakDudhe/InsiderJobs?style=flat-square&color=blue" alt="Stars Placeholder" />
+    <img src="https://img.shields.io/github/forks/SarthakDudhe/InsiderJobs?style=flat-square&color=blue" alt="Forks Placeholder" />
+    <img src="https://img.shields.io/badge/Deployment-Live-success?style=flat-square" alt="Deployment Status Placeholder" />
+    <img src="https://img.shields.io/github/license/SarthakDudhe/InsiderJobs?style=flat-square&color=blue" alt="License Placeholder" />
+    <img src="https://img.shields.io/badge/Version-1.0.0-blue?style=flat-square" alt="Version" />
+  </p>
+  
+  <p align="center">
+    <!-- SOCIAL LINKS PLACEHOLDERS -->
+    <a href="[Live Demo URL]"><img src="https://img.shields.io/badge/Live%20Demo-Launch-success?style=for-the-badge" alt="Live Demo" /></a>
+    <a href="[LinkedIn URL]"><img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin" alt="LinkedIn" /></a>
+    <a href="[Portfolio URL]"><img src="https://img.shields.io/badge/Portfolio-View-8b5cf6?style=for-the-badge&logo=globe" alt="Portfolio" /></a>
+  </p>
 </div>
 
 ---
 
-## 📽️ Visual Product Gallery
+## ⚡ Key Achievements & Engineering Highlights
 
-Below is the visual specs reference mapping key product screens, target aspect ratios, and mock rendering contexts designed for recruiters and engineering leads.
+For Technical Recruiters and Engineering Managers reviewing this project, here are the most significant technical achievements:
 
-| Product Surface | Target Aspect Ratio | Recommended Resolution | Mock Context & Expected Visual |
-| :--- | :---: | :---: | :--- |
-| **Candidate Landing Page** | `16:10` | `1440x900` | Homepage showing modern light theme, hero section with search bars, category selectors, and active hiring badges. |
-| **AI Recommendation Console** | `16:10` | `1440x900` | Split-pane showing the resume PDF upload portal alongside Groq-extracted skills chips and matching external Google Jobs. |
-| **Recruiter Dashboard Workspace** | `16:10` | `1440x900` | Employer interface showing the posted jobs table, applicant counts, status update drop-downs, and visibility toggle switches. |
-| **Admin Operations Dashboard** | `16:10` | `1440x900` | Administrator console rendering the 7-day AreaChart (Recharts), pending company verification queue, and reported job flags table. |
+> [!TIP]
+> **Why this project stands out:** This is not a standard CRUD application. It incorporates complex AI orchestration, real-time data handling, and robust multi-tenant architectures.
 
----
-
-## 🎯 Why This Project Matters
-
-Online hiring marketplaces suffer from a major trust and verification gap. Platforms are frequently flooded with spam listings, outdated entries ("Ghost Jobs"), and unverified companies, while candidates must navigate manual keyword searches that do not align with their resumes.
-
-InsiderJobs addresses these real-world operational challenges by providing:
-
-* **Spam & Ghost Job Prevention:** Implements admin-moderated company verification gates, ensuring only trusted corporate entities can publish jobs to the public index.
-* **Resume-to-Job Matching Automation:** Resolves search fatigue by parsing uploaded candidate resumes, caching extracted text, and utilizing LLMs to query external networks for matching roles.
-* **Streamlined Candidate Pipeline Management:** Provides B2B employers with custom email validation registration, Quill rich-text editors for job posting, and single-query applicant tracking to reduce backend overhead.
+- **Intelligent AI Orchestration (Groq API + LLaMA 3 70B):** Implemented a high-performance backend pipeline that parses raw PDF resumes via `unpdf`, extracts structured text, and feeds it to Groq LLMs. The AI automatically generates an ATS match score, extracts skills/experience/education, outputs tailored interview questions for recruiters, and provides personalized resume tailoring suggestions.
+- **Multi-Tenant Architecture & Role-Based Access Control (RBAC):** Custom JWT-based authentication system securely isolating three distinct domains: Candidates, Recruiters (Companies), and Admins. Includes company verification workflows.
+- **Real-Time Polling & Optimistic UI Updates:** Built highly responsive recruiter dashboards that auto-refresh every 30 seconds to fetch new applicants without memory leaks, paired with optimistic state updates for instant AI screening results.
+- **Enterprise-Grade UI/UX:** Designed a completely custom, Tailwind-based design system featuring glassmorphism, fluid micro-animations, conic-gradient data visualizations, and robust responsive layouts. No pre-built component libraries (like MUI/Chakra) were relied upon for core layouts.
+- **Complex Aggregation & Analytics:** Frontend analytics engine that calculates funnel conversion rates, time-to-decision metrics, and identifies "stale" applications on the fly.
 
 ---
 
-## ✨ Discovered Features & Workflows
+## 🚀 Feature Showcase
 
-### 1. Candidate Application & Commerce
-- **Verified Job Discovery:** Supports title and location regex matching, checkbox filters, and pagination, excluding listings from unverified employers.
-- **Hiring Freshness Indicators:** Computes hiring activity levels (`Active`, `Slow`, `Stale`) dynamically by checking employer login frequency.
-- **Application Portal:** Prevents duplicate submissions using Mongoose compound unique indexes on applicant and job identifiers.
+### 🧠 AI-Powered Candidate Features
+| Feature | Description | Technical Implementation |
+|---------|-------------|--------------------------|
+| **Smart PDF Resume Parsing** | Upload a PDF resume and watch the AI instantly extract your skills, education, and experience into a structured profile. | `unpdf` buffer parsing → Groq LLM JSON schema enforcement. |
+| **ATS Job Audit** | Compares candidate's resume text against job descriptions to provide a match score, missing keywords, and tailoring tips. | Server-side prompt engineering with LLaMA 3 returning strictly typed JSON. |
+| **AI Job Recommender** | Suggests the best active job listings based on the semantic match of the candidate's parsed profile. | Dynamic querying and filtering algorithms based on AI-extracted tags. |
+| **Career Command Center** | A visual pipeline showing pending, accepted, and rejected applications with success rate visualizations. | Custom SVG Conic Gradients, local data aggregation, and memoized math. |
 
-### 2. Groq AI Recommender Pipeline
-- **Resume Text Caching:** Automatically reads PDF uploads using `pdf-parse` and caches the extracted text, preventing duplicate parsing overhead.
-- **LLM Extraction:** Sends cached text to Groq API (`llama-3.3-70b-versatile`) under structured JSON formatting constraints to isolate core roles and skills.
-- **SerpApi Integration:** Queries Google Jobs (targeted to India) using extracted tags, returning structured external opportunities with candidate override options.
+### 🏢 Enterprise Recruiter Console
+| Feature | Description | Technical Implementation |
+|---------|-------------|--------------------------|
+| **AI Candidate Pre-Screening** | Recruiters can click a button to have the AI instantly summarize an applicant's fit, score them (0-100), and generate 3 custom interview questions. | Asynchronous `Groq SDK` API calls with MongoDB document updates. |
+| **Pipeline Management** | Track applicants through a visual table, mark them as Accepted/Rejected, and manage active/hidden job postings. | React state management with auto-refresh (`setInterval`) hooks and Axios interceptors. |
+| **Rich Text Job Editor** | Create compelling job descriptions using a fully integrated rich text editor. | Integrated `Quill.js` mapped to MongoDB string schemas. |
+| **Workspace Verification** | Companies cannot post active jobs until their workspace email is verified and approved by the platform Admin. | Secure backend flags (`isEmailVerified`, `isVerified`) checked via middleware. |
 
-### 3. Recruiter Dashboard Workspace
-- **Domain Verification Gate:** Screens company registrations by comparing domains against public providers, blocking common emails (e.g. Gmail, Yahoo).
-- **Listing Visibility Toggle:** Allows recruiters to hide or publish active postings, keeping the candidate discovery feed up to date.
-- **Single-Query Aggregation:** Mitigates the N+1 database query problem by summarizing applicant counts using a single MongoDB aggregation pipeline.
+<br />
 
-### 4. Admin Operations Console
-- **Reported Jobs Queue:** Consolidates reported jobs containing candidate flags into a single moderation queue for review.
-- **One-Click Moderation Actions:** Allows administrators to clear reported flags or delete the job, cascading deletions to clean up associated applications.
-- **Recharts Data Visualization:** Renders daily metrics for jobs posted and applications submitted over the last 7 days.
+<div align="center">
+  <!-- DASHBOARD PREVIEW PLACEHOLDER -->
+  <img src="https://via.placeholder.com/1000x500/f8fafc/0f172a?text=[Dashboard+Preview+Screenshot]+Recommended:+1000x500px" alt="Recruiter Dashboard Preview" width="100%" />
+  <p><em>Recruiter Pipeline Dashboard showing Candidate Social Links, Resumes, and Application Statuses</em></p>
+</div>
+
+---
+
+## 🗺️ Interactive Product Walkthrough
+
+### The User Journey
+
+```mermaid
+journey
+    title Candidate User Flow
+    section Onboarding
+      Sign up with Email: 5: Candidate
+      Upload PDF Resume: 4: Candidate
+      AI Extracts Profile: 5: System
+    section Discovery
+      Browse Job Listings: 4: Candidate
+      Run ATS Audit on Job: 5: Candidate
+      AI Suggests Resume Tweaks: 4: System
+    section Application
+      Apply to Job: 5: Candidate
+      Recruiter Receives App: 5: Recruiter
+      AI Auto-Screens Candidate: 5: System
+```
+
+### Authentication Flow
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Server
+    participant DB
+    Client->>Server: POST /api/users/login (email, pass)
+    Server->>DB: Find User
+    DB-->>Server: Return User Doc
+    Server->>Server: bcrypt.compare(pass, hash)
+    Server->>Server: jwt.sign(id, secret)
+    Server-->>Client: 200 OK + token
+    Client->>Client: localStorage.setItem('userToken', token)
+    Client->>Client: React Context State Update
+```
 
 ---
 
 ## 🛠️ Technology Ecosystem
 
-### Frontend Client Tier
-* **Core Framework:** React 19.1 & Vite 7 (Candidate & Recruiter SPA)
-* **Admin Dashboard:** React 19.2 & Vite 8 SPA
-* **Styling & Layout:** Tailwind CSS v4, Styled-Components, Lucide React
-* **Integrations:** Axios, React Router 7, Quill Editor, Recharts, React Toastify
+### Frontend
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
 
-### Backend API Tier
-* **Core Engine:** Node.js (ES Modules), Express 5.1
-* **Database Client:** MongoDB & Mongoose 8
-* **Authentication Services:** JSON Web Tokens (JWT), bcrypt (B2B Hashing)
-* **File Parser Engine:** Multer, `pdf-parse`
+### Backend & Database
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![Mongoose](https://img.shields.io/badge/Mongoose-800?style=for-the-badge&logo=mongoose&logoColor=white)
 
-### Integration Services
-* **Identity Management:** `@clerk/clerk-react`, `@clerk/express` (Candidate Authentication)
-* **Webhook Security:** Svix (Clerk event verification)
-* **Media Storage CDN:** Cloudinary (Resume & Logo storage)
-* **AI & Search Engines:** Groq SDK (Llama-3.3 LLM), SerpApi (Google Jobs API)
-* **Observability:** Sentry Node SDK (with Mongoose integration)
+### AI & Cloud Integrations
+![Groq](https://img.shields.io/badge/Groq_LLM-f59e0b?style=for-the-badge)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
+![JWT](https://img.shields.io/badge/JSON_Web_Tokens-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white)
 
 ---
 
-## 📐 System Architecture & Communication Flow
+## 🏗️ Architecture & Database Design
 
-### High-Level System Architecture
+### System Design
+The application follows a decoupled Client-Server architecture. The React/Vite frontend communicates securely with the Express.js REST API. Static assets and resumes are streamed directly to Cloudinary.
 
-```mermaid
-flowchart TB
-    subgraph ClientTier["Client Application Tier"]
-        CandidateApp["Candidate & Recruiter App (React 19 / Vite 7)"]
-        AdminApp["Admin Dashboard (React 19 / Vite 8)"]
-    end
-
-    subgraph APITier["Express 5.1 Backend Gateway"]
-        AuthClerk["Clerk Verification Middleware"]
-        AuthJWT["JWT Validation Middleware"]
-        Controllers["API Controllers"]
-    end
-
-    subgraph ServiceTier["Service & Integration Tier"]
-        ClerkSvc["Clerk Identity Provider"]
-        CloudinarySvc["Cloudinary Media CDN"]
-        GroqSvc["Groq Llama-3.3 LLM"]
-        SerpSvc["SerpApi Google Jobs"]
-        SentrySvc["Sentry Node Monitoring"]
-    end
-
-    subgraph DataTier["Data Core"]
-        Mongo[(MongoDB)]
-    end
-
-    CandidateApp -->|Clerk Token / Public Requests| APITier
-    AdminApp -->|JWT Authenticated Requests| APITier
-    APITier --> AuthClerk
-    APITier --> AuthJWT
-    AuthClerk --> Controllers
-    AuthJWT --> Controllers
-    Controllers --> DataTier
-    Controllers --> ClerkSvc
-    Controllers --> CloudinarySvc
-    Controllers --> GroqSvc
-    Controllers --> SerpSvc
-    Controllers --> SentrySvc
-```
-
-### Recruiter & Admin JWT Authentication Flow
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Recruiter / Admin
-    participant Client as Frontend SPA
-    participant Server as Express Server
-    participant DB as MongoDB / Env Variables
-
-    User->>Client: Input credentials & submit form
-    Client->>Server: POST /api/company/login OR /api/admin/login
-    alt Admin Login Validation
-        Server->>Server: Match inputs with environment variables
-    else Recruiter Login Validation
-        Server->>DB: Query company by email
-        DB-->>Server: Return company hashed password
-        Server->>Server: Verify password using bcrypt.compare()
-    end
-    
-    alt Credentials Valid
-        Server->>Server: Sign JWT containing ID & Role
-        Server-->>Client: Return Token + Profile Details
-        Client->>Client: Cache JWT in LocalStorage
-    else Credentials Invalid
-        Server-->>Client: Return success: false + error message
-    end
-
-    Note over Client,Server: Authenticated Request Pipeline
-    Client->>Server: HTTP Request (Header: token)
-    Server->>Server: Decode and verify JWT signature
-    Server->>Server: Validate company/admin permissions
-    Server-->>Client: Return authorized payload
-```
-
----
-
-## ⚡ Technical Excellence & Engineering Highlights
-
-* **Three-Surface Monorepo Topography:** Manages candidate profiles, recruiter interfaces, and admin moderation consoles inside a single repository structure, maintaining clean separation of concerns.
-* **Hybrid Session Hydration:** Decouples authentication contexts using Clerk OAuth to manage consumer candidates, and custom JWT tokens to authenticate recruiter and admin operations.
-* **N+1 Database Query Mitigation:** Replaces nested loops with MongoDB aggregation pipelines to calculate candidate application counts in a single query.
-- **Resume Cache Hydration:** Persists parsed PDF text to Mongoose user records, preventing redundant PDF parsing operations during AI recommendation queries.
-- **Print stylesheet overrides:** Restructures CSS rendering paths to ensure candidate resume sheets print cleanly from the web browser.
-- **Custom Recharts Coordinate Mapping:** Integrates custom coordinate tooltips inside Recharts dashboards, mapping data dimensions across the last 7 days of platform activity.
-
----
-
-## 📊 Database Schema
+### Database Relational Schema
 
 ```mermaid
 erDiagram
     USER ||--o{ JOB_APPLICATION : submits
-    COMPANY ||--o{ JOB : publishes
+    COMPANY ||--o{ JOB : posts
     COMPANY ||--o{ JOB_APPLICATION : receives
     JOB ||--o{ JOB_APPLICATION : has
-    JOB ||--o{ REPORT : contains
 
     USER {
-        string _id "Clerk ID (PK)"
-        string name "User Name"
-        string email "Unique Email Address"
-        string resume "Cloudinary URL"
-        string resumeText "Parsed Text Cache"
-        string image "Avatar URL"
+        ObjectId _id
+        String name
+        String email
+        String password
+        String resumeText
+        Array skills
+        Object links
     }
-
     COMPANY {
-        objectId _id "PK"
-        string name "Company Name"
-        string email "Unique Corporate Email"
-        string password "Bcrypt Hashed Password"
-        string image "Cloudinary Logo URL"
-        date lastActivity "Activity timestamp"
-        boolean isVerified "Admin verification flag"
+        ObjectId _id
+        String name
+        String email
+        Boolean isVerified
     }
-
     JOB {
-        objectId _id "PK"
-        string title "Job Title"
-        string description "HTML Description"
-        string location "Location"
-        string category "Category"
-        string level "Experience Level"
-        number salary "Salary Compensation"
-        number date "Epoch Timestamp"
-        boolean visible "Visibility toggle"
-        objectId companyId "FK referencing COMPANY"
-        array reports "Embeds reports: userId, reason, createdAt"
+        ObjectId _id
+        ObjectId companyId
+        String title
+        String description
     }
-
     JOB_APPLICATION {
-        objectId _id "PK"
-        string userId "FK referencing USER"
-        objectId companyId "FK referencing COMPANY"
-        objectId jobId "FK referencing JOB"
-        string status "Pending / Accepted / Rejected"
-        number date "Epoch Timestamp"
+        ObjectId _id
+        ObjectId userId
+        ObjectId jobId
+        ObjectId companyId
+        String status
+        Number aiScore
+        String aiSummary
     }
 ```
 
 ---
 
-## 📁 Monorepo Directory Layout
+## 💻 Installation & Local Development
 
-```text
-InsiderJobs/
-├── admin/                           # Standalone Admin Operations UI (Vite 8)
-│   ├── src/
-│   │   ├── App.css                  # Custom styling for admin dashboards
-│   │   ├── App.jsx                  # Single Page Admin Control Console
-│   │   ├── index.css                # Base CSS directives with Tailwind v4
-│   │   └── main.jsx                 # Vite mounting module
-│   └── package.json                 # Admin dependencies (Recharts, etc.)
-├── client/                          # Candidate & Recruiter Interface UI (Vite 7)
-│   ├── src/
-│   │   ├── context/
-│   │   │   └── AppContext.jsx       # State management and API fetch wrapper
-│   │   ├── Pages/                   # Route view pages
-│   │   │   ├── AddJob.jsx           # Job posting editor
-│   │   │   ├── AIJobRecommender.jsx # Resume upload & recommendations
-│   │   │   ├── Application.jsx      # Candidate tracking dashboard
-│   │   │   ├── ApplyJob.jsx         # Job details and reporting modal
-│   │   │   ├── Dashboard.jsx        # Recruiter workflow console layout
-│   │   │   ├── Home.jsx             # Candidate landing page
-│   │   │   ├── ManageJobs.jsx       # Recruiter active listings console
-│   │   │   └── ViewApplications.jsx # Recruiter applicant review console
-│   │   ├── App.jsx                  # Main router definitions
-│   │   └── main.jsx                 # Vite mounting entrypoint
-│   └── package.json                 # Candidate package configurations
-└── server/                          # Consolidated Express API Backend
-    ├── config/
-    │   ├── db.js                    # MongoDB mongoose database client
-    │   ├── cloudinary.js            # Cloudinary API storage config
-    │   ├── instrument.js            # Sentry Node monitoring initialization
-    │   └── multer.js                # Disk upload destination configuration
-    ├── controllers/
-    │   ├── adminController.js       # Admin actions
-    │   ├── aiController.js          # AI and SerpApi logic
-    │   ├── companyController.js     # Recruiter actions
-    │   ├── jobController.js         # Public queries & reporting
-    │   └── userController.js        # Profile and resume actions
-    ├── middlewares/
-    │   └── companyAuth.js           # JWT validation middleware
-    ├── models/
-    │   ├── Company.js               # Mongoose company model
-    │   ├── Job.js                   # Mongoose job model
-    │   ├── JobApplication.js        # Mongoose application model
-    │   └── User.js                  # Mongoose user model
-    ├── server.js                    # Core server setup & middleware
-    └── package.json                 # Node package configurations
-```
+### Prerequisites
+- Node.js (v18+ recommended)
+- MongoDB Cluster (Local or Atlas)
+- Groq API Key (for AI features)
+- Cloudinary Account (for file storage)
 
----
-
-## Key Configurations & Local Installation
-
-### 🗝️ Environment Configuration
-
-Create a `.env` file in the `server/` directory and configure the following variables:
-
-```ini
-# Server Setup
-PORT=5000
-NODE_ENV=development
-
-# Database Configuration
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net
-
-# JWT Signature Secret
-JWT_SECRET=your_jwt_signing_secret_here
-
-# Clerk Authentication Webhooks
-CLERK_WEBHOOK_SECRET=whsec_your_clerk_svix_secret_here
-
-# Cloudinary Integration
-CLOUDINARY_NAME=your_cloudinary_name
-CLOUDINARY_API_KEY=your_cloudinary_key
-CLOUDINARY_SECRET_KEY=your_cloudinary_secret
-
-# AI Recommendation Integration
-GROK_API_KEY=gsk_your_groq_api_key_here
-SERP_API_KEY=your_serp_api_key_here
-
-# Default Admin Credentials
-ADMIN_EMAIL=admin@insiderjobs.com
-ADMIN_PASSWORD=admin123
-```
-
-Ensure the `client/.env` and `admin/.env` files point to the backend URL:
-```ini
-VITE_BACKEND_URL=http://localhost:5000
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_key_here # (client only)
-```
-
----
-
-### 🚀 Local Installation & Developer Guide
-
-#### 1. Install Dependencies
-Run the installation commands in each directory:
+### Step 1: Clone the repository
 ```bash
-# Server dependencies
+git clone https://github.com/SarthakDudhe/InsiderJobs.git
+cd InsiderJobs
+```
+
+### Step 2: Setup Backend
+```bash
 cd server
 npm install
+```
+Create a `.env` file in the `server` directory:
+```env
+MONGODB_URI=your_mongodb_connection_string
+GROK_API_KEY=your_groq_api_key
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_SECRET_KEY=your_cloudinary_secret
+CLOUDINARY_NAME=your_cloudinary_name
+JWT_SECRET=your_super_secret_key
+PORT=5000
+```
+Start the backend server:
+```bash
+npm run dev
+```
 
-# Client dependencies
+### Step 3: Setup Frontend (Client)
+```bash
 cd ../client
 npm install
+```
+Create a `.env` file in the `client` directory:
+```env
+VITE_BACKEND_URL=http://localhost:5000
+```
+Start the Vite development server:
+```bash
+npm run dev
+```
 
-# Admin dependencies
+### Step 4: Setup Admin Dashboard
+```bash
 cd ../admin
 npm install
-```
-
-#### 2. Run the Local Development Servers
-Run the services in separate terminal windows:
-```bash
-# Run backend API server (runs on port 5000)
-cd server
-npm run server
-
-# Run candidate/recruiter frontend (runs on port 5173)
-cd client
-npm run dev
-
-# Run admin dashboard console (runs on port 5174)
-cd admin
 npm run dev
 ```
 
-#### 3. Compile Production Builds
-Ensure all builds compile cleanly before deployment:
-```bash
-cd client && npm run build
-cd ../admin && npm run build
-```
+---
+
+## 🔒 Security Considerations
+
+- **Authentication:** Custom JWT-based stateless authentication with secure storage and strict expiration limits. Frontend robustly clears local storage if malformed/expired tokens are detected.
+- **File Uploads:** Validated via `multer` before uploading to Cloudinary. Temporary local files are immediately unlinked (deleted) from the server filesystem via `fs.unlink` to prevent directory traversal and storage exhaustion.
+- **Passwords:** Hashed with a 10-round salt using `bcryptjs` before persisting to MongoDB.
+- **API Guarding:** Dedicated Middlewares (`protectUser`, `protectCompany`, `protectAdmin`) enforce role-based access control.
 
 ---
 
-## 🔒 Security Architectures
+<div align="center">
+  <h2>Ready to revolutionize recruitment?</h2>
+  <p>Contributions, issues, and feature requests are welcome!</p>
+  <p>Feel free to check <a href="#">issues page</a>.</p>
+  
+  <br />
+  <img src="https://via.placeholder.com/600x150/ffffff/0f172a?text=[Footer+Banner+Placeholder]+Recommended:+600x150px" alt="Footer Banner" width="600" />
+</div>
 
-InsiderJobs implements several layers of security to protect data and verify identities:
-
-- **Bcrypt Password Encryption:** Recruiter registration hashes passwords using `bcrypt` with a work salt factor of `10` before persisting details.
-- **JWT Endpoint Authentication:** Restricts recruiter and admin endpoints by verifying custom JSON Web Tokens passed in request headers.
-- **Clerk Signature Verification:** Uses Svix signature verification to validate incoming Clerk user webhooks, preventing payload spoofing.
-- **Corporate Domain Enforcement:** Screens company registrations by comparing domains against public providers, blocking common email domains (e.g. Gmail, Yahoo).
-- **Temporary Upload Cleanup:** Automatically deletes temporary file writes from the local disk using file system unlink calls after processing is complete.
-
----
-
-## 🤝 Contributing Guidelines & License
-
-### Contributing Guidelines
-1. **Maintain separation of concerns:** Ensure changes in `client/`, `admin/`, and `server/` remain decoupled.
-2. **Preserve verification checks:** Do not bypass company verification checks on the public job listing endpoints.
-3. **Keep Commits Clean:** Do not commit environment configuration files (`.env`) or build output folders.
-
-### Recommended Git Workflow
-```bash
-git checkout -b feature/your-feature-name
-npm run build --prefix client
-git commit -m "feat: add feature details"
-git push origin feature/your-feature-name
-```
-
-### License
-This project is licensed under the **MIT License**. Refer to the server's [package.json](file:///c:/Users/saksh/Desktop/MY%20PROJECTS/InsiderJobs/server/package.json#L12) file for license details.
-
----
-
-## 📧 Contact & Developer Info
-
-* **Developer Portfolio:** [Your Website](https://your-portfolio-url.com)
-* **GitHub Repository:** [Your GitHub Profile](https://github.com/your-username)
-* **LinkedIn Profile:** [Your LinkedIn](https://linkedin.com/in/your-username)
-* **Corporate Email:** contact@insiderjobs.com
+<p align="center">Made with ❤️ by <a href="https://github.com/SarthakDudhe">Sarthak Dudhe</a></p>
