@@ -7,6 +7,8 @@
 
   <!-- LOGO PLACEHOLDER -->
   <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=150&h=150&q=80" alt="InsiderJobs Logo" width="120" height="120" style="border-radius: 24px;" />
+  <img  height="120" alt="logo_transparent" src="https://github.com/user-attachments/assets/ac31d63d-552c-4ee1-9f94-33c005dbce6d" />
+
 
   <h1 align="center">InsiderJobs</h1>
   <p align="center"><strong>Enterprise AI-Powered Career Command Center & Applicant Tracking System (ATS)</strong></p>
