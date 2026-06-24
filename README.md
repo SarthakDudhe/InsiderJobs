@@ -192,7 +192,6 @@ Recruiters can screen any applicant's application. The system reviews the resume
 ### 👨‍💻 Candidate Workspace
 *   **Resume Extraction & Profile Build:** Upload a PDF to automatically fill out tech skills, past experience, and educational background.
 *   **Dynamic ATS Audit:** Real-time feedback on job postings with score indicators and missing keywords.
-*   **AI Job Recommender:** Dynamically scrapes live jobs matching extracted resume skills in India using SerpApi Google Jobs.
 *   **Funnel Analytics Dashboard:** 
     *   Dynamic Ring Charts rendering application status percentages (using pure CSS conic gradients).
     *    Funnel progress bars representing accepted/pending/rejected conversions.
@@ -203,6 +202,17 @@ Recruiters can screen any applicant's application. The system reviews the resume
   <!-- DYNAMIC DASHBOARD PLACEHOLDER -->
   <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&h=500&q=80" alt="Recruiter Console Dashboard showing Candidate Pipelines" width="100%" />
   <p><em>Candidate command center showing application statistics, CSS conic-gradient charts, and stale job warnings</em></p>
+</div>
+
+### 🤖 AI Job Recommender
+*   **Resume-Keyed Recommendations:** Dynamically scrapes live job listings matching extracted resume skills in India using SerpApi Google Jobs.
+*   **Custom Tag Search:** Candidates can add or remove skill tags to tailor real-time opportunities to specific tech stacks.
+*   **Direct Apply Portals:** Connects candidates directly to external application forms in real-time.
+
+<div align="center">
+  <!-- AI RECOMMENDER PLACEHOLDER -->
+  <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1000&h=500&q=80" alt="AI Job Recommender Interface" width="100%" />
+  <p><em>AI career assistant workspace generating targeted live opportunities from parsed resume keywords and customizable tags</em></p>
 </div>
 
 ### 🏢 Recruiter Console
@@ -216,6 +226,12 @@ Recruiters can screen any applicant's application. The system reviews the resume
 *   **7-Day Recharts Activity Chart:** Plots jobs posted vs. applications submitted over the last week.
 *   **Workspace Approvals:** Approve or revoke company registrations to manage site-wide active permissions.
 *   **Report Queue:** Flags jobs reported by candidates (e.g. Ghost Jobs, Fake Postings). Admins can dismiss flags or delete job postings instantly (cascading to clean up all applications).
+
+<div align="center">
+  <!-- ADMIN PANEL PLACEHOLDER -->
+  <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&h=500&q=80" alt="Admin Moderator Console Dashboard" width="100%" />
+  <p><em>Admin moderator control console displaying 7-day activity metrics charts, reported jobs queue, and workspace approval control</em></p>
+</div>
 
 ---
 
