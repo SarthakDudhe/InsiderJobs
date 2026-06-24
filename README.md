@@ -235,7 +235,9 @@ Recruiters can screen any applicant's application. The system reviews the resume
 
 <div align="center">
   <!-- ADMIN PANEL PLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&h=500&q=80" alt="Admin Moderator Console Dashboard" width="100%" />
+
+  <img width="100%"  alt="Screenshot 2026-06-23 212612" src="https://github.com/user-attachments/assets/2c848330-db17-473c-bf87-01ee08211889" />
+
   <p><em>Admin moderator control console displaying 7-day activity metrics charts, reported jobs queue, and workspace approval control</em></p>
 </div>
 
