@@ -1,6 +1,6 @@
 <div align="center">
   <!-- HERO BANNER PLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&h=300&q=80" alt="InsiderJobs Enterprise Banner" width="100%" />
+<img width="100%"  alt="Screenshot 2026-06-20 011016" src="https://github.com/user-attachments/assets/5a76a6e6-5954-4b20-a7b6-293173436b72" />
 
   <br />
   <br />
