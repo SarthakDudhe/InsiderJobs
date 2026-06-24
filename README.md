@@ -215,7 +215,9 @@ Recruiters can screen any applicant's application. The system reviews the resume
 
 <div align="center">
   <!-- AI RECOMMENDER PLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1000&h=500&q=80" alt="AI Job Recommender Interface" width="100%" />
+
+  <img width="100%"  alt="Screenshot 2026-06-23 212032" src="https://github.com/user-attachments/assets/6dea4c03-7afb-43bb-ad38-596a19df4190" />
+
   <p><em>AI career assistant workspace generating targeted live opportunities from parsed resume keywords and customizable tags</em></p>
 </div>
 
