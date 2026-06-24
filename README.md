@@ -168,7 +168,8 @@ InsiderJobs uses the LLaMA 3.3 70B model hosted on Groq Cloud to deliver instant
 
 <div align="center">
   <!-- AI FLOWPLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=1000&h=450&q=80" alt="AI Resume Analysis Flow Representation" width="100%" />
+<img width="100%"  alt="Screenshot 2026-06-23 212119" src="https://github.com/user-attachments/assets/58ce5e16-2824-4acc-b5c5-30a9454d3237" />
+
   <p><em>System Pipeline: Resume Upload -> PDF Text Extraction -> Groq LLaMA JSON Schema Structuring -> Vector ATS Auditing</em></p>
 </div>
 
