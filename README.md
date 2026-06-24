@@ -204,7 +204,8 @@ Recruiters can screen any applicant's application. The system reviews the resume
 
 <div align="center">
   <!-- DYNAMIC DASHBOARD PLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&h=500&q=80" alt="Recruiter Console Dashboard showing Candidate Pipelines" width="100%" />
+<img width="100%"  alt="Screenshot 2026-06-23 211931" src="https://github.com/user-attachments/assets/a948ab5d-4ea9-48d7-9fdd-581523e5bca2" />
+
   <p><em>Candidate command center showing application statistics, CSS conic-gradient charts, and stale job warnings</em></p>
 </div>
 
