@@ -1,14 +1,16 @@
 <div align="center">
   <!-- HERO BANNER PLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&h=300&q=80" alt="InsiderJobs Enterprise Banner" width="100%" />
+<img width="100%"  alt="Screenshot 2026-06-20 011016" src="https://github.com/user-attachments/assets/5a76a6e6-5954-4b20-a7b6-293173436b72" />
 
   <br />
   <br />
 
   <!-- LOGO PLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=150&h=150&q=80" alt="InsiderJobs Logo" width="120" height="120" style="border-radius: 24px;" />
 
-  <h1 align="center">InsiderJobs</h1>
+<img  height="120" alt="ChatGPT Image Jun 4, 2026, 01_26_24 PM" src="https://github.com/user-attachments/assets/0405254b-5c30-423f-bbbc-dd58777e3831" />
+
+
+ 
   <p align="center"><strong>Enterprise AI-Powered Career Command Center & Applicant Tracking System (ATS)</strong></p>
 
   <p align="center">
@@ -166,7 +168,8 @@ InsiderJobs uses the LLaMA 3.3 70B model hosted on Groq Cloud to deliver instant
 
 <div align="center">
   <!-- AI FLOWPLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=1000&h=450&q=80" alt="AI Resume Analysis Flow Representation" width="100%" />
+<img width="100%"  alt="Screenshot 2026-06-23 212119" src="https://github.com/user-attachments/assets/58ce5e16-2824-4acc-b5c5-30a9454d3237" />
+
   <p><em>System Pipeline: Resume Upload -> PDF Text Extraction -> Groq LLaMA JSON Schema Structuring -> Vector ATS Auditing</em></p>
 </div>
 
@@ -200,7 +203,8 @@ Recruiters can screen any applicant's application. The system reviews the resume
 
 <div align="center">
   <!-- DYNAMIC DASHBOARD PLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&h=500&q=80" alt="Recruiter Console Dashboard showing Candidate Pipelines" width="100%" />
+<img width="100%"  alt="Screenshot 2026-06-23 211931" src="https://github.com/user-attachments/assets/a948ab5d-4ea9-48d7-9fdd-581523e5bca2" />
+
   <p><em>Candidate command center showing application statistics, CSS conic-gradient charts, and stale job warnings</em></p>
 </div>
 
