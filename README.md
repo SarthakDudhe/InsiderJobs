@@ -555,6 +555,6 @@ Contributions are welcome! Please follow these guidelines:
 Distributed under the **ISC License**. See `LICENSE` in the repository for more information.
 
 <div align="center">
-  <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&h=150&q=80" alt="Footer Banner" width="600" style="border-radius: 12px;" />
+
   <p>Made with ❤️ by <a href="https://github.com/SarthakDudhe">Sarthak Dudhe</a></p>
 </div>
