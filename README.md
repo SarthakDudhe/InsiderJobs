@@ -10,7 +10,7 @@
 <img  height="120" alt="ChatGPT Image Jun 4, 2026, 01_26_24 PM" src="https://github.com/user-attachments/assets/0405254b-5c30-423f-bbbc-dd58777e3831" />
 
 
-  <h1 align="center">InsiderJobs</h1>
+ 
   <p align="center"><strong>Enterprise AI-Powered Career Command Center & Applicant Tracking System (ATS)</strong></p>
 
   <p align="center">
