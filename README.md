@@ -97,8 +97,8 @@ flowchart TD
     end
 
     subgraph DataStorage ["Data & File Storage"]
-        MongoDB[("MongoDB Atlas Database")]
-        Cloudinary[("Cloudinary Asset Store")]
+        MongoDB[(MongoDB Atlas Database)]
+        Cloudinary[(Cloudinary Asset Store)]
     end
 
     subgraph ThirdParty ["External Integrations"]
@@ -134,7 +134,7 @@ flowchart TD
     CompanyController -->|Auto Screen Prompts| GroqSDK
     
     %% Error Logging
-    APILayer -->|Telemetry Stream| Sentry
+    AuthMiddleware -->|Telemetry Stream| Sentry
     MongoDB -->|Query Profiling| Sentry
 ```
 
@@ -144,19 +144,19 @@ Security is enforced using stateless JSON Web Tokens. If a candidate, recruiter,
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Client as Candidate / Recruiter Client
-    participant API as Express Gateway
-    participant Database as MongoDB
+    participant Client as "Candidate / Recruiter Client"
+    participant API as "Express Gateway"
+    participant Database as "MongoDB"
     
-    Client->>API: POST /api/users/login (or /company/login)
+    Client->>API: "POST /api/users/login (or /company/login)"
     API->>Database: Query by email
     Database-->>API: User details + hashed password
-    API->>API: Compare password (bcryptjs)
+    API->>API: "Compare password (bcryptjs)"
     alt Invalid Credentials
-        API-->>Client: 200 OK (success: false, message: "Invalid Credentials")
+        API-->>Client: "200 OK (success: false, message: 'Invalid Credentials')"
     else Valid Credentials
-        API->>API: Generate JWT (expiresIn: 1d)
-        API-->>Client: 200 OK + JWT Token + Profile
+        API->>API: "Generate JWT (expiresIn: 1d)"
+        API-->>Client: "200 OK + JWT Token + Profile"
     end
 ```
 
@@ -416,10 +416,10 @@ InsiderJobs/
 
 ```mermaid
 erDiagram
-    USER ||--o{ JOB_APPLICATION : submits
-    COMPANY ||--o{ JOB : posts
-    COMPANY ||--o{ JOB_APPLICATION : receives
-    JOB ||--o{ JOB_APPLICATION : has
+    USER ||--o{ JOB_APPLICATION : "submits"
+    COMPANY ||--o{ JOB : "posts"
+    COMPANY ||--o{ JOB_APPLICATION : "receives"
+    JOB ||--o{ JOB_APPLICATION : "has"
 
     USER {
         ObjectId _id
