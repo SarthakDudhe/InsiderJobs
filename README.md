@@ -215,7 +215,9 @@ Recruiters can screen any applicant's application. The system reviews the resume
 
 <div align="center">
   <!-- AI RECOMMENDER PLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1000&h=500&q=80" alt="AI Job Recommender Interface" width="100%" />
+
+  <img width="100%"  alt="Screenshot 2026-06-23 212032" src="https://github.com/user-attachments/assets/6dea4c03-7afb-43bb-ad38-596a19df4190" />
+
   <p><em>AI career assistant workspace generating targeted live opportunities from parsed resume keywords and customizable tags</em></p>
 </div>
 
@@ -233,7 +235,9 @@ Recruiters can screen any applicant's application. The system reviews the resume
 
 <div align="center">
   <!-- ADMIN PANEL PLACEHOLDER -->
-  <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&h=500&q=80" alt="Admin Moderator Console Dashboard" width="100%" />
+
+  <img width="100%"  alt="Screenshot 2026-06-23 212612" src="https://github.com/user-attachments/assets/2c848330-db17-473c-bf87-01ee08211889" />
+
   <p><em>Admin moderator control console displaying 7-day activity metrics charts, reported jobs queue, and workspace approval control</em></p>
 </div>
 
@@ -551,6 +555,6 @@ Contributions are welcome! Please follow these guidelines:
 Distributed under the **ISC License**. See `LICENSE` in the repository for more information.
 
 <div align="center">
-  <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&h=150&q=80" alt="Footer Banner" width="600" style="border-radius: 12px;" />
+
   <p>Made with ❤️ by <a href="https://github.com/SarthakDudhe">Sarthak Dudhe</a></p>
 </div>
