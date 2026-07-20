@@ -21,7 +21,9 @@ router.post("/apply", protectUser, applyForJob)
 //Get applied jobs data
 router.get("/applications", protectUser, getUserJobApplication)
 
-//Update User profile
+//Update User profile (Resume upload)
+router.post("/update-resume", protectUser, upload.single('resume'), updateUserResume);
+
 // Update profile links (GitHub, LinkedIn, Portfolio)
 router.post("/update-links", protectUser, updateUserLinks);
 
