@@ -580,7 +580,7 @@ const Application = () => {
         <section className='premium-panel overflow-hidden rounded-[1.5rem]'>
           <div className='border-b border-gray-200 p-6'>
             <h2 className='text-xl font-extrabold text-gray-950'>Applied Jobs History</h2>
-            <p className='mt-1 text-sm text-gray-500'>A clean view of your active hiring pipeline.</p>
+            <p className='mt-1 text-sm text-gray-500'>A clean view of your active hiring pipeline & status progression.</p>
           </div>
 
           <div className='hidden overflow-x-auto md:block'>
@@ -591,7 +591,7 @@ const Application = () => {
                   <th className='px-4 py-4 text-left font-extrabold'>Position</th>
                   <th className='px-4 py-4 text-left font-extrabold'>Location</th>
                   <th className='px-4 py-4 text-left font-extrabold'>Date Applied</th>
-                  <th className='px-4 py-4 text-left font-extrabold'>Status</th>
+                  <th className='px-4 py-4 text-left font-extrabold'>Hiring Pipeline Progress</th>
                 </tr>
               </thead>
               <tbody className='divide-y divide-gray-100'>
@@ -607,7 +607,7 @@ const Application = () => {
                     <td className='px-4 py-5 text-gray-500'>{job.jobId.location}</td>
                     <td className='px-4 py-5 text-sm text-gray-500'>{moment(job.date).format('MMM D, YYYY')}</td>
                     <td className='px-4 py-5'>
-                      <Status status={job.status} />
+                      <PipelineStatus status={job.status} />
                     </td>
                   </tr>
                 ))}
@@ -637,7 +637,7 @@ const Application = () => {
                 </div>
                 <div className='flex items-center justify-between border-t border-gray-200 pt-3'>
                   <span className='text-xs font-bold uppercase tracking-[0.12em] text-gray-400'>Status</span>
-                  <Status status={job.status} />
+                  <PipelineStatus status={job.status} />
                 </div>
               </div>
             ))}
@@ -649,7 +649,7 @@ const Application = () => {
                 <FileText className='text-blue-600' size={30} />
               </div>
               <p className='font-bold text-gray-500'>No job applications found yet.</p>
-              <button onClick={() => navigate('/')} className='mt-4 font-extrabold text-blue-600 hover:underline'>
+              <button onClick={() => navigate('/')} className='mt-4 font-extrabold text-blue-600 hover:underline cursor-pointer'>
                 Browse latest jobs
               </button>
             </div>
@@ -661,10 +661,28 @@ const Application = () => {
   )
 }
 
-const Status = ({ status }) => (
-  <span className={`status-chip ${status === 'Accepted' ? 'border border-green-100 bg-green-50 text-green-700' : status === 'Rejected' ? 'border border-red-100 bg-red-50 text-red-700' : 'border border-amber-100 bg-amber-50 text-amber-700'}`}>
-    {status}
-  </span>
-)
+const PipelineStatus = ({ status }) => {
+  const isAccepted = status === 'Accepted'
+  const isRejected = status === 'Rejected'
+  const isPending = status === 'Pending'
+
+  return (
+    <div className='flex flex-col gap-1.5'>
+      <div className='flex items-center gap-1 text-[11px] font-extrabold'>
+        <span className={`px-2 py-0.5 rounded-md ${isAccepted ? 'bg-emerald-100 text-emerald-800' : isRejected ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}`}>
+          {status}
+        </span>
+      </div>
+      {/* 5-stage progress bar dots */}
+      <div className='flex items-center gap-1'>
+        <div className='h-1.5 w-6 rounded-full bg-blue-600' title='Stage 1: Applied' />
+        <div className='h-1.5 w-6 rounded-full bg-blue-600' title='Stage 2: AI Screened' />
+        <div className={`h-1.5 w-6 rounded-full ${isPending || isAccepted ? 'bg-blue-600' : 'bg-gray-200'}`} title='Stage 3: Recruiter Review' />
+        <div className={`h-1.5 w-6 rounded-full ${isAccepted ? 'bg-emerald-500' : isRejected ? 'bg-rose-400' : 'bg-gray-200'}`} title='Stage 4: Decision / Interview' />
+        <div className={`h-1.5 w-6 rounded-full ${isAccepted ? 'bg-emerald-500' : 'bg-gray-200'}`} title='Stage 5: Final Offer' />
+      </div>
+    </div>
+  )
+}
 
 export default Application

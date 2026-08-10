@@ -13,10 +13,27 @@ const ViewApplications = () => {
   const [expandedId, setExpandedId] = useState(null)
   const [screeningIds, setScreeningIds] = useState({})
   const [revealedAnswers, setRevealedAnswers] = useState({})
+  const [compareList, setCompareList] = useState([])
+  const [showCompareModal, setShowCompareModal] = useState(false)
 
   const toggleAnswer = (applicantId, idx) => {
     const key = `${applicantId}-${idx}`
     setRevealedAnswers(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  const toggleCandidateCompare = (applicant) => {
+    setCompareList(prev => {
+      const exists = prev.some(a => a._id === applicant._id)
+      if (exists) {
+        return prev.filter(a => a._id !== applicant._id)
+      } else {
+        if (prev.length >= 3) {
+          toast.warning("You can compare up to 3 candidates max.")
+          return prev
+        }
+        return [...prev, applicant]
+      }
+    })
   }
 
   const handleScreenApplication = async (applicationId) => {
@@ -110,8 +127,16 @@ const ViewApplications = () => {
           <p className='mt-2 text-gray-600'>Review resumes and rank candidates using the AI Recruiter Screener.</p>
         </div>
 
-        {/* Sorting Toggles & Actions */}
-        <div className='flex items-center gap-2 rounded-xl border border-gray-200 bg-white p-1 shadow-sm h-fit self-end sm:self-center'>
+        {/* Sorting Toggles & Comparison Button */}
+        <div className='flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white p-1 shadow-sm h-fit self-end sm:self-center'>
+          {compareList.length >= 2 && (
+            <button
+              onClick={() => setShowCompareModal(true)}
+              className='cursor-pointer rounded-lg bg-emerald-600 text-white px-3 py-2 text-xs font-extrabold transition-all hover:bg-emerald-700 shadow-sm flex items-center gap-1'
+            >
+              📊 Compare ({compareList.length})
+            </button>
+          )}
           <button
             onClick={() => setSortBy('date')}
             className={`cursor-pointer rounded-lg px-4 py-2 text-xs font-bold transition-all ${
