@@ -59,16 +59,18 @@ export const AppcontextProvider = (props) => {
                 setcompanyData(data.company)
             }
             else {
-                toast.error(data.message)
-                const authErrors = ['jwt expired', 'Session Expired, Login Again', 'Not Authorized, Login Again !', 'Company not found', 'jwt malformed']
-                if (authErrors.includes(data.message)) {
+                const msg = data.message || ''
+                const isAuthErr = msg.includes('jwt') || msg.includes('Expired') || msg.includes('Authorized') || msg.includes('Company not found') || msg.includes('Session')
+                if (isAuthErr) {
                     setCompanyToken(null)
                     setcompanyData(null)
                     localStorage.removeItem('companyToken')
+                } else {
+                    toast.error(data.message)
                 }
             }
         } catch (error) {
-            toast.error(error.message)
+            console.error("fetchCompanyData error:", error.message)
         }
     }
 
@@ -80,16 +82,18 @@ export const AppcontextProvider = (props) => {
                 setUserData(data.user)
             }
             else {
-                toast.error(data.message)
-                const authErrors = ['jwt expired', 'Session Expired, Login Again', 'Not Authorized, Login Again !', 'User not found', 'jwt malformed']
-                if (authErrors.includes(data.message)) {
+                const msg = data.message || ''
+                const isAuthErr = msg.includes('jwt') || msg.includes('Expired') || msg.includes('Authorized') || msg.includes('User not found') || msg.includes('Session')
+                if (isAuthErr) {
                     setUserData(null)
                     setUserToken(null)
                     localStorage.removeItem('userToken')
+                } else {
+                    toast.error(data.message)
                 }
             }
         } catch (error) {
-            toast.error(error.message)
+            console.error("fetchUserData error:", error.message)
         }
     }
 
@@ -100,17 +104,19 @@ export const AppcontextProvider = (props) => {
             if (data.success) {
                 setUserApplications(data.application)
             } else {
-                toast.error(data.message)
-                const authErrors = ['jwt expired', 'Session Expired, Login Again', 'Not Authorized, Login Again !', 'User not found', 'jwt malformed']
-                if (authErrors.includes(data.message)) {
+                const msg = data.message || ''
+                const isAuthErr = msg.includes('jwt') || msg.includes('Expired') || msg.includes('Authorized') || msg.includes('User not found') || msg.includes('Session')
+                if (isAuthErr) {
                     setUserApplications([])
                     setUserData(null)
                     setUserToken(null)
                     localStorage.removeItem('userToken')
+                } else {
+                    toast.error(data.message)
                 }
             }
         } catch (error) {
-            toast.error(error.message)
+            console.error("fetchUserApplications error:", error.message)
         }
     }
 
