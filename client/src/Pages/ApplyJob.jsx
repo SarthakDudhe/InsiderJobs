@@ -24,6 +24,10 @@ const ApplyJob = () => {
   const [atsReport, setAtsReport] = useState(null)
   const [isAuditing, setIsAuditing] = useState(false)
 
+  const [tailoredData, setTailoredData] = useState(null)
+  const [isTailoring, setIsTailoring] = useState(false)
+  const [copiedLetter, setCopiedLetter] = useState(false)
+
   const runAtsAudit = async () => {
     setIsAuditing(true)
     try {
@@ -42,6 +46,27 @@ const ApplyJob = () => {
       toast.error(error.message)
     } finally {
       setIsAuditing(false)
+    }
+  }
+
+  const runAutoTailor = async () => {
+    setIsTailoring(true)
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/users/ats-tailor/${jobData._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${userToken}` } }
+      )
+      if (data.success) {
+        setTailoredData(data.tailoredData)
+        toast.success("Generated tailored bullets & cover letter!")
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setIsTailoring(false)
     }
   }
 
@@ -339,7 +364,14 @@ const ApplyJob = () => {
                     </div>
                   </div>
 
-                  <div className='pt-4 border-t border-gray-100 flex justify-end'>
+                  <div className='pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3'>
+                    <button
+                      onClick={runAutoTailor}
+                      disabled={isTailoring}
+                      className='cursor-pointer text-xs font-extrabold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-4 py-2 rounded-xl transition-all flex items-center gap-1.5'
+                    >
+                      {isTailoring ? '⚡ Generating AI Tailoring...' : '🪄 Auto-Tailor Resume & Cover Letter'}
+                    </button>
                     <button onClick={runAtsAudit} className='cursor-pointer text-xs font-extrabold text-indigo-600 hover:text-indigo-700 transition-colors flex items-center gap-1'>
                       🔄 Re-run AI Audit
                     </button>
@@ -347,6 +379,77 @@ const ApplyJob = () => {
                 </div>
               )}
             </div>
+
+            {/* AI Auto-Tailored Content Box */}
+            {tailoredData && (
+              <div className='premium-panel rounded-[1.5rem] p-6 md:p-8 border border-blue-100 bg-gradient-to-br from-blue-50/40 to-indigo-50/40 shadow-sm space-y-6'>
+                <div className='flex items-center justify-between border-b border-blue-100 pb-4'>
+                  <div className='flex items-center gap-3'>
+                    <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-lg shadow-sm'>
+                      🪄
+                    </div>
+                    <div>
+                      <h3 className='text-lg font-extrabold text-gray-950'>Tailored Resume & Cover Letter</h3>
+                      <p className='text-xs text-gray-500'>Customized specifically for {jobData.companyId?.name || 'this posting'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Value Proposition */}
+                {tailoredData.valueProposition && (
+                  <div className='p-4 rounded-xl bg-white border border-blue-100 shadow-sm'>
+                    <span className='text-[10px] font-extrabold uppercase tracking-wider text-blue-600'>1-Sentence Value Hook</span>
+                    <p className='text-xs font-bold text-gray-800 mt-1 leading-relaxed'>{tailoredData.valueProposition}</p>
+                  </div>
+                )}
+
+                {/* Tailored Bullets */}
+                {tailoredData.tailoredBullets?.length > 0 && (
+                  <div>
+                    <h4 className='text-xs font-extrabold uppercase tracking-wider text-gray-700 mb-3'>High-Impact Resume Bullets</h4>
+                    <ul className='space-y-2.5'>
+                      {tailoredData.tailoredBullets.map((bullet, idx) => (
+                        <li key={idx} className='flex items-start justify-between gap-3 p-3 rounded-xl bg-white border border-gray-100 text-xs text-gray-700 leading-relaxed shadow-sm'>
+                          <span>• {bullet}</span>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(bullet)
+                              toast.success("Bullet copied to clipboard!")
+                            }}
+                            className='text-blue-600 hover:text-blue-700 text-[11px] font-bold shrink-0 cursor-pointer'
+                          >
+                            Copy
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Personalized Cover Letter */}
+                {tailoredData.coverLetter && (
+                  <div>
+                    <div className='flex items-center justify-between mb-2'>
+                      <h4 className='text-xs font-extrabold uppercase tracking-wider text-gray-700'>Tailored Cover Letter</h4>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(tailoredData.coverLetter)
+                          setCopiedLetter(true)
+                          toast.success("Cover letter copied!")
+                          setTimeout(() => setCopiedLetter(false), 2000)
+                        }}
+                        className='px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-blue-600 hover:bg-gray-50 transition-all cursor-pointer shadow-sm'
+                      >
+                        {copiedLetter ? '✓ Copied' : '📋 Copy Letter'}
+                      </button>
+                    </div>
+                    <div className='p-4 rounded-xl bg-white border border-gray-100 text-xs text-gray-700 leading-relaxed font-sans whitespace-pre-line shadow-sm'>
+                      {tailoredData.coverLetter}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <aside>

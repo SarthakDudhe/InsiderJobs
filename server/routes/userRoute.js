@@ -1,5 +1,5 @@
 import express from "express";
-import { applyForJob, getUserData, getUserJobApplication, updateUserResume, updateUserLinks, registerUser, loginUser, auditJobATS } from "../controllers/userController.js";
+import { applyForJob, getUserData, getUserJobApplication, updateUserResume, updateUserLinks, registerUser, loginUser, auditJobATS, tailorResumeAndCoverLetter } from "../controllers/userController.js";
 import { getAIJobRecommendations } from "../controllers/aiController.js";
 import { protectUser } from "../middlewares/authMiddleware.js";
 import upload from "../config/multer.js";
@@ -33,5 +33,8 @@ router.get("/ai-recommender", protectUser, getAIJobRecommendations)
 
 //ATS Audit for resume vs job
 router.post("/ats-audit/:jobId", protectUser, auditJobATS)
+
+//AI Resume Auto-Tailoring & Cover Letter Generator
+router.post("/ats-tailor/:jobId", protectUser, tailorResumeAndCoverLetter)
 
 export default router

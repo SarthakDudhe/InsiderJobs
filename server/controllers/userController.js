@@ -491,3 +491,92 @@ Return the result as a valid JSON object matching this structure exactly (do not
         res.json({ success: false, message: error.message });
     }
 }
+
+// Generate tailored resume bullets & cover letter using Groq LLaMA 3.3
+export const tailorResumeAndCoverLetter = async (req, res) => {
+    const { jobId } = req.params;
+    const userId = req.auth?.userId;
+
+    if (!userId) {
+        return res.json({ success: false, message: "Not Authorized, Login Again" });
+    }
+
+    try {
+        const job = await Job.findById(jobId).populate('companyId');
+        if (!job) {
+            return res.json({ success: false, message: "Job Not Found" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user || !user.resume) {
+            return res.json({ success: false, message: "Please upload your resume first on your profile." });
+        }
+
+        let resumeText = user.resumeText;
+        if (!resumeText) {
+            try {
+                const response = await axios.get(user.resume, { responseType: 'arraybuffer' });
+                const pdf = await getDocumentProxy(new Uint8Array(response.data));
+                const { text } = await extractText(pdf, { mergePages: true });
+                resumeText = text?.trim() || "";
+                if (resumeText) {
+                    user.resumeText = resumeText;
+                    await user.save();
+                }
+            } catch (pdfErr) {
+                return res.json({ success: false, message: "Unable to parse candidate resume PDF." });
+            }
+        }
+
+        const groqApiKey = process.env.GROK_API_KEY;
+        if (!groqApiKey) {
+            return res.json({ success: false, message: "Missing Groq API key on server." });
+        }
+
+        const groq = new Groq({ apiKey: groqApiKey });
+        const prompt = `You are an elite career strategist. Analyze the candidate's resume and the job opening.
+Job Title: ${job.title}
+Company: ${job.companyId?.name || 'Hiring Team'}
+Job Description: ${job.description}
+
+Candidate Resume:
+${resumeText}
+
+Generate tailored materials for this application:
+1. 3 high-impact, quantifiable resume bullet points customized specifically to align with this job requirement.
+2. A compelling, concise cover letter (approx 150 words) written in a professional yet confident tone.
+3. A 1-sentence value proposition summary.
+
+Return ONLY a valid JSON object matching this schema exactly:
+{
+  "tailoredBullets": ["Bullet 1", "Bullet 2", "Bullet 3"],
+  "coverLetter": "Full text cover letter...",
+  "valueProposition": "1-sentence hook..."
+}`;
+
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                { role: "system", content: "You are a top tech recruiter and resume builder. Return ONLY valid JSON." },
+                { role: "user", content: prompt }
+            ],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.4,
+            response_format: { type: "json_object" }
+        });
+
+        const result = JSON.parse(chatCompletion.choices[0]?.message?.content || '{}');
+
+        res.json({
+            success: true,
+            tailoredData: {
+                tailoredBullets: result.tailoredBullets || [],
+                coverLetter: result.coverLetter || "",
+                valueProposition: result.valueProposition || ""
+            }
+        });
+    } catch (error) {
+        console.error("AI Tailor Error:", error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
