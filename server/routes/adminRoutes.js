@@ -1,11 +1,14 @@
 import express from "express";
-import { adminLogin, getDashboardStats, getAllCompanies, verifyCompany, getReportedJobs, dismissJobReports, deleteJob, getAnalyticsData, getAllJobs } from "../controllers/adminController.js";
+import { adminLogin, getDashboardStats, getAllCompanies, verifyCompany, getReportedJobs, dismissJobReports, deleteJob, getAnalyticsData, getAllJobs, getDashboardBundle } from "../controllers/adminController.js";
 import { protectAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 // Admin Authentication
 router.post("/login", adminLogin);
+
+// Fast Consolidated Dashboard Bundle
+router.get("/dashboard-bundle", protectAdmin, getDashboardBundle);
 
 // Dashboard Statistics
 router.get("/stats", protectAdmin, getDashboardStats);

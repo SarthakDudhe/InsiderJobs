@@ -21,13 +21,15 @@ export const adminLogin = async (req, res) => {
     }
 }
 
-// Get Dashboard Statistics
+// Get Dashboard Statistics (Optimized with Promise.all)
 export const getDashboardStats = async (req, res) => {
     try {
-        const totalCompanies = await Company.countDocuments();
-        const pendingVerifications = await Company.countDocuments({ isVerified: false });
-        const totalJobs = await Job.countDocuments();
-        const totalApplications = await JobApplication.countDocuments();
+        const [totalCompanies, pendingVerifications, totalJobs, totalApplications] = await Promise.all([
+            Company.countDocuments(),
+            Company.countDocuments({ isVerified: false }),
+            Job.countDocuments(),
+            JobApplication.countDocuments()
+        ]);
 
         res.json({
             success: true,
@@ -46,7 +48,7 @@ export const getDashboardStats = async (req, res) => {
 // Get All Companies for moderation
 export const getAllCompanies = async (req, res) => {
     try {
-        const companies = await Company.find().select("-password").sort({ name: 1 });
+        const companies = await Company.find().select("-password").sort({ name: 1 }).lean();
         res.json({ success: true, companies });
     } catch (error) {
         res.json({ success: false, message: error.message });
@@ -78,7 +80,8 @@ export const getReportedJobs = async (req, res) => {
     try {
         const reportedJobs = await Job.find({ "reports.0": { $exists: true } })
             .populate("companyId", "name email image")
-            .sort({ date: -1 });
+            .sort({ date: -1 })
+            .lean();
         res.json({ success: true, reportedJobs });
     } catch (error) {
         res.json({ success: false, message: error.message });
@@ -118,36 +121,33 @@ export const deleteJob = async (req, res) => {
     }
 }
 
-// Get daily analytics for the last 7 days
+// Get daily analytics for the last 7 days (Optimized with parallel Promise.all)
 export const getAnalyticsData = async (req, res) => {
     try {
-        const stats = [];
+        const days = [6, 5, 4, 3, 2, 1, 0];
         const now = new Date();
-        
-        for (let i = 6; i >= 0; i--) {
+
+        const statsPromises = days.map(async (i) => {
             const date = new Date(now);
             date.setDate(now.getDate() - i);
             date.setHours(0, 0, 0, 0);
             const startOfDay = date.getTime();
             const endOfDay = startOfDay + (24 * 60 * 60 * 1000);
-            
             const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            
-            const jobsCount = await Job.countDocuments({
-                date: { $gte: startOfDay, $lt: endOfDay }
-            });
-            
-            const applicationsCount = await JobApplication.countDocuments({
-                date: { $gte: startOfDay, $lt: endOfDay }
-            });
-            
-            stats.push({
+
+            const [jobsCount, applicationsCount] = await Promise.all([
+                Job.countDocuments({ date: { $gte: startOfDay, $lt: endOfDay } }),
+                JobApplication.countDocuments({ date: { $gte: startOfDay, $lt: endOfDay } })
+            ]);
+
+            return {
                 date: dateString,
                 jobs: jobsCount,
                 applications: applicationsCount
-            });
-        }
-        
+            };
+        });
+
+        const stats = await Promise.all(statsPromises);
         res.json({ success: true, stats });
     } catch (error) {
         res.json({ success: false, message: error.message });
@@ -159,8 +159,71 @@ export const getAllJobs = async (req, res) => {
     try {
         const jobs = await Job.find()
             .populate("companyId", "name email image")
-            .sort({ date: -1 });
+            .sort({ date: -1 })
+            .lean();
         res.json({ success: true, jobs });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+// Consolidated Dashboard Bundle (High-Performance 1-Roundtrip Endpoint)
+export const getDashboardBundle = async (req, res) => {
+    try {
+        const days = [6, 5, 4, 3, 2, 1, 0];
+        const now = new Date();
+
+        const [
+            totalCompanies,
+            pendingVerifications,
+            totalJobs,
+            totalApplications,
+            companies,
+            reportedJobs,
+            jobs,
+            analyticsStats
+        ] = await Promise.all([
+            Company.countDocuments(),
+            Company.countDocuments({ isVerified: false }),
+            Job.countDocuments(),
+            JobApplication.countDocuments(),
+            Company.find().select("-password").sort({ name: 1 }).lean(),
+            Job.find({ "reports.0": { $exists: true } }).populate("companyId", "name email image").sort({ date: -1 }).lean(),
+            Job.find().populate("companyId", "name email image").sort({ date: -1 }).lean(),
+            Promise.all(days.map(async (i) => {
+                const date = new Date(now);
+                date.setDate(now.getDate() - i);
+                date.setHours(0, 0, 0, 0);
+                const startOfDay = date.getTime();
+                const endOfDay = startOfDay + (24 * 60 * 60 * 1000);
+                const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                const [jobsCount, applicationsCount] = await Promise.all([
+                    Job.countDocuments({ date: { $gte: startOfDay, $lt: endOfDay } }),
+                    JobApplication.countDocuments({ date: { $gte: startOfDay, $lt: endOfDay } })
+                ]);
+
+                return {
+                    date: dateString,
+                    jobs: jobsCount,
+                    applications: applicationsCount
+                };
+            }))
+        ]);
+
+        res.json({
+            success: true,
+            stats: {
+                totalCompanies,
+                pendingVerifications,
+                totalJobs,
+                totalApplications
+            },
+            companies,
+            reportedJobs,
+            jobs,
+            analytics: analyticsStats
+        });
     } catch (error) {
         res.json({ success: false, message: error.message });
     }

@@ -82,17 +82,29 @@ const App = () => {
     toast.info('Logged out of Admin Portal.')
   }
 
+  // Fetch All Dashboard Data in 1 Fast Request
+  const fetchDashboardBundle = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/admin/dashboard-bundle`, {
+        headers: { token: adminToken }
+      })
+      if (data.success) {
+        setStats(data.stats)
+        setCompanies(data.companies)
+        setReportedJobs(data.reportedJobs)
+        setAllJobs(data.jobs)
+        setAnalyticsData(data.analytics)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   // Refresh all data
   const [isRefreshing, setIsRefreshing] = useState(false)
   const refreshAll = async () => {
     setIsRefreshing(true)
-    await Promise.all([
-      fetchStats(),
-      fetchCompanies(),
-      fetchReportedJobs(),
-      fetchAllJobs(),
-      fetchAnalytics()
-    ])
+    await fetchDashboardBundle()
     setIsRefreshing(false)
     toast.success('Dashboard refreshed!')
   }
@@ -216,10 +228,7 @@ const App = () => {
       )
       if (data.success) {
         toast.success(data.message)
-        fetchReportedJobs()
-        fetchAllJobs()
-        fetchStats()
-        fetchAnalytics()
+        fetchDashboardBundle()
       } else {
         toast.error(data.message)
       }
@@ -230,19 +239,11 @@ const App = () => {
 
   useEffect(() => {
     if (adminToken) {
-      fetchStats()
-      fetchCompanies()
-      fetchReportedJobs()
-      fetchAllJobs()
-      fetchAnalytics()
+      fetchDashboardBundle()
 
       // Auto-refresh every 30 seconds
       const interval = setInterval(() => {
-        fetchStats()
-        fetchCompanies()
-        fetchReportedJobs()
-        fetchAllJobs()
-        fetchAnalytics()
+        fetchDashboardBundle()
       }, 30000)
       return () => clearInterval(interval)
     }
