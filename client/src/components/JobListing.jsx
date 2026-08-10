@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import { assets, JobCategories, JobLocations } from '../assets/assets'
 import JobCard from './JobCard'
+import JobQuickViewDrawer from './JobQuickViewDrawer'
 import { Filter, X } from 'lucide-react'
 
 const JobListing = () => {
@@ -10,6 +11,7 @@ const JobListing = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedCategories, setSelectedCategories] = useState([])
   const [selectedLocation, setSelectedLocation] = useState([])
+  const [quickViewJob, setQuickViewJob] = useState(null)
 
   const handleCategorychange = (category) => {
     setSelectedCategories(prev => prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category])
@@ -87,7 +89,7 @@ const JobListing = () => {
 
         <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3'>
           {jobs.map((job, index) => (
-            <JobCard key={index} job={job} />
+            <JobCard key={index} job={job} onQuickView={(selectedJob) => setQuickViewJob(selectedJob)} />
           ))}
         </div>
 
@@ -109,6 +111,11 @@ const JobListing = () => {
           </div>
         )}
       </section>
+
+      {/* Quick View Drawer Modal */}
+      {quickViewJob && (
+        <JobQuickViewDrawer job={quickViewJob} onClose={() => setQuickViewJob(null)} />
+      )}
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 
-const JobCard = ({ job }) => {
+const JobCard = ({ job, onQuickView }) => {
   const navigate = useNavigate()
 
   const openJob = () => {
@@ -86,11 +86,11 @@ const JobCard = ({ job }) => {
       </div>
 
       <div className='flex gap-3 text-sm font-bold'>
-        <button className='premium-button flex-1 px-4 py-3' onClick={openJob}>
+        <button className='premium-button flex-1 px-4 py-3 cursor-pointer' onClick={openJob}>
           Apply <ArrowRight size={16} />
         </button>
-        <button className='flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 active:scale-95' onClick={openJob}>
-          Details
+        <button className='flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 active:scale-95' onClick={() => onQuickView ? onQuickView(job) : openJob()}>
+          Quick View
         </button>
       </div>
     </div>
