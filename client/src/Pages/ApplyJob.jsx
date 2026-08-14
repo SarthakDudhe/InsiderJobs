@@ -169,16 +169,16 @@ const ApplyJob = () => {
     <div className='min-h-screen ij-shell'>
       <Navbar />
       <main className='ij-container py-10'>
-        <section className='premium-card mb-8 rounded-[2rem] p-6 md:p-10'>
+        <section className='premium-card mb-8 rounded-[1.35rem] p-6 md:p-8'>
           <div className='flex flex-col justify-between gap-8 md:flex-row md:items-center'>
             <div className='flex flex-col items-center gap-5 text-center md:flex-row md:text-left'>
-              <div className='flex h-24 w-24 items-center justify-center rounded-3xl border border-gray-200 bg-white p-4 shadow-sm'>
-                <img className='max-h-16 object-contain' src={jobData.companyId.image} alt={jobData.companyId.name} />
+              <div className='flex h-20 w-20 items-center justify-center rounded-3xl border border-slate-200 bg-white p-4 shadow-sm'>
+                <img className='max-h-14 object-contain' src={jobData.companyId.image} alt={jobData.companyId.name} />
               </div>
               <div>
                 <p className='section-kicker mb-2'>{jobData.companyId.name}</p>
-                <h1 className='text-3xl font-extrabold text-gray-950 md:text-5xl'>{jobData.title}</h1>
-                <div className='mt-4 flex flex-wrap justify-center gap-3 text-sm font-semibold text-gray-600 md:justify-start'>
+                <h1 className='max-w-4xl text-3xl font-semibold leading-tight tracking-tight text-slate-950 md:text-5xl'>{jobData.title}</h1>
+                <div className='mt-4 flex flex-wrap justify-center gap-3 text-sm font-semibold text-slate-600 md:justify-start'>
                   <Info icon={<Briefcase />} text={jobData.companyId.name} />
                   <Info icon={<MapPin />} text={jobData.location} />
                   <Info icon={<Users />} text={jobData.level} />
@@ -221,23 +221,52 @@ const ApplyJob = () => {
               </div>
             </div>
 
-            <div className='text-center md:text-right'>
-              <button onClick={applyHandler} className={`px-8 py-4 ${isAlreadyApplied ? 'rounded-xl bg-gray-200 font-extrabold text-gray-500' : 'premium-button cursor-pointer'}`}>
-                {isAlreadyApplied ? 'Already Applied' : 'Apply Now'}
+            <div className='relative overflow-hidden rounded-[1.15rem] border border-slate-200 bg-slate-950 p-4 text-white shadow-[0_22px_60px_rgba(15,23,42,0.18)] md:w-80'>
+              <div className='absolute inset-0 bg-[radial-gradient(circle_at_80%_0%,rgba(37,99,235,0.45),transparent_14rem)]' />
+              <div className='relative'>
+                <div className='flex items-center justify-between gap-4'>
+                  <div>
+                    <p className='text-[11px] font-bold uppercase tracking-[0.18em] text-blue-200'>Career fit</p>
+                    <p className='mt-1 text-sm text-slate-300'>Decision readiness</p>
+                  </div>
+                  <ScoreRing score={94} />
+                </div>
+                <div className='mt-5 grid grid-cols-3 gap-2 text-center'>
+                  <SignalPill label='Role' value='High' />
+                  <SignalPill label='Resume' value={userData?.resume ? 'Ready' : 'Needs PDF'} />
+                  <SignalPill label='Speed' value={jobData.companyId?.averageDecisionDays ? `${jobData.companyId.averageDecisionDays}d` : 'Live'} />
+                </div>
+              </div>
+              <button onClick={applyHandler} className={`relative mt-5 w-full px-8 py-4 ${isAlreadyApplied ? 'rounded-xl bg-white/12 font-bold text-slate-300' : 'premium-button cursor-pointer'}`}>
+                {isAlreadyApplied ? 'Already applied' : 'Apply now'}
               </button>
-              <p className='mt-3 text-sm font-semibold text-gray-500'>CTC: {kConvert.convertTo(jobData.salary)}</p>
+              <p className='relative mt-3 text-sm font-semibold text-slate-300'>CTC: {kConvert.convertTo(jobData.salary)}</p>
             </div>
+          </div>
+          <div className='mt-8 grid gap-3 border-t border-slate-200 pt-5 sm:grid-cols-3'>
+            <DecisionMetric icon={<Gauge />} label='Match quality' value='Excellent' detail='Role level and location are aligned.' tone='blue' />
+            <DecisionMetric icon={<BrainCircuit />} label='Resume fit' value={userData?.resume ? 'Ready to analyze' : 'Resume needed'} detail='Run the ATS audit before applying.' tone='violet' />
+            <DecisionMetric icon={<ShieldCheck />} label='Company signal' value={jobData.companyId?.hasApplicants ? `${jobData.companyId.responseRate}% response` : 'Verified workspace'} detail='Hiring activity and response data.' tone='emerald' />
           </div>
         </section>
 
         <div className='grid gap-8 lg:grid-cols-[1fr_360px]'>
           <div className='space-y-8'>
-            <article className='premium-panel rounded-[1.5rem] p-6 md:p-8'>
-              <h2 className='mb-5 text-2xl font-extrabold text-gray-950'>Job description</h2>
-              <div className='rich-text prose max-w-none text-gray-700' dangerouslySetInnerHTML={{ __html: jobData.description }} />
-              <div className='mt-10 flex flex-wrap gap-4 items-center'>
-                <button onClick={applyHandler} className={`px-8 py-3.5 ${isAlreadyApplied ? 'rounded-xl bg-gray-200 font-extrabold text-gray-500' : 'premium-button cursor-pointer'}`}>
-                  {isAlreadyApplied ? 'Already Applied' : 'Apply Now'}
+            <article className='premium-panel rounded-[1.15rem] p-6 md:p-8'>
+              <div className='mb-6 flex flex-col justify-between gap-4 border-b border-slate-100 pb-5 md:flex-row md:items-start'>
+                <div>
+                  <p className='section-kicker'>Role briefing</p>
+                  <h2 className='mt-2 text-2xl font-semibold tracking-tight text-slate-950'>Overview and requirements</h2>
+                  <p className='mt-2 text-sm leading-6 text-slate-600'>Use this page as a decision workspace, not just a job description.</p>
+                </div>
+                <span className='inline-flex w-fit items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700'>
+                  <Sparkles size={14} /> AI guidance available
+                </span>
+              </div>
+              <div className='rich-text prose max-w-none text-slate-700' dangerouslySetInnerHTML={{ __html: jobData.description }} />
+              <div className='mt-10 flex flex-wrap items-center gap-4'>
+                <button onClick={applyHandler} className={`px-8 py-3.5 ${isAlreadyApplied ? 'rounded-xl bg-slate-200 font-bold text-slate-500' : 'premium-button cursor-pointer'}`}>
+                  {isAlreadyApplied ? 'Already applied' : 'Apply now'}
                 </button>
                 <button 
                   type='button'
@@ -473,8 +502,10 @@ const ApplyJob = () => {
 
           <aside>
             <div className='sticky top-24 space-y-6'>
+              <CompanySignalCard jobData={jobData} />
+
               {/* Company Info Sidebar Card */}
-              <div className='premium-panel rounded-[1.5rem] p-6 border border-gray-100 bg-white/50 backdrop-blur-md shadow-sm'>
+              <div className='hidden premium-panel rounded-[1.5rem] p-6 border border-gray-100 bg-white/50 backdrop-blur-md shadow-sm'>
                 <div className='flex items-center gap-4 mb-4'>
                   <div className='flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 p-2 shadow-sm'>
                     <img className='h-10 w-10 object-contain' src={jobData.companyId.image} alt={jobData.companyId.name} />
@@ -600,10 +631,98 @@ const ApplyJob = () => {
 }
 
 const Info = ({ icon, text }) => (
-  <span className='inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5'>
+  <span className='inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5'>
     {React.cloneElement(icon, { size: 15, className: 'text-blue-600' })}
     {text}
   </span>
+)
+
+const ScoreRing = ({ score }) => (
+  <div className='relative grid h-20 w-20 place-items-center rounded-full' style={{ background: `conic-gradient(#60a5fa ${score * 3.6}deg, rgba(255,255,255,0.14) 0deg)` }}>
+    <div className='grid h-[62px] w-[62px] place-items-center rounded-full bg-slate-950 ring-1 ring-white/10'>
+      <span className='text-2xl font-semibold tracking-tight text-white'>{score}</span>
+    </div>
+  </div>
+)
+
+const SignalPill = ({ label, value }) => (
+  <div className='rounded-xl border border-white/10 bg-white/8 px-2 py-2'>
+    <p className='text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
+    <p className='mt-1 truncate text-xs font-bold text-white'>{value}</p>
+  </div>
+)
+
+const DecisionMetric = ({ icon, label, value, detail, tone = 'blue' }) => {
+  const toneStyles = {
+    blue: 'from-blue-50 to-white text-blue-600 border-blue-100',
+    violet: 'from-violet-50 to-white text-violet-600 border-violet-100',
+    emerald: 'from-emerald-50 to-white text-emerald-600 border-emerald-100'
+  }
+
+  return (
+    <div className={`relative overflow-hidden rounded-2xl border bg-gradient-to-br p-4 ${toneStyles[tone]}`}>
+      <div className='flex items-start justify-between gap-3'>
+        <div>
+          <p className='text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
+          <p className='mt-2 text-base font-bold text-slate-950'>{value}</p>
+        </div>
+        <div className='rounded-xl bg-white p-2 shadow-sm'>
+          {React.cloneElement(icon, { size: 17 })}
+        </div>
+      </div>
+      <p className='mt-3 text-xs leading-5 text-slate-600'>{detail}</p>
+    </div>
+  )
+}
+
+const CompanySignalCard = ({ jobData }) => {
+  const activity = activityConfig[jobData.hiringActivity || 'stale'] || activityConfig.stale
+  const responseValue = jobData.companyId.hasApplicants ? `${jobData.companyId.responseRate}%` : 'High'
+  const decisionValue = jobData.companyId.hasApplicants ? `${jobData.companyId.averageDecisionDays} days` : 'Fast signal'
+
+  return (
+    <div className='overflow-hidden rounded-[1.25rem] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)]'>
+      <div className='bg-slate-950 p-5 text-white'>
+        <div className='flex items-center gap-4'>
+          <div className='flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white p-2 shadow-sm'>
+            <img className='h-10 w-10 object-contain' src={jobData.companyId.image} alt={jobData.companyId.name} />
+          </div>
+          <div>
+            <h3 className='text-lg font-semibold tracking-tight'>{jobData.companyId.name}</h3>
+            <p className='mt-1 text-[11px] font-bold uppercase tracking-[0.16em] text-blue-200'>Verified workspace</p>
+          </div>
+        </div>
+        <div className='mt-5 rounded-2xl border border-white/10 bg-white/8 p-4'>
+          <p className='text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400'>Hiring signal</p>
+          <div className='mt-2 flex items-center justify-between gap-3'>
+            <span className='text-xl font-semibold'>{activity.label}</span>
+            <span className='relative flex h-2.5 w-2.5'>
+              {activity.pulse && <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${activity.dot} opacity-75`} />}
+              <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${activity.dot}`} />
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className='grid grid-cols-2 gap-3 p-4'>
+        <CompanyMiniStat label='Response' value={responseValue} />
+        <CompanyMiniStat label='Decision' value={decisionValue} />
+      </div>
+      <div className='border-t border-slate-100 px-4 pb-4'>
+        <div className='rounded-2xl bg-slate-50 p-4'>
+          <p className='text-xs font-bold uppercase tracking-[0.12em] text-slate-400'>What this means</p>
+          <p className='mt-2 text-sm leading-6 text-slate-600'>Prioritize this role if the fit is strong; the company signal suggests this listing is worth a confident application.</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const CompanyMiniStat = ({ label, value }) => (
+  <div className='rounded-2xl border border-slate-200 bg-slate-50 p-3'>
+    <p className='text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
+    <p className='mt-1 text-lg font-semibold text-slate-950'>{value}</p>
+  </div>
 )
 
 export default ApplyJob

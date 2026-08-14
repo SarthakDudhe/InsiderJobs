@@ -3,7 +3,7 @@ import { AppContext } from '../context/AppContext'
 import { assets, JobCategories, JobLocations } from '../assets/assets'
 import JobCard from './JobCard'
 import JobQuickViewDrawer from './JobQuickViewDrawer'
-import { BrainCircuit, BriefcaseBusiness, Filter, Gauge, SearchX, SlidersHorizontal, X } from 'lucide-react'
+import { BrainCircuit, BriefcaseBusiness, CheckCircle2, Filter, Gauge, Radar, SearchX, SlidersHorizontal, Sparkles, TimerReset, X } from 'lucide-react'
 
 const JobListing = () => {
   const { isSearched, searchFilter, setSearchFilter, jobs, totalJobs, fetchJobs } = useContext(AppContext)
@@ -45,20 +45,31 @@ const JobListing = () => {
 
   return (
     <div className='ij-container py-10'>
-      <div className='mb-8 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]'>
-        <div>
-          <p className='section-kicker'>Job discovery</p>
-          <h1 className='mt-2 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-slate-950 md:text-5xl' id='job-list'>
-            Search with context, compare with confidence.
-          </h1>
-          <p className='mt-3 max-w-2xl text-sm leading-7 text-slate-600 md:text-base'>
-            Verified roles are organized by fit signals, company responsiveness, and your active search intent.
-          </p>
-        </div>
-        <div className='grid gap-3 sm:grid-cols-3 lg:self-end'>
-          <InsightTile icon={<BriefcaseBusiness />} value={totalJobs} label='open roles' />
-          <InsightTile icon={<Gauge />} value='92%' label='avg. AI fit' />
-          <InsightTile icon={<BrainCircuit />} value={activeFilterCount} label='active signals' />
+      <div className='mb-8 overflow-hidden rounded-[1.35rem] border border-slate-200 bg-slate-950 shadow-[0_30px_90px_rgba(15,23,42,0.18)]'>
+        <div className='relative grid gap-8 p-6 text-white md:p-8 lg:grid-cols-[1.15fr_0.85fr]'>
+          <div className='absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(37,99,235,0.48),transparent_24rem),radial-gradient(circle_at_92%_18%,rgba(6,182,212,0.22),transparent_22rem)]' />
+          <div className='relative'>
+            <p className='inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-blue-100'>
+              <Radar size={14} /> Opportunity intelligence
+            </p>
+            <h1 className='mt-5 max-w-4xl text-3xl font-semibold leading-tight tracking-tight md:text-5xl' id='job-list'>
+              Compare roles by fit, signal, and momentum.
+            </h1>
+            <p className='mt-4 max-w-2xl text-sm leading-7 text-slate-300 md:text-base'>
+              A focused workspace for verified roles, AI match quality, hiring activity, and the signals that tell you where to spend your next application.
+            </p>
+            <div className='mt-6 flex flex-wrap gap-2'>
+              {['High fit', 'Fast response', 'Remote-ready', 'Verified teams'].map(item => (
+                <span key={item} className='rounded-full border border-white/10 bg-white/8 px-3 py-1.5 text-xs font-bold text-slate-200'>{item}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className='relative grid gap-3 sm:grid-cols-3 lg:grid-cols-1'>
+            <InsightTile icon={<BriefcaseBusiness />} value={totalJobs} label='open roles' detail='curated in this search' />
+            <InsightTile icon={<Gauge />} value='92%' label='avg. AI fit' detail='based on role context' />
+            <InsightTile icon={<BrainCircuit />} value={activeFilterCount} label='active signals' detail='filters shaping results' />
+          </div>
         </div>
       </div>
 
@@ -93,7 +104,7 @@ const JobListing = () => {
           )}
 
           <div className={showFilter ? 'block' : 'max-lg:hidden'}>
-            <div className='mb-6 rounded-xl border border-slate-200 bg-slate-50/80 p-3'>
+            <div className='mb-6 rounded-xl border border-blue-100 bg-blue-50/70 p-3'>
               <div className='flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-slate-400'>
                 <SlidersHorizontal size={14} /> Match controls
               </div>
@@ -105,16 +116,23 @@ const JobListing = () => {
         </aside>
 
         <section className='w-full'>
-          <div className='mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center'>
+          <div className='mb-5 rounded-[1.15rem] border border-slate-200 bg-white/90 p-4 shadow-sm'>
+            <div className='flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
             <div>
               <h2 className='text-xl font-bold text-slate-950'>Recommended roles</h2>
-              <p className='mt-1 text-sm text-slate-600'>Sorted for fit, freshness, and hiring activity.</p>
+              <p className='mt-1 text-sm text-slate-600'>Sorted for fit, freshness, company signal, and response velocity.</p>
             </div>
-            <span className='status-chip w-fit border border-slate-200 bg-white text-slate-600'>{totalJobs} roles</span>
+            <div className='flex flex-wrap items-center gap-2'>
+              <ResultChip icon={<Sparkles />} label='AI ranked' />
+              <ResultChip icon={<CheckCircle2 />} label='Verified' />
+              <ResultChip icon={<TimerReset />} label='Fresh first' />
+              <span className='status-chip w-fit border border-slate-200 bg-white text-slate-600'>{totalJobs} roles</span>
+            </div>
+            </div>
           </div>
 
           {jobs.length > 0 ? (
-            <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3'>
+            <div className='grid grid-cols-1 gap-5 xl:grid-cols-2'>
               {jobs.map((job, index) => (
                 <JobCard key={job._id || index} job={job} onQuickView={(selectedJob) => setQuickViewJob(selectedJob)} />
               ))}
@@ -169,12 +187,24 @@ const FilterGroup = ({ title, items, selected, onToggle, className = '' }) => (
   </div>
 )
 
-const InsightTile = ({ icon, value, label }) => (
-  <div className='premium-panel rounded-[1rem] p-4'>
-    {React.cloneElement(icon, { size: 18, className: 'text-blue-600' })}
-    <p className='mt-3 text-2xl font-semibold tracking-tight text-slate-950'>{value}</p>
-    <p className='text-xs font-bold uppercase tracking-[0.12em] text-slate-400'>{label}</p>
+const InsightTile = ({ icon, value, label, detail }) => (
+  <div className='rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur'>
+    <div className='flex items-center justify-between gap-3'>
+      <div className='rounded-xl bg-white/10 p-2 text-blue-100'>
+        {React.cloneElement(icon, { size: 18 })}
+      </div>
+      <p className='text-2xl font-semibold tracking-tight text-white'>{value}</p>
+    </div>
+    <p className='mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-blue-100'>{label}</p>
+    <p className='mt-1 text-xs text-slate-400'>{detail}</p>
   </div>
+)
+
+const ResultChip = ({ icon, label }) => (
+  <span className='inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600'>
+    {React.cloneElement(icon, { size: 13, className: 'text-blue-600' })}
+    {label}
+  </span>
 )
 
 const EmptyJobsState = ({ onClear }) => (
