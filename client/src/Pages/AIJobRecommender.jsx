@@ -4,8 +4,15 @@ import Footer from '../components/Footer'
 import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { BrainCircuit, Briefcase, RefreshCw, Sparkles } from 'lucide-react'
+import { ArrowUpRight, BrainCircuit, Briefcase, CheckCircle2, FileText, Lightbulb, MapPin, RefreshCw, Search, Sparkles, Target, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+
+const suggestedPrompts = [
+  'Find roles that match my resume',
+  'Prioritize remote product teams',
+  'Surface senior frontend roles',
+  'Show interview-ready opportunities'
+]
 
 const AIJobRecommender = () => {
   const { backendUrl, userData, userToken } = useContext(AppContext)
@@ -15,11 +22,11 @@ const AIJobRecommender = () => {
   const [recommendations, setRecommendations] = useState(null)
   const [error, setError] = useState(null)
   const [keywords, setKeywords] = useState([])
-  const [newKeywordInput, setNewKeywordInput] = useState("")
+  const [newKeywordInput, setNewKeywordInput] = useState('')
 
   const fetchRecommendations = async (customKeywordsList = null) => {
     if (!userData || !userData.resume) {
-      setError("Please upload your resume in the Applications page first.")
+      setError('Upload your resume in Applications before running AI recommendations.')
       return
     }
 
@@ -44,7 +51,7 @@ const AIJobRecommender = () => {
         toast.error(data.message)
       }
     } catch (err) {
-      setError('Failed to fetch recommendations. Please try again.')
+      setError('Recommendation engine is temporarily unavailable. Please try again.')
       toast.error(err.message)
     } finally {
       setLoading(false)
@@ -56,7 +63,7 @@ const AIJobRecommender = () => {
     const trimmed = newKeywordInput.trim()
     if (trimmed && !keywords.includes(trimmed)) {
       setKeywords(prev => [...prev, trimmed])
-      setNewKeywordInput("")
+      setNewKeywordInput('')
     }
   }
 
@@ -67,143 +74,264 @@ const AIJobRecommender = () => {
   return (
     <div className='min-h-screen ij-shell'>
       <Navbar />
-      <main className='ij-container py-12'>
-        <div className='relative mb-10 overflow-hidden rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.13),transparent_26rem),linear-gradient(135deg,#ffffff,#eef5ff)] p-7 shadow-[0_30px_80px_rgba(15,23,42,0.1)] md:p-10'>
-          <div className='relative z-10 max-w-3xl'>
-            <div className='mb-5 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-blue-700'>
-              <BrainCircuit size={15} /> AI career intelligence
-            </div>
-            <h1 className='mb-4 text-4xl font-extrabold leading-tight text-slate-950 md:text-6xl'>
-              Recommendations shaped by your resume, not generic keywords.
+      <main className='ij-container py-10'>
+        <section className='mb-8 grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-end'>
+          <div>
+            <p className='section-kicker'>AI career assistant</p>
+            <h1 className='mt-2 max-w-4xl text-3xl font-semibold leading-tight tracking-tight text-slate-950 md:text-5xl'>
+              A focused workspace for resume-aware job discovery.
             </h1>
-            <p className='max-w-2xl text-lg leading-relaxed text-slate-600'>
-              Upload your resume once, then let InsiderJobs surface relevant roles, extracted strengths, and live opportunities in a focused AI workspace.
+            <p className='mt-4 max-w-2xl text-sm leading-7 text-slate-600 md:text-base'>
+              InsiderJobs reads your candidate context, extracts useful signals, and turns them into live role recommendations you can refine.
             </p>
           </div>
-        </div>
-
-        {loading ? (
-          <div className='flex flex-col items-center justify-center rounded-[1.5rem] border border-slate-200 bg-white/90 py-20 text-center shadow-sm'>
-            <div className='mb-5 h-16 w-16 animate-spin rounded-full border-4 border-blue-400/20 border-t-blue-400' />
-            <p className='text-xl font-bold text-slate-950'>Analyzing your resume and searching for jobs...</p>
-            <p className='mt-2 text-sm text-slate-500'>Matching skills, seniority, location, and role intent.</p>
-          </div>
-        ) : error ? (
-          <div className='mx-auto max-w-md rounded-[1.5rem] border border-red-200 bg-red-50 p-8 text-center'>
-            <p className='mb-6 text-red-700'>{error}</p>
-            <button onClick={() => navigate('/applications')} className='premium-button px-6 py-3'>
-              Go to Applications
-            </button>
-          </div>
-        ) : recommendations ? (
-          <div className='grid gap-7 lg:grid-cols-3'>
-            <aside className='lg:col-span-1'>
-              <div className='sticky top-24 rounded-[1.5rem] border border-slate-200 bg-white/90 p-6 shadow-[0_22px_60px_rgba(15,23,42,0.08)] backdrop-blur'>
-                <h3 className='mb-4 flex items-center gap-2 text-xl font-extrabold text-slate-950'>
-                  <span className='rounded-xl bg-blue-500 p-2 text-white'><Sparkles size={18} /></span>
-                  Resume Insights
-                </h3>
-                <p className='mb-4 text-sm leading-relaxed text-slate-500'>Keywords extracted from your resume. Add or remove tags to refine job listings.</p>
-                
-                <div className='flex flex-wrap gap-2'>
-                  {keywords.map((keyword, index) => (
-                    <span key={index} className='inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 pl-3 pr-2 py-1.5 text-sm font-bold text-blue-700'>
-                      {keyword}
-                      <button 
-                        onClick={() => removeKeyword(keyword)} 
-                        className='inline-flex h-4 w-4 items-center justify-center rounded-full text-blue-500 transition-all hover:bg-blue-100 hover:text-blue-800 text-xs font-normal'
-                        title="Remove Keyword"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-
-                <form onSubmit={handleAddKeyword} className='mt-4 flex gap-2'>
-                  <input
-                    type='text'
-                    value={newKeywordInput}
-                    onChange={(e) => setNewKeywordInput(e.target.value)}
-                    placeholder='Add skill or role...'
-                    className='w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-blue-400 focus:outline-none'
-                  />
-                  <button type='submit' className='premium-button px-4 py-2 text-sm shrink-0'>
-                    Add
-                  </button>
-                </form>
-
-                <button onClick={() => fetchRecommendations(keywords)} className='mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-blue-500 bg-blue-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 shadow-md shadow-blue-500/20'>
-                  <RefreshCw size={16} /> Search Custom Keywords
-                </button>
-
-                <button onClick={() => fetchRecommendations(null)} className='mt-2 text-xs text-slate-500 hover:text-blue-700 transition-all underline w-full text-center'>
-                  Reset to Resume Keywords
-                </button>
+          <div className='premium-panel rounded-[1.15rem] p-4'>
+            <div className='flex items-center gap-3'>
+              <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600'>
+                <BrainCircuit size={22} />
               </div>
-            </aside>
-
-            <section className='lg:col-span-2'>
-              <div className='mb-6 flex items-center justify-between'>
-                <h3 className='text-2xl font-extrabold text-slate-950'>Recommended Jobs</h3>
-                <span className='status-chip border border-slate-200 bg-white text-slate-600'>{recommendations.jobs.length} found</span>
+              <div>
+                <p className='text-sm font-bold text-slate-950'>Persistent career context</p>
+                <p className='text-xs leading-5 text-slate-500'>Resume, skills, keywords, and live roles stay connected.</p>
               </div>
-
-              {recommendations.jobs.length > 0 ? (
-                <div className='space-y-4'>
-                  {recommendations.jobs.map((job, index) => (
-                    <div key={index} className='group rounded-[1.35rem] border border-slate-200 bg-white/90 p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_20px_55px_rgba(37,99,235,0.1)] sm:p-6'>
-                      <div className='flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
-                        <div className='flex gap-4'>
-                          <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-100'>
-                            <Briefcase size={22} />
-                          </div>
-                          <div>
-                            <h4 className='text-lg font-extrabold text-slate-950 transition-colors group-hover:text-blue-700'>{job.title}</h4>
-                            <p className='font-semibold text-slate-600'>{job.company}</p>
-                            <div className='mt-2 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500'>
-                              <span>{job.location || 'Remote'}</span>
-                              {job.type && <span>{job.type}</span>}
-                              {job.salary && <span className='text-green-700'>{job.salary}</span>}
-                            </div>
-                            {(job.department || job.seniority) && (
-                              <div className='mt-3 flex flex-wrap gap-2'>
-                                {job.department && <span className='rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600'>{job.department}</span>}
-                                {job.seniority && <span className='rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700'>{job.seniority}</span>}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <a href={job.url} target='_blank' rel='noopener noreferrer' className='premium-button w-full px-5 py-3 text-sm sm:w-auto'>
-                          Apply Now
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className='rounded-[1.5rem] border border-dashed border-slate-300 bg-white/80 p-12 text-center'>
-                  <p className='text-slate-500'>No jobs matched these keywords yet. Try updating your resume with more technical skills.</p>
-                </div>
-              )}
-            </section>
-          </div>
-        ) : (
-          <div className='flex flex-col items-center justify-center rounded-[1.5rem] border border-slate-200 bg-white/90 py-20 text-center shadow-sm'>
-            <div className='mb-6 rounded-[2rem] border border-blue-100 bg-blue-50 p-7'>
-              <BrainCircuit size={52} className='text-blue-600' />
             </div>
-            <h3 className='mb-2 text-2xl font-extrabold text-slate-950'>Ready to find your match?</h3>
-            <p className='mb-8 max-w-sm text-slate-500'>Start the AI analysis and generate role recommendations from your resume.</p>
-            <button onClick={fetchRecommendations} className='premium-button px-8 py-4 text-lg'>
-              Analyze Resume
-            </button>
           </div>
-        )}
+        </section>
+
+        <div className='grid gap-7 lg:grid-cols-[340px_1fr]'>
+          <aside className='space-y-5'>
+            <div className='premium-panel rounded-[1.15rem] p-5'>
+              <div className='mb-5 flex items-center gap-3'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-white'>
+                  <FileText size={18} />
+                </div>
+                <div>
+                  <h2 className='font-bold text-slate-950'>Candidate context</h2>
+                  <p className='text-xs text-slate-500'>{userData?.resume ? 'Resume connected' : 'Resume required'}</p>
+                </div>
+              </div>
+
+              <div className='space-y-3'>
+                <ContextRow icon={<CheckCircle2 />} label='Profile' value={userData?.name || 'Candidate'} active={Boolean(userData)} />
+                <ContextRow icon={<FileText />} label='Resume' value={userData?.resume ? 'Available for AI analysis' : 'Not uploaded'} active={Boolean(userData?.resume)} />
+                <ContextRow icon={<Target />} label='Search mode' value={keywords.length ? `${keywords.length} custom signals` : 'Resume-derived'} active />
+              </div>
+
+              {!userData?.resume && (
+                <button onClick={() => navigate('/applications')} className='premium-button mt-5 w-full px-5 py-3 text-sm'>
+                  Upload resume
+                </button>
+              )}
+            </div>
+
+            <div className='premium-panel rounded-[1.15rem] p-5'>
+              <div className='mb-4 flex items-center justify-between gap-3'>
+                <div>
+                  <h2 className='font-bold text-slate-950'>Signal controls</h2>
+                  <p className='text-xs text-slate-500'>Tune the keywords used for matching.</p>
+                </div>
+                <Sparkles size={18} className='text-blue-600' />
+              </div>
+
+              <div className='flex flex-wrap gap-2'>
+                {keywords.length > 0 ? keywords.map((keyword, index) => (
+                  <span key={`${keyword}-${index}`} className='inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 py-1.5 pl-3 pr-2 text-xs font-bold text-blue-700'>
+                    {keyword}
+                    <button
+                      onClick={() => removeKeyword(keyword)}
+                      className='ij-focus-ring inline-flex h-4 w-4 items-center justify-center rounded-full text-blue-500 transition-all hover:bg-blue-100 hover:text-blue-800'
+                      title='Remove keyword'
+                      aria-label={`Remove ${keyword}`}
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )) : (
+                  <p className='rounded-xl border border-dashed border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-500'>
+                    Run analysis to extract resume keywords, or add your own search signals.
+                  </p>
+                )}
+              </div>
+
+              <form onSubmit={handleAddKeyword} className='mt-4 flex gap-2'>
+                <input
+                  type='text'
+                  value={newKeywordInput}
+                  onChange={(e) => setNewKeywordInput(e.target.value)}
+                  placeholder='Add skill or role'
+                  className='premium-input w-full rounded-xl px-3 py-2 text-sm placeholder:text-slate-400'
+                />
+                <button type='submit' className='premium-button shrink-0 px-4 py-2 text-sm'>
+                  Add
+                </button>
+              </form>
+
+              <button onClick={() => fetchRecommendations(keywords)} className='premium-button mt-5 inline-flex w-full px-4 py-3 text-sm'>
+                <RefreshCw size={16} /> Search custom signals
+              </button>
+              <button onClick={() => fetchRecommendations(null)} className='mt-3 w-full text-center text-xs font-bold text-slate-500 transition hover:text-blue-700'>
+                Reset to resume signals
+              </button>
+            </div>
+          </aside>
+
+          <section className='premium-panel min-h-[620px] overflow-hidden rounded-[1.15rem]'>
+            <div className='border-b border-slate-200 bg-white p-5'>
+              <div className='flex flex-col justify-between gap-4 md:flex-row md:items-center'>
+                <div>
+                  <h2 className='text-xl font-bold text-slate-950'>Assistant workspace</h2>
+                  <p className='mt-1 text-sm text-slate-500'>Generate, refine, and act on job recommendations.</p>
+                </div>
+                <button onClick={() => fetchRecommendations(null)} disabled={loading} className='premium-button px-5 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-60'>
+                  {loading ? 'Analyzing...' : 'Analyze resume'}
+                </button>
+              </div>
+
+              <div className='mt-5 flex flex-wrap gap-2'>
+                {suggestedPrompts.map(prompt => (
+                  <button
+                    key={prompt}
+                    onClick={() => {
+                      const promptSignals = [...new Set([...keywords, prompt])]
+                      setKeywords(promptSignals)
+                      if (!loading) fetchRecommendations(promptSignals)
+                    }}
+                    className='ij-focus-ring rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700'
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className='p-5 md:p-6'>
+              {loading ? (
+                <LoadingState />
+              ) : error ? (
+                <ErrorState error={error} onApplications={() => navigate('/applications')} />
+              ) : recommendations ? (
+                <RecommendationsList recommendations={recommendations} />
+              ) : (
+                <StartState onStart={() => fetchRecommendations(null)} />
+              )}
+            </div>
+          </section>
+        </div>
       </main>
       <Footer />
     </div>
   )
 }
+
+const ContextRow = ({ icon, label, value, active }) => (
+  <div className='flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/80 p-3'>
+    <div className={`mt-0.5 ${active ? 'text-blue-600' : 'text-slate-500'}`}>
+      {React.cloneElement(icon, { size: 16 })}
+    </div>
+    <div>
+      <p className='text-xs font-bold uppercase tracking-[0.12em] text-slate-400'>{label}</p>
+      <p className='mt-0.5 text-sm font-semibold text-slate-800'>{value}</p>
+    </div>
+  </div>
+)
+
+const LoadingState = () => (
+  <div className='grid gap-4'>
+    <div className='rounded-2xl border border-blue-100 bg-blue-50/70 p-5'>
+      <div className='flex items-center gap-3'>
+        <div className='h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600' />
+        <div>
+          <p className='font-bold text-slate-950'>AI is reading your resume and searching live roles.</p>
+          <p className='text-sm text-slate-600'>Matching skills, seniority, location, and role intent.</p>
+        </div>
+      </div>
+    </div>
+    {[0, 1, 2].map(item => (
+      <div key={item} className='animate-pulse rounded-2xl border border-slate-200 bg-white p-5'>
+        <div className='h-4 w-1/3 rounded bg-slate-200' />
+        <div className='mt-4 h-3 w-2/3 rounded bg-slate-100' />
+        <div className='mt-3 h-3 w-1/2 rounded bg-slate-100' />
+      </div>
+    ))}
+  </div>
+)
+
+const ErrorState = ({ error, onApplications }) => (
+  <div className='flex min-h-[430px] flex-col items-center justify-center text-center'>
+    <div className='flex h-14 w-14 items-center justify-center rounded-2xl border border-rose-100 bg-rose-50 text-rose-600'>
+      <Lightbulb size={24} />
+    </div>
+    <h3 className='mt-5 text-xl font-bold text-slate-950'>AI recommendations need one more signal</h3>
+    <p className='mt-2 max-w-md text-sm leading-6 text-slate-600'>{error}</p>
+    <button onClick={onApplications} className='premium-button mt-6 px-6 py-3 text-sm'>
+      Open Applications
+    </button>
+  </div>
+)
+
+const StartState = ({ onStart }) => (
+  <div className='flex min-h-[430px] flex-col items-center justify-center text-center'>
+    <div className='flex h-16 w-16 items-center justify-center rounded-3xl border border-blue-100 bg-blue-50 text-blue-600'>
+      <BrainCircuit size={34} />
+    </div>
+    <h3 className='mt-6 text-2xl font-bold text-slate-950'>Ready to generate your match brief?</h3>
+    <p className='mt-2 max-w-md text-sm leading-6 text-slate-600'>Start with your resume, then refine the results with custom skills, roles, or company preferences.</p>
+    <button onClick={onStart} className='premium-button mt-7 px-8 py-4 text-base'>
+      Analyze resume
+    </button>
+  </div>
+)
+
+const RecommendationsList = ({ recommendations }) => (
+  <div>
+    <div className='mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center'>
+      <div>
+        <p className='text-sm font-bold text-slate-950'>Recommended jobs</p>
+        <p className='text-xs text-slate-500'>Ranked from current resume and keyword context.</p>
+      </div>
+      <span className='status-chip w-fit border border-slate-200 bg-white text-slate-600'>{recommendations.jobs.length} found</span>
+    </div>
+
+    {recommendations.jobs.length > 0 ? (
+      <div className='space-y-4'>
+        {recommendations.jobs.map((job, index) => (
+          <article key={`${job.title}-${index}`} className='group rounded-[1.15rem] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-[0_20px_55px_rgba(37,99,235,0.1)] sm:p-6'>
+            <div className='flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
+              <div className='flex gap-4'>
+                <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 ring-1 ring-blue-100'>
+                  <Briefcase size={22} />
+                </div>
+                <div>
+                  <h4 className='text-lg font-bold text-slate-950 transition-colors group-hover:text-blue-700'>{job.title}</h4>
+                  <p className='font-semibold text-slate-600'>{job.company}</p>
+                  <div className='mt-2 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500'>
+                    <span className='inline-flex items-center gap-1'><MapPin size={13} /> {job.location || 'Remote'}</span>
+                    {job.type && <span>{job.type}</span>}
+                    {job.salary && <span className='text-emerald-700'>{job.salary}</span>}
+                  </div>
+                  {(job.department || job.seniority) && (
+                    <div className='mt-3 flex flex-wrap gap-2'>
+                      {job.department && <span className='rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600'>{job.department}</span>}
+                      {job.seniority && <span className='rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700'>{job.seniority}</span>}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <a href={job.url} target='_blank' rel='noopener noreferrer' className='premium-button w-full px-5 py-3 text-sm sm:w-auto'>
+                Open role <ArrowUpRight size={16} />
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <div className='rounded-[1.15rem] border border-dashed border-slate-300 bg-white/80 p-12 text-center'>
+        <Search className='mx-auto mb-3 text-blue-600' size={28} />
+        <p className='font-bold text-slate-700'>No jobs matched these signals yet.</p>
+        <p className='mt-1 text-sm text-slate-500'>Try broadening keywords or adding more resume context.</p>
+      </div>
+    )}
+  </div>
+)
 
 export default AIJobRecommender
