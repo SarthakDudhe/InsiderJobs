@@ -9,7 +9,26 @@ import JobCard from '../components/JobCard'
 import Footer from '../components/Footer'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { Briefcase, CalendarClock, MapPin, Users, X } from 'lucide-react'
+import { BrainCircuit, Briefcase, CalendarClock, Flag, Gauge, MapPin, ShieldCheck, Sparkles, Users, X } from 'lucide-react'
+
+const activityConfig = {
+  active: {
+    label: 'Active hiring',
+    className: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    dot: 'bg-emerald-500',
+    pulse: true
+  },
+  slow: {
+    label: 'Slow activity',
+    className: 'border-amber-200 bg-amber-50 text-amber-700',
+    dot: 'bg-amber-500'
+  },
+  stale: {
+    label: 'Likely stale',
+    className: 'border-rose-200 bg-rose-50 text-rose-700',
+    dot: 'bg-rose-500'
+  }
+}
 
 const ApplyJob = () => {
   const { id } = useParams()
