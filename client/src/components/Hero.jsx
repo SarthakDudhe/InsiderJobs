@@ -2,6 +2,7 @@ import React, { useContext, useRef } from 'react'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import {
   ArrowRight,
   Bell,
@@ -14,6 +15,7 @@ import {
   Search,
   ShieldCheck,
   Sparkles,
+  Target,
   UsersRound
 } from 'lucide-react'
 
@@ -21,6 +23,7 @@ const MotionDiv = motion.div
 
 const Hero = () => {
   const { setIsSearched, setSearchFilter } = useContext(AppContext)
+  const navigate = useNavigate()
   const titleRef = useRef(null)
   const locationRef = useRef(null)
 
@@ -30,10 +33,11 @@ const Hero = () => {
       location: locationRef.current.value
     })
     setIsSearched(true)
+    navigate('/opportunities')
   }
 
   return (
-    <section className='relative isolate overflow-hidden bg-[#f5f7fb] text-slate-950'>
+    <section className='relative isolate overflow-hidden bg-[var(--ij-canvas)] text-slate-950'>
       <div className='hero-grid-bg absolute inset-0 opacity-70' />
       <div className='hero-aurora absolute inset-x-0 top-0 h-[520px]' />
 
@@ -47,13 +51,13 @@ const Hero = () => {
           >
             <p className='mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-semibold text-slate-600 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur'>
               <Sparkles className='h-4 w-4 text-blue-600' />
-              AI-matched roles, verified recruiters, zero job-board noise
+              AI-matched roles, verified companies, zero job-board noise
             </p>
-            <h1 className='mx-auto max-w-5xl text-4xl font-semibold leading-[1.02] tracking-tight text-slate-950 sm:text-5xl md:text-7xl'>
-              Find work with insider-grade clarity.
+            <h1 className='mx-auto max-w-5xl text-4xl font-semibold leading-[1.04] tracking-tight text-slate-950 sm:text-5xl md:text-6xl'>
+              Your AI career operating system.
             </h1>
             <p className='mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600 md:text-lg'>
-              InsiderJobs turns career search into a focused command center: verified openings, intelligent recommendations, application tracking, and recruiter tools in one polished workspace.
+              InsiderJobs turns career search into a focused command center: intelligent recommendations, verified openings, application tracking, and actionable next steps in one polished workspace.
             </p>
 
             <MotionDiv
@@ -85,7 +89,7 @@ const Hero = () => {
                   <span className='points-wrapper'>
                     {[...Array(10)].map((_, index) => <i key={index} className='point' />)}
                   </span>
-                  <span className='button-inner'>Find Jobs <ArrowRight size={18} /></span>
+                  <span className='button-inner'>Discover Matches <ArrowRight size={18} /></span>
                 </button>
               </div>
             </MotionDiv>
@@ -112,25 +116,25 @@ const Hero = () => {
                 <span className='h-3 w-3 rounded-full bg-emerald-400/80' />
                 <div className='ml-3 hidden items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-600 sm:flex'>
                   <Layers3 className='h-3.5 w-3.5 text-blue-600' />
-                  InsiderJobs Console - Live market
+                  InsiderJobs Console - Career intelligence
                 </div>
               </div>
               <div className='flex items-center gap-2'>
                 <button className='hidden rounded-md border border-slate-200 bg-slate-50 p-1.5 text-slate-600 transition hover:bg-white sm:inline-flex' aria-label='Notifications'>
                   <Bell className='h-4 w-4' />
                 </button>
-                <button className='rounded-md bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-500'>Publish role</button>
+                <button className='rounded-md bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-500'>Analyze fit</button>
               </div>
             </div>
 
             <div className='grid min-h-[520px] grid-cols-1 md:grid-cols-12'>
               <aside className='hidden border-r border-slate-200 bg-slate-50/80 p-4 md:col-span-3 md:block'>
                 <div className='mb-4 flex items-center justify-between'>
-                  <span className='rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-600'>Talent radar</span>
+                  <span className='rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-600'>Opportunity radar</span>
                   <Search className='h-4 w-4 text-slate-500' />
                 </div>
                 <div className='space-y-2'>
-                  {['AI matched', 'Recently funded', 'Remote friendly', 'Fast response'].map((item, index) => (
+                  {['AI matched', 'Remote friendly', 'Fast response', 'Salary visible'].map((item, index) => (
                     <div key={item} className={`flex items-center justify-between rounded-lg px-3 py-2 text-xs ${index === 0 ? 'bg-blue-50 text-blue-700' : 'bg-white text-slate-600'}`}>
                       <span>{item}</span>
                       <span className='text-slate-400'>{index === 0 ? '128' : 42 - index * 6}</span>
@@ -138,11 +142,11 @@ const Hero = () => {
                   ))}
                 </div>
                 <div className='mt-5 rounded-xl border border-slate-200 bg-white p-3'>
-                  <p className='text-xs font-semibold text-slate-700'>Pipeline health</p>
+                  <p className='text-xs font-semibold text-slate-700'>Application health</p>
                   <div className='mt-3 space-y-3'>
-                    <Progress label='Shortlist' value='78%' />
-                    <Progress label='Interview' value='54%' />
-                    <Progress label='Offer' value='31%' />
+                    <Progress label='Profile strength' value='88%' />
+                    <Progress label='Match quality' value='76%' />
+                    <Progress label='Pipeline clarity' value='64%' />
                   </div>
                 </div>
               </aside>
@@ -150,25 +154,25 @@ const Hero = () => {
               <main className='relative bg-white p-4 md:col-span-6 sm:p-6'>
                 <div className='mb-4 flex flex-wrap items-center gap-2 text-xs text-slate-600'>
                   <Building2 className='h-4 w-4 text-blue-600' />
-                  <span>Senior Product Designer</span>
+                  <span>Senior Frontend Engineer</span>
                   <span className='rounded-md bg-slate-100 px-2 py-1'>Remote</span>
-                  <span className='rounded-md bg-emerald-50 px-2 py-1 text-emerald-700'>92% match</span>
+                  <span className='rounded-md bg-emerald-50 px-2 py-1 text-emerald-700'>94% match</span>
                 </div>
                 <div className='overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70'>
                   <div className='border-b border-slate-200 bg-white p-4'>
                     <div className='flex items-start justify-between gap-4'>
                       <div>
-                        <h3 className='text-2xl font-semibold tracking-tight text-slate-950'>Executive shortlist</h3>
-                        <p className='mt-1 text-sm leading-6 text-slate-500'>Ranked by role fit, verified experience, and recruiter response velocity.</p>
+                        <h3 className='text-2xl font-semibold tracking-tight text-slate-950'>Best-fit opportunities</h3>
+                        <p className='mt-1 text-sm leading-6 text-slate-500'>Ranked by profile fit, growth potential, recruiter velocity, and freshness.</p>
                       </div>
                       <span className='rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700'>Live</span>
                     </div>
                   </div>
                   <div className='divide-y divide-slate-200'>
                     {[
-                      ['Aarav Mehta', 'Product Design Lead', 'Bengaluru', 'Top 3% fit', '98'],
-                      ['Mira Kapoor', 'Senior UX Strategist', 'Remote', 'Interview ready', '94'],
-                      ['Dev Shah', 'Design Systems Manager', 'Mumbai', 'Fast response', '91']
+                      ['Vercel Labs', 'Senior Frontend Engineer', 'Remote', 'Top 3% fit', '94'],
+                      ['Stripe Systems', 'Product Engineer', 'Bengaluru', 'Fast response', '91'],
+                      ['Linear Works', 'Design Systems Engineer', 'Mumbai', 'Skill stretch', '88']
                     ].map((item, index) => (
                       <div key={item[0]} className='grid gap-3 p-4 transition hover:bg-white sm:grid-cols-[1fr_auto] sm:items-center'>
                         <div className='flex items-center gap-3'>
@@ -188,26 +192,26 @@ const Hero = () => {
                 </div>
 
                 <div className='mt-4 grid gap-3 sm:grid-cols-3'>
-                  <Metric value='10k+' label='Listings' />
-                  <Metric value='8k+' label='Placements' />
+                  <Metric value='94%' label='Match score' />
                   <Metric value='24h' label='Avg. reply' />
+                  <Metric value='6' label='Next actions' />
                 </div>
               </main>
 
               <aside className='hidden border-l border-slate-200 bg-slate-50/80 p-4 md:col-span-3 md:block'>
                 <div className='mb-4 rounded-xl border border-slate-200 bg-white p-4'>
-                  <p className='text-xs font-semibold uppercase tracking-[0.14em] text-slate-400'>Role score</p>
+                  <p className='text-xs font-semibold uppercase tracking-[0.14em] text-slate-400'>Career fit</p>
                   <div className='mt-3 flex items-end gap-2'>
-                    <span className='text-5xl font-semibold text-slate-950'>92</span>
+                    <span className='text-5xl font-semibold text-slate-950'>94</span>
                     <span className='mb-2 text-sm font-bold text-emerald-700'>Excellent</span>
                   </div>
-                  <p className='mt-2 text-xs leading-5 text-slate-500'>Strong match for leadership, portfolio depth, and design systems ownership.</p>
+                  <p className='mt-2 text-xs leading-5 text-slate-500'>Strong match for React depth, product engineering, and remote collaboration.</p>
                 </div>
                 <div className='space-y-2'>
                   {[
                     ['Resume parsed', CheckCircle2, 'text-emerald-600'],
-                    ['Recruiter verified', ShieldCheck, 'text-blue-600'],
-                    ['Interview window', Clock3, 'text-amber-600']
+                    ['Company verified', ShieldCheck, 'text-blue-600'],
+                    ['Prep plan ready', Target, 'text-violet-600']
                   ].map(([label, Icon, color]) => (
                     <div key={label} className='flex items-center gap-3 rounded-lg bg-white p-3 text-sm text-slate-600'>
                       {React.createElement(Icon, { className: `h-4 w-4 ${color}` })}
