@@ -3,7 +3,7 @@ import { AppContext } from '../context/AppContext'
 import { assets, JobCategories, JobLocations } from '../assets/assets'
 import JobCard from './JobCard'
 import JobQuickViewDrawer from './JobQuickViewDrawer'
-import { BrainCircuit, BriefcaseBusiness, CheckCircle2, Filter, Gauge, Radar, SearchX, SlidersHorizontal, Sparkles, TimerReset, X } from 'lucide-react'
+import { CheckCircle2, Filter, SearchX, SlidersHorizontal, Sparkles, Target, TimerReset, X } from 'lucide-react'
 
 const JobListing = () => {
   const { isSearched, searchFilter, setSearchFilter, jobs, totalJobs, fetchJobs } = useContext(AppContext)
@@ -42,76 +42,78 @@ const JobListing = () => {
 
   const activeFilterCount = selectedCategories.length + selectedLocation.length + (searchFilter.title ? 1 : 0) + (searchFilter.location ? 1 : 0)
   const totalPages = Math.ceil(totalJobs / 6)
+  const clearFilters = () => {
+    setSearchFilter({ title: '', location: '' })
+    setSelectedCategories([])
+    setSelectedLocation([])
+    setCurrentPage(1)
+  }
 
   return (
-    <div className='ij-container py-10'>
-      <div className='mb-8 overflow-hidden rounded-[1.35rem] border border-slate-200 bg-slate-950 shadow-[0_30px_90px_rgba(15,23,42,0.18)]'>
-        <div className='relative grid gap-8 p-6 text-white md:p-8 lg:grid-cols-[1.15fr_0.85fr]'>
-          <div className='absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(37,99,235,0.48),transparent_24rem),radial-gradient(circle_at_92%_18%,rgba(6,182,212,0.22),transparent_22rem)]' />
-          <div className='relative'>
-            <p className='inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-blue-100'>
-              <Radar size={14} /> Opportunity intelligence
-            </p>
-            <h1 className='mt-5 max-w-4xl text-3xl font-semibold leading-tight tracking-tight md:text-5xl' id='job-list'>
-              Compare roles by fit, signal, and momentum.
-            </h1>
-            <p className='mt-4 max-w-2xl text-sm leading-7 text-slate-300 md:text-base'>
-              A focused workspace for verified roles, AI match quality, hiring activity, and the signals that tell you where to spend your next application.
-            </p>
-            <div className='mt-6 flex flex-wrap gap-2'>
-              {['High fit', 'Fast response', 'Remote-ready', 'Verified teams'].map(item => (
-                <span key={item} className='rounded-full border border-white/10 bg-white/8 px-3 py-1.5 text-xs font-bold text-slate-200'>{item}</span>
-              ))}
-            </div>
-          </div>
-
-          <div className='relative grid gap-3 sm:grid-cols-3 lg:grid-cols-1'>
-            <InsightTile icon={<BriefcaseBusiness />} value={totalJobs} label='open roles' detail='curated in this search' />
-            <InsightTile icon={<Gauge />} value='92%' label='avg. AI fit' detail='based on role context' />
-            <InsightTile icon={<BrainCircuit />} value={activeFilterCount} label='active signals' detail='filters shaping results' />
-          </div>
-        </div>
-      </div>
-
+    <div className='ij-container py-8'>
       <div className='grid gap-8 lg:grid-cols-[320px_1fr] lg:items-start'>
-        <aside className='premium-panel w-full rounded-[1.15rem] p-5 lg:sticky lg:top-24'>
-          <div className='mb-5 flex items-center justify-between'>
-            <div>
-              <p className='section-kicker'>Filters</p>
-              <h3 className='mt-1 text-xl font-bold text-slate-950'>Refine matches</h3>
+        <aside className='overflow-hidden rounded-[1.25rem] border border-slate-200 bg-white shadow-[0_22px_70px_rgba(15,23,42,0.08)] lg:sticky lg:top-24'>
+          <div className='bg-slate-950 p-5 text-white'>
+            <div className='flex items-center justify-between gap-4'>
+              <div>
+                <p className='text-[11px] font-bold uppercase tracking-[0.18em] text-blue-200'>Discovery console</p>
+                <h3 className='mt-2 text-xl font-semibold tracking-tight'>Tune your search signals</h3>
+              </div>
+              <button onClick={() => setShowFilter(prev => !prev)} className='ij-focus-ring inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/8 text-white lg:hidden' aria-label='Toggle filters'>
+                {showFilter ? <X size={18} /> : <Filter size={18} />}
+              </button>
             </div>
-            <button onClick={() => setShowFilter(prev => !prev)} className='ij-focus-ring inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 lg:hidden' aria-label='Toggle filters'>
-              {showFilter ? <X size={18} /> : <Filter size={18} />}
-            </button>
+            <div className='mt-5 grid grid-cols-3 gap-2'>
+              <ConsoleStat value={totalJobs} label='roles' />
+              <ConsoleStat value='92%' label='fit' />
+              <ConsoleStat value={activeFilterCount} label='signals' />
+            </div>
+            <div className='mt-5 rounded-2xl border border-white/10 bg-white/8 p-3'>
+              <div className='flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-300'>
+                <Target size={14} className='text-blue-200' /> Search intent
+              </div>
+              <p className='mt-2 text-sm leading-6 text-slate-300'>
+                {searchFilter.title || searchFilter.location ? `${searchFilter.title || 'Any role'} in ${searchFilter.location || 'any location'}` : 'Open discovery across verified roles'}
+              </p>
+            </div>
           </div>
 
-          {isSearched && (searchFilter.title !== '' || searchFilter.location !== '') && (
-            <div className='mb-6 rounded-2xl border border-blue-100 bg-blue-50/70 p-4'>
-              <p className='mb-3 text-sm font-bold text-slate-950'>Current search</p>
-              <div className='flex flex-wrap gap-2 text-sm font-semibold text-blue-700'>
-                {searchFilter.title && (
-                  <button className='inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-sm' onClick={() => setSearchFilter(prev => ({ ...prev, title: '' }))}>
-                    {searchFilter.title} <X size={14} />
-                  </button>
-                )}
-                {searchFilter.location && (
-                  <button className='inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-sm' onClick={() => setSearchFilter(prev => ({ ...prev, location: '' }))}>
-                    {searchFilter.location} <X size={14} />
-                  </button>
-                )}
+          <div className='p-5'>
+            {isSearched && (searchFilter.title !== '' || searchFilter.location !== '') && (
+              <div className='mb-5 rounded-2xl border border-blue-100 bg-blue-50/70 p-4'>
+                <p className='mb-3 text-xs font-bold uppercase tracking-[0.14em] text-blue-700'>Active query</p>
+                <div className='flex flex-wrap gap-2 text-sm font-semibold text-blue-700'>
+                  {searchFilter.title && (
+                    <button className='inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-sm' onClick={() => setSearchFilter(prev => ({ ...prev, title: '' }))}>
+                      {searchFilter.title} <X size={14} />
+                    </button>
+                  )}
+                  {searchFilter.location && (
+                    <button className='inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-sm' onClick={() => setSearchFilter(prev => ({ ...prev, location: '' }))}>
+                      {searchFilter.location} <X size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className={showFilter ? 'block' : 'max-lg:hidden'}>
-            <div className='mb-6 rounded-xl border border-blue-100 bg-blue-50/70 p-3'>
-              <div className='flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-slate-400'>
-                <SlidersHorizontal size={14} /> Match controls
+            <div className={showFilter ? 'block' : 'max-lg:hidden'}>
+              <div className='mb-5 rounded-2xl border border-slate-200 bg-slate-50 p-4'>
+                <div className='flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-slate-400'>
+                  <SlidersHorizontal size={14} className='text-blue-600' /> Match controls
+                </div>
+                <div className='mt-4 space-y-3'>
+                  <SignalMeter label='Fit confidence' value='92%' width='92%' />
+                  <SignalMeter label='Freshness bias' value='High' width='78%' />
+                  <SignalMeter label='Filter precision' value={activeFilterCount ? 'Focused' : 'Broad'} width={activeFilterCount ? '68%' : '38%'} />
+                </div>
               </div>
-              <p className='mt-2 text-xs leading-5 text-slate-600'>Use a few strong filters. The workspace stays optimized for comparison.</p>
+              <FilterGroup title='Categories' items={JobCategories} selected={selectedCategories} onToggle={handleCategorychange} />
+              <FilterGroup title='Location' items={JobLocations} selected={selectedLocation} onToggle={handleLocationchange} className='mt-8' />
+              <button onClick={clearFilters} className='mt-6 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50'>
+                Reset console
+              </button>
             </div>
-            <FilterGroup title='Categories' items={JobCategories} selected={selectedCategories} onToggle={handleCategorychange} />
-            <FilterGroup title='Location' items={JobLocations} selected={selectedLocation} onToggle={handleLocationchange} className='mt-8' />
           </div>
         </aside>
 
@@ -138,11 +140,7 @@ const JobListing = () => {
               ))}
             </div>
           ) : (
-            <EmptyJobsState onClear={() => {
-              setSearchFilter({ title: '', location: '' })
-              setSelectedCategories([])
-              setSelectedLocation([])
-            }} />
+            <EmptyJobsState onClear={clearFilters} />
           )}
 
           {totalJobs > 0 && totalPages > 1 && (
@@ -187,16 +185,22 @@ const FilterGroup = ({ title, items, selected, onToggle, className = '' }) => (
   </div>
 )
 
-const InsightTile = ({ icon, value, label, detail }) => (
-  <div className='rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur'>
-    <div className='flex items-center justify-between gap-3'>
-      <div className='rounded-xl bg-white/10 p-2 text-blue-100'>
-        {React.cloneElement(icon, { size: 18 })}
-      </div>
-      <p className='text-2xl font-semibold tracking-tight text-white'>{value}</p>
+const ConsoleStat = ({ value, label }) => (
+  <div className='rounded-2xl border border-white/10 bg-white/8 p-3 text-center'>
+    <p className='text-xl font-semibold tracking-tight'>{value}</p>
+    <p className='mt-1 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
+  </div>
+)
+
+const SignalMeter = ({ label, value, width }) => (
+  <div>
+    <div className='mb-1.5 flex items-center justify-between gap-3 text-xs'>
+      <span className='font-semibold text-slate-600'>{label}</span>
+      <span className='font-bold text-slate-950'>{value}</span>
     </div>
-    <p className='mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-blue-100'>{label}</p>
-    <p className='mt-1 text-xs text-slate-400'>{detail}</p>
+    <div className='h-1.5 overflow-hidden rounded-full bg-slate-200'>
+      <div className='h-full rounded-full bg-blue-600' style={{ width }} />
+    </div>
   </div>
 )
 
