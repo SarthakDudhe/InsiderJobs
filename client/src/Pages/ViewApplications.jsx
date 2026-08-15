@@ -142,7 +142,7 @@ const ViewApplications = () => {
   }), [filteredApplicants, sortBy])
   const screenedCount = filteredApplicants.filter(applicant => applicant.aiScore !== undefined).length
   const pendingCount = filteredApplicants.filter(applicant => applicant.status === 'Pending').length
-  const topFit = filteredApplicants.reduce((best, applicant) => Math.max(best, applicant.aiScore || 0), 0)
+  const topMatch = filteredApplicants.reduce((best, applicant) => Math.max(best, applicant.aiScore || 0), 0)
 
   if (!hasLoaded) {
     return <RecruiterLoading label='Loading candidate pipeline' />
@@ -167,7 +167,7 @@ const ViewApplications = () => {
         <div className='grid gap-3 sm:grid-cols-3'>
           <RecruiterStat icon={<UsersRound />} label='Candidates' value={filteredApplicants.length} />
           <RecruiterStat icon={<Clock3 />} label='Pending' value={pendingCount} tone='amber' />
-          <RecruiterStat icon={<Trophy />} label='Top fit' value={`${topFit}%`} tone='emerald' />
+          <RecruiterStat icon={<Trophy />} label='Top match' value={`${topMatch}%`} tone='emerald' />
         </div>
       </div>
 
@@ -204,7 +204,7 @@ const ViewApplications = () => {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            ✨ Rank by AI Fit Score
+            Rank by Resume Match
           </button>
           <div className='w-[1px] h-6 bg-gray-200 mx-1'></div>
           <button
@@ -249,7 +249,7 @@ const ViewApplications = () => {
                                     ? 'bg-amber-50 text-amber-700 border border-amber-200'
                                     : 'bg-rose-50 text-rose-700 border border-rose-200'
                                 }`}>
-                                  {applicant.aiScore}% Fit
+                                  {applicant.aiScore}% Match
                                 </span>
                               )}
                             </div>
@@ -398,7 +398,7 @@ const ViewApplications = () => {
                                         ? 'bg-amber-50 text-amber-700 border border-amber-200'
                                         : 'bg-rose-50 text-rose-700 border border-rose-200'
                                     }`}>
-                                      {applicant.aiScore}% Match Score
+                                      {applicant.aiScore}% Resume Match
                                     </span>
                                   </div>
                                   <div className='rounded-xl border border-gray-100 bg-white p-3.5 shadow-sm'>
