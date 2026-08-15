@@ -4,7 +4,7 @@ import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Loader from '../LoaderFront/Loader'
-import { BarChart3, BrainCircuit, Check, Clock3, Eye, EyeOff, Github, Globe, Lightbulb, Linkedin, RefreshCw, RotateCcw, Sparkles, Trophy, UsersRound, X } from 'lucide-react'
+import { BarChart3, BrainCircuit, Check, Clock3, Eye, EyeOff, Github, Globe, Lightbulb, Linkedin, RefreshCw, RotateCcw, Sparkles, Trophy, UserPlus, UsersRound, X } from 'lucide-react'
 import { readRecruiterCache, writeRecruiterCache } from '../utils/recruiterCache'
 
 const ViewApplications = () => {
@@ -345,6 +345,17 @@ const ViewApplications = () => {
                           >
                             <Sparkles size={16} />
                           </button>
+                          <button
+                            onClick={() => toggleCandidateCompare(applicant)}
+                            className={`rounded-xl border p-2 transition-all cursor-pointer ${
+                              compareList.some(item => item._id === applicant._id)
+                                ? 'border-emerald-200 bg-emerald-500 text-white'
+                                : 'border-emerald-100 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                            }`}
+                            title='Compare candidate'
+                          >
+                            <UserPlus size={16} />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -473,6 +484,72 @@ const ViewApplications = () => {
           </table>
         </div>
       </div>
+      {compareList.length > 0 && (
+        <div className='sticky bottom-4 z-20 mt-5 rounded-2xl border border-emerald-100 bg-white/95 p-3 shadow-[0_18px_50px_rgba(15,23,42,0.14)] backdrop-blur-xl'>
+          <div className='flex flex-wrap items-center justify-between gap-3'>
+            <div>
+              <p className='text-xs font-bold uppercase tracking-[0.14em] text-emerald-700'>Compare shortlist</p>
+              <p className='mt-1 text-sm font-semibold text-slate-700'>{compareList.length} of 3 candidates selected</p>
+            </div>
+            <div className='flex flex-wrap items-center gap-2'>
+              {compareList.map(candidate => (
+                <span key={candidate._id} className='inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600'>
+                  {candidate.userId?.name}
+                  <button onClick={() => toggleCandidateCompare(candidate)} className='text-slate-400 hover:text-rose-600' title='Remove from compare'>
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
+              {compareList.length >= 2 && (
+                <button onClick={() => setShowCompareModal(true)} className='inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-extrabold text-white transition hover:bg-emerald-700'>
+                  <BarChart3 size={14} /> Compare
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {showCompareModal && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm'>
+          <div className='w-full max-w-5xl overflow-hidden rounded-[1.35rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.24)]'>
+            <div className='flex items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-br from-white via-emerald-50/70 to-cyan-50/40 p-5'>
+              <div>
+                <p className='section-kicker'>Candidate comparison</p>
+                <h2 className='mt-2 text-2xl font-semibold tracking-tight text-slate-950'>Compare shortlisted applicants</h2>
+                <p className='mt-2 text-sm leading-6 text-slate-600'>Review resume match, application status, links, and screening notes side by side.</p>
+              </div>
+              <button onClick={() => setShowCompareModal(false)} className='inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:text-slate-950' aria-label='Close comparison'>
+                <X size={17} />
+              </button>
+            </div>
+            <div className='grid gap-4 p-5 md:grid-cols-3'>
+              {compareList.map(candidate => (
+                <div key={candidate._id} className='rounded-2xl border border-slate-200 bg-white p-4 shadow-sm'>
+                  <div className='mb-4 flex items-center gap-3'>
+                    <img className='h-12 w-12 rounded-2xl border border-slate-200 object-cover p-0.5' src={candidate.userId?.image} alt={candidate.userId?.name || 'Candidate'} />
+                    <div>
+                      <h3 className='font-bold text-slate-950'>{candidate.userId?.name}</h3>
+                      <p className='text-xs text-slate-500'>{candidate.jobId?.title}</p>
+                    </div>
+                  </div>
+                  <div className='grid grid-cols-2 gap-2'>
+                    <CompareMetric label='Resume match' value={candidate.aiScore !== undefined ? `${candidate.aiScore}%` : 'Not run'} tone='emerald' />
+                    <CompareMetric label='Status' value={candidate.status} />
+                    <CompareMetric label='Location' value={candidate.jobId?.location || 'Not listed'} />
+                    <CompareMetric label='Resume' value={candidate.userId?.resume ? 'Available' : 'Missing'} tone={candidate.userId?.resume ? 'blue' : 'rose'} />
+                  </div>
+                  {candidate.aiSummary && (
+                    <div className='mt-4 rounded-2xl border border-slate-100 bg-slate-50 p-3'>
+                      <p className='text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400'>Screening summary</p>
+                      <p className='mt-2 text-xs leading-5 text-slate-600'>{candidate.aiSummary}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -501,5 +578,21 @@ const RecruiterLoading = ({ label }) => (
     <p className='text-xs font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
   </div>
 )
+
+const CompareMetric = ({ label, value, tone = 'slate' }) => {
+  const styles = {
+    slate: 'border-slate-200 bg-slate-50 text-slate-700',
+    emerald: 'border-emerald-100 bg-emerald-50 text-emerald-700',
+    blue: 'border-blue-100 bg-blue-50 text-blue-700',
+    rose: 'border-rose-100 bg-rose-50 text-rose-700'
+  }[tone]
+
+  return (
+    <div className={`rounded-xl border p-3 ${styles}`}>
+      <p className='text-[9px] font-bold uppercase tracking-[0.14em] opacity-70'>{label}</p>
+      <p className='mt-1 truncate text-sm font-bold'>{value}</p>
+    </div>
+  )
+}
 
 export default ViewApplications
