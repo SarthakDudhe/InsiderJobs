@@ -4,7 +4,7 @@ import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Loader from '../LoaderFront/Loader'
-import { Check, RotateCcw, UsersRound, X, Eye, EyeOff, RefreshCw, Github, Linkedin, Globe, Clock3, Trophy } from 'lucide-react'
+import { BarChart3, BrainCircuit, Check, Clock3, Eye, EyeOff, Github, Globe, Lightbulb, Linkedin, RefreshCw, RotateCcw, Sparkles, Trophy, UsersRound, X } from 'lucide-react'
 import { readRecruiterCache, writeRecruiterCache } from '../utils/recruiterCache'
 
 const ViewApplications = () => {
@@ -183,7 +183,7 @@ const ViewApplications = () => {
               onClick={() => setShowCompareModal(true)}
               className='cursor-pointer rounded-lg bg-emerald-600 text-white px-3 py-2 text-xs font-extrabold transition-all hover:bg-emerald-700 shadow-sm flex items-center gap-1'
             >
-              📊 Compare ({compareList.length})
+              <BarChart3 size={14} /> Compare ({compareList.length})
             </button>
           )}
           <button
@@ -300,7 +300,7 @@ const ViewApplications = () => {
                             </a>
                           )}
                           {!applicant.userId?.links?.github && !applicant.userId?.links?.linkedin && !applicant.userId?.links?.portfolio && (
-                            <span className='text-[10px] text-gray-400 font-semibold'>—</span>
+                            <span className='text-[10px] font-semibold text-gray-400'>-</span>
                           )}
                         </div>
                       </td>
@@ -343,7 +343,7 @@ const ViewApplications = () => {
                             }`}
                             title='AI Recruiter Review'
                           >
-                            ✨
+                            <Sparkles size={16} />
                           </button>
                         </div>
                       </td>
@@ -357,7 +357,7 @@ const ViewApplications = () => {
                             <div className='flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-3'>
                               <div className='flex items-center gap-3'>
                                 <span className='flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-700 text-sm font-bold'>
-                                  🤖
+                                  <BrainCircuit size={15} />
                                 </span>
                                 <span className='text-xs font-bold text-gray-400 uppercase tracking-wider'>
                                   AI Screening Assessment
@@ -373,9 +373,9 @@ const ViewApplications = () => {
                                   {screeningIds[applicant._id] ? (
                                     <span>Screening Application...</span>
                                   ) : applicant.aiScore !== undefined ? (
-                                    <span>🔄 Re-run Screening</span>
+                                    <span className='inline-flex items-center gap-1'><RefreshCw size={13} /> Re-run screening</span>
                                   ) : (
-                                    <span>✨ Run AI Screening</span>
+                                    <span className='inline-flex items-center gap-1'><Sparkles size={13} /> Run AI screening</span>
                                   )}
                                 </button>
                               </div>
@@ -426,7 +426,6 @@ const ViewApplications = () => {
                                               {hasAnswer && (
                                                 <button
                                                   onClick={() => toggleAnswer(applicant._id, idx)}
-                                                  title={isRevealed ? 'Hide ideal answer' : 'Show ideal answer'}
                                                   className={`shrink-0 rounded-lg p-1.5 transition-all cursor-pointer ${
                                                     isRevealed
                                                       ? 'bg-violet-100 text-violet-700'
@@ -439,7 +438,7 @@ const ViewApplications = () => {
                                             </div>
                                             {isRevealed && hasAnswer && (
                                               <div className='mx-3 mb-3 rounded-lg border border-violet-100 bg-violet-50 px-3 py-2.5'>
-                                                <p className='text-[10px] font-extrabold uppercase tracking-wider text-violet-500 mb-1'>💡 Ideal Answer</p>
+                                                <p className='mb-1 inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-violet-500'><Lightbulb size={12} /> Ideal answer</p>
                                                 <p className='text-xs text-violet-800 leading-relaxed'>{applicant.aiAnswers[idx]}</p>
                                               </div>
                                             )}
@@ -460,7 +459,7 @@ const ViewApplications = () => {
                                   disabled={screeningIds[applicant._id]}
                                   className='premium-button px-4 py-2.5 text-[10px] cursor-pointer'
                                 >
-                                  ✨ Run AI Screening
+                                  <Sparkles size={13} /> Run AI screening
                                 </button>
                               </div>
                             )}

@@ -9,7 +9,7 @@ import JobCard from '../components/JobCard'
 import Footer from '../components/Footer'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { BrainCircuit, Briefcase, CalendarClock, Flag, Gauge, MapPin, ShieldCheck, Sparkles, Users, X } from 'lucide-react'
+import { AlertTriangle, BrainCircuit, Briefcase, CalendarClock, CheckCircle2, Flag, Gauge, MapPin, RefreshCw, ShieldCheck, Sparkles, Users, Wand2, X } from 'lucide-react'
 
 const activityConfig = {
   active: {
@@ -208,12 +208,12 @@ const ApplyJob = () => {
 
                   {jobData.companyId?.hasApplicants ? (
                     <span className='inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-blue-700 shadow-sm'>
-                      <span className='text-blue-500 font-bold'>✓</span>
+                      <CheckCircle2 size={14} className='text-blue-600' />
                       <span className='text-xs font-bold'>{jobData.companyId.responseRate}% Response Rate | {jobData.companyId.averageDecisionDays}d Decisions</span>
                     </span>
                   ) : (
                     <span className='inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-indigo-700 shadow-sm'>
-                      <span className='text-indigo-500'>★</span>
+                      <Sparkles size={14} className='text-indigo-600' />
                       <span className='text-xs font-bold'>Highly Active Workspace</span>
                     </span>
                   )}
@@ -273,7 +273,7 @@ const ApplyJob = () => {
                   onClick={() => setShowReportModal(true)} 
                   className='cursor-pointer rounded-xl border border-rose-200 px-6 py-3.5 text-rose-600 font-bold hover:bg-rose-50 transition-all active:scale-95 text-sm flex items-center gap-1.5'
                 >
-                  🚩 Report Listing
+                  <Flag size={16} /> Report listing
                 </button>
               </div>
             </article>
@@ -283,7 +283,7 @@ const ApplyJob = () => {
               <div className='mb-6 flex items-center justify-between border-b border-gray-100 pb-4'>
                 <div className='flex items-center gap-3'>
                   <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-700 shadow-sm'>
-                    <span className='font-bold text-lg'>✨</span>
+                    <Sparkles size={18} />
                   </div>
                   <div>
                     <h2 className='text-lg font-extrabold text-gray-950'>ATS Resume Match Auditor</h2>
@@ -381,13 +381,13 @@ const ApplyJob = () => {
                         <div className='flex flex-wrap gap-1.5'>
                           {atsReport.missingSkills.map((skill, index) => (
                             <span key={index} className='rounded-lg bg-rose-50 border border-rose-100 px-2.5 py-1 text-xs font-bold text-rose-700 flex items-center gap-1'>
-                              ⚠️ {skill}
+                              <AlertTriangle size={13} /> {skill}
                             </span>
                           ))}
                         </div>
                       ) : (
                         <p className='text-xs font-bold text-emerald-600 flex items-center gap-1'>
-                          ✓ No critical missing skills!
+                          <CheckCircle2 size={13} /> No critical missing skills.
                         </p>
                       )}
                     </div>
@@ -418,10 +418,10 @@ const ApplyJob = () => {
                       disabled={isTailoring}
                       className='cursor-pointer text-xs font-extrabold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-4 py-2 rounded-xl transition-all flex items-center gap-1.5'
                     >
-                      {isTailoring ? '⚡ Generating AI Tailoring...' : '🪄 Auto-Tailor Resume & Cover Letter'}
+                      {isTailoring ? <><Sparkles size={13} /> Generating tailoring...</> : <><Wand2 size={13} /> Auto-tailor resume and cover letter</>}
                     </button>
                     <button onClick={runAtsAudit} className='cursor-pointer text-xs font-extrabold text-indigo-600 hover:text-indigo-700 transition-colors flex items-center gap-1'>
-                      🔄 Re-run AI Audit
+                      <RefreshCw size={13} /> Re-run audit
                     </button>
                   </div>
                 </div>
@@ -434,7 +434,7 @@ const ApplyJob = () => {
                 <div className='flex items-center justify-between border-b border-blue-100 pb-4'>
                   <div className='flex items-center gap-3'>
                     <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-lg shadow-sm'>
-                      🪄
+                      <Wand2 size={18} />
                     </div>
                     <div>
                       <h3 className='text-lg font-extrabold text-gray-950'>Tailored Resume & Cover Letter</h3>
@@ -458,7 +458,7 @@ const ApplyJob = () => {
                     <ul className='space-y-2.5'>
                       {tailoredData.tailoredBullets.map((bullet, idx) => (
                         <li key={idx} className='flex items-start justify-between gap-3 p-3 rounded-xl bg-white border border-gray-100 text-xs text-gray-700 leading-relaxed shadow-sm'>
-                          <span>• {bullet}</span>
+                          <span>{bullet}</span>
                           <button
                             onClick={() => {
                               navigator.clipboard.writeText(bullet)
@@ -488,7 +488,7 @@ const ApplyJob = () => {
                         }}
                         className='px-3 py-1 bg-white border border-gray-200 rounded-lg text-xs font-bold text-blue-600 hover:bg-gray-50 transition-all cursor-pointer shadow-sm'
                       >
-                        {copiedLetter ? '✓ Copied' : '📋 Copy Letter'}
+                        {copiedLetter ? 'Copied' : 'Copy letter'}
                       </button>
                     </div>
                     <div className='p-4 rounded-xl bg-white border border-gray-100 text-xs text-gray-700 leading-relaxed font-sans whitespace-pre-line shadow-sm'>
@@ -547,7 +547,7 @@ const ApplyJob = () => {
                     {jobData.companyId.hasApplicants ? (
                       <span className='font-extrabold text-blue-600'>{jobData.companyId.responseRate}%</span>
                     ) : (
-                      <span className='font-extrabold text-indigo-600'>★ Highly Active</span>
+                      <span className='font-extrabold text-indigo-600'>Highly active</span>
                     )}
                   </div>
 
@@ -586,7 +586,7 @@ const ApplyJob = () => {
               </button>
               
               <div className='mb-6'>
-                <span className='inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 font-bold mb-3'>🚩</span>
+                <span className='mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 font-bold'><Flag size={18} /></span>
                 <h3 className='text-lg font-extrabold text-gray-950'>Report Job Listing</h3>
                 <p className='text-xs text-gray-500 mt-1'>Help us keep the InsiderJobs workspace clean and verified.</p>
               </div>

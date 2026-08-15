@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
-import { BriefcaseBusiness, ClipboardList, FilePlus2, LogOut, ShieldCheck, UsersRound } from 'lucide-react'
+import { AlertTriangle, BriefcaseBusiness, ClipboardList, FilePlus2, LogOut, MailCheck, ShieldCheck, UsersRound } from 'lucide-react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { readRecruiterCache } from '../utils/recruiterCache'
@@ -111,7 +111,7 @@ const Dashboard = () => {
             <div className='mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 shadow-sm transition-all duration-300'>
               <div className='flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
                 <div className='flex items-start gap-3'>
-                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600 font-bold'>✉</span>
+                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600 font-bold'><MailCheck size={17} /></span>
                   <div>
                     <h4 className='text-sm font-extrabold text-red-900'>Work Email Verification Required</h4>
                     <p className='text-xs text-red-700 mt-1 leading-relaxed max-w-2xl'>
@@ -133,7 +133,7 @@ const Dashboard = () => {
           {companyData && companyData.isEmailVerified && !companyData.isVerified && (
             <div className='mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm transition-all duration-300'>
               <div className='flex items-start gap-3'>
-                <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600 font-bold'>⚠️</span>
+                <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600 font-bold'><AlertTriangle size={17} /></span>
                 <div>
                   <h4 className='text-sm font-extrabold text-amber-900'>Workspace Pending Admin Approval</h4>
                   <p className='text-xs text-amber-700 mt-1 leading-relaxed max-w-2xl'>
