@@ -1,14 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Loader from '../LoaderFront/Loader'
-import { Check, RotateCcw, UsersRound, X, Eye, EyeOff, RefreshCw, Github, Linkedin, Globe } from 'lucide-react'
+import { Check, RotateCcw, UsersRound, X, Eye, EyeOff, RefreshCw, Github, Linkedin, Globe, Clock3, Trophy } from 'lucide-react'
+import { readRecruiterCache, writeRecruiterCache } from '../utils/recruiterCache'
 
 const ViewApplications = () => {
   const { backendUrl, companyToken } = useContext(AppContext)
-  const [applicants, setApplicants] = useState(false)
+  const cached = readRecruiterCache(companyToken)
+  const [applicants, setApplicants] = useState(cached?.applications || [])
+  const [hasLoaded, setHasLoaded] = useState(Boolean(cached?.applications))
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [sortBy, setSortBy] = useState('date')
   const [expandedId, setExpandedId] = useState(null)
   const [screeningIds, setScreeningIds] = useState({})
@@ -49,7 +53,7 @@ const ViewApplications = () => {
         // Direct local state update to prevent caching/fetch lag and ensure instant UI updates
         setApplicants(prev => {
           if (!prev) return prev;
-          return prev.map(app => {
+          const nextApplicants = prev.map(app => {
             if (app._id === applicationId) {
               return {
                 ...app,
@@ -61,6 +65,8 @@ const ViewApplications = () => {
             }
             return app;
           })
+          writeRecruiterCache(companyToken, { applications: nextApplicants })
+          return nextApplicants
         })
       } else {
         toast.error(data.message)
@@ -72,47 +78,79 @@ const ViewApplications = () => {
     }
   }
 
-  const fetchCompanyJobs = async () => {
+  const fetchCompanyJobs = async ({ silent = false } = {}) => {
+    if (!silent) setIsRefreshing(true)
     try {
       const { data } = await axios.get(backendUrl + '/api/company/applicants', {
         headers: { token: companyToken }
       })
       if (data.success) {
-        setApplicants(data.applications.reverse())
+        const nextApplicants = [...(data.applications || [])].reverse()
+        setApplicants(nextApplicants)
+        setHasLoaded(true)
+        writeRecruiterCache(companyToken, { applications: nextApplicants })
       } else {
         toast.error(data.message)
       }
     } catch (error) {
-      toast.error(error.message)
+      if (!silent) toast.error(error.message)
+    } finally {
+      setIsRefreshing(false)
     }
   }
 
   const changeJobStatus = async (id, status) => {
+    const previousApplicants = applicants
+    const nextApplicants = applicants.map(applicant => applicant._id === id ? { ...applicant, status } : applicant)
+    setApplicants(nextApplicants)
+    writeRecruiterCache(companyToken, { applications: nextApplicants })
+
     try {
       const { data } = await axios.post(backendUrl + '/api/company/change-status', { id, status }, { headers: { token: companyToken } })
       if (data.success) {
-        fetchCompanyJobs()
+        fetchCompanyJobs({ silent: true })
       } else {
+        setApplicants(previousApplicants)
+        writeRecruiterCache(companyToken, { applications: previousApplicants })
         toast.error(data.message)
       }
     } catch (error) {
+      setApplicants(previousApplicants)
+      writeRecruiterCache(companyToken, { applications: previousApplicants })
       toast.error(error.message)
     }
   }
 
   useEffect(() => {
     if (companyToken) {
-      fetchCompanyJobs()
+      fetchCompanyJobs({ silent: hasLoaded })
       const interval = setInterval(() => {
-        fetchCompanyJobs()
+        fetchCompanyJobs({ silent: true })
       }, 30000)
       return () => clearInterval(interval)
     }
   }, [companyToken])
 
-  return applicants ? applicants.length === 0 ? (
+  const filteredApplicants = useMemo(() => applicants.filter(item => item.jobId && item.userId), [applicants])
+  const sortedApplicants = useMemo(() => [...filteredApplicants].sort((a, b) => {
+    if (sortBy === 'aiScore') {
+      const scoreA = a.aiScore ?? -1
+      const scoreB = b.aiScore ?? -1
+      return scoreB - scoreA
+    }
+    return new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0)
+  }), [filteredApplicants, sortBy])
+  const screenedCount = filteredApplicants.filter(applicant => applicant.aiScore !== undefined).length
+  const pendingCount = filteredApplicants.filter(applicant => applicant.status === 'Pending').length
+  const topFit = filteredApplicants.reduce((best, applicant) => Math.max(best, applicant.aiScore || 0), 0)
+
+  if (!hasLoaded) {
+    return <RecruiterLoading label='Loading candidate pipeline' />
+  }
+
+  return filteredApplicants.length === 0 ? (
     <div className='flex h-[70vh] flex-col items-center justify-center text-center'>
-      <div className='mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-white shadow-sm'>
+      <div className='mb-4 flex h-20 w-20 items-center justify-center rounded-3xl border border-blue-100 bg-blue-50 shadow-sm'>
         <UsersRound className='text-blue-600' size={30} />
       </div>
       <p className='text-xl font-extrabold text-gray-950'>No applications yet</p>
@@ -120,15 +158,26 @@ const ViewApplications = () => {
     </div>
   ) : (
     <div className='mx-auto max-w-6xl'>
-      <div className='mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
+      <div className='mb-6 grid gap-5 xl:grid-cols-[1fr_420px] xl:items-end'>
         <div>
           <p className='section-kicker'>Candidate review</p>
-          <h1 className='mt-2 text-3xl font-extrabold text-gray-950'>Applications</h1>
-          <p className='mt-2 text-gray-600'>Review resumes and rank candidates using the AI Recruiter Screener.</p>
+          <h1 className='mt-2 text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl'>Recruiter candidate pipeline</h1>
+          <p className='mt-3 max-w-2xl text-sm leading-7 text-slate-600'>Candidate rows hydrate from cache first, then status, resumes, links, and AI screening data refresh quietly in the background.</p>
+        </div>
+        <div className='grid gap-3 sm:grid-cols-3'>
+          <RecruiterStat icon={<UsersRound />} label='Candidates' value={filteredApplicants.length} />
+          <RecruiterStat icon={<Clock3 />} label='Pending' value={pendingCount} tone='amber' />
+          <RecruiterStat icon={<Trophy />} label='Top fit' value={`${topFit}%`} tone='emerald' />
+        </div>
+      </div>
+
+      <div className='mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/80 p-3 shadow-sm'>
+        <div className='flex flex-wrap gap-2 text-xs font-bold text-slate-500'>
+          <span className='rounded-full border border-violet-100 bg-violet-50 px-3 py-1.5 text-violet-700'>{screenedCount} AI screened</span>
+          <span className='rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5'>{pendingCount} awaiting decision</span>
         </div>
 
-        {/* Sorting Toggles & Comparison Button */}
-        <div className='flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white p-1 shadow-sm h-fit self-end sm:self-center'>
+        <div className='flex flex-wrap items-center gap-2'>
           {compareList.length >= 2 && (
             <button
               onClick={() => setShowCompareModal(true)}
@@ -159,11 +208,11 @@ const ViewApplications = () => {
           </button>
           <div className='w-[1px] h-6 bg-gray-200 mx-1'></div>
           <button
-            onClick={fetchCompanyJobs}
+            onClick={() => fetchCompanyJobs()}
             className='cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-gray-50 hover:text-blue-600 transition-all'
             title='Refresh Applications'
           >
-            <RefreshCw size={16} />
+            <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
           </button>
         </div>
       </div>
@@ -182,18 +231,7 @@ const ViewApplications = () => {
               </tr>
             </thead>
             <tbody className='divide-y divide-gray-100'>
-              {(() => {
-                const filteredApplicants = applicants ? applicants.filter(item => item.jobId && item.userId) : [];
-                const sortedApplicants = [...filteredApplicants].sort((a, b) => {
-                  if (sortBy === 'aiScore') {
-                    const scoreA = a.aiScore ?? -1;
-                    const scoreB = b.aiScore ?? -1;
-                    return scoreB - scoreA;
-                  }
-                  return 0;
-                });
-
-                return sortedApplicants.map((applicant, index) => (
+              {sortedApplicants.map((applicant, index) => (
                   <React.Fragment key={applicant._id || index}>
                     <tr className='group transition-colors hover:bg-blue-50/30'>
                       <td className='px-6 py-5 font-semibold text-gray-400 max-sm:hidden'>{index + 1}</td>
@@ -314,7 +352,7 @@ const ViewApplications = () => {
                     {/* Expandable AI Screener Section */}
                     {expandedId === applicant._id && (
                       <tr className='bg-slate-50/50 backdrop-blur-sm'>
-                        <td colSpan={5} className='px-6 py-5 border-t border-b border-indigo-50/60'>
+                        <td colSpan={6} className='px-6 py-5 border-t border-b border-indigo-50/60'>
                           <div className='space-y-4'>
                             <div className='flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-3'>
                               <div className='flex items-center gap-3'>
@@ -431,18 +469,38 @@ const ViewApplications = () => {
                       </tr>
                     )}
                   </React.Fragment>
-                ));
-              })()}
+                ))}
             </tbody>
           </table>
         </div>
       </div>
     </div>
-  ) : (
-    <div className='flex min-h-[60vh] items-center justify-center'>
-      <Loader />
+  )
+}
+
+const RecruiterStat = ({ icon, label, value, tone = 'blue' }) => {
+  const styles = {
+    blue: 'border-blue-100 bg-blue-50 text-blue-700',
+    amber: 'border-amber-100 bg-amber-50 text-amber-700',
+    emerald: 'border-emerald-100 bg-emerald-50 text-emerald-700'
+  }[tone]
+
+  return (
+    <div className={`rounded-2xl border p-4 shadow-sm ${styles}`}>
+      <div className='flex items-center justify-between'>
+        {React.cloneElement(icon, { size: 18 })}
+        <span className='text-2xl font-semibold'>{value}</span>
+      </div>
+      <p className='mt-3 text-[10px] font-bold uppercase tracking-[0.14em]'>{label}</p>
     </div>
   )
 }
+
+const RecruiterLoading = ({ label }) => (
+  <div className='flex min-h-[60vh] flex-col items-center justify-center gap-4'>
+    <Loader />
+    <p className='text-xs font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
+  </div>
+)
 
 export default ViewApplications

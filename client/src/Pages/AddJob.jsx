@@ -4,7 +4,7 @@ import { JobCategories, JobLocations } from '../assets/assets'
 import axios from 'axios'
 import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
-import { Send } from 'lucide-react'
+import { BriefcaseBusiness, MapPin, Send, Sparkles } from 'lucide-react'
 
 const AddJob = () => {
   const [title, settitle] = useState('')
@@ -48,16 +48,23 @@ const AddJob = () => {
 
   return (
     <div className='mx-auto max-w-5xl'>
-      <div className='mb-6'>
-        <p className='section-kicker'>Create listing</p>
-        <h1 className='mt-2 text-3xl font-extrabold text-gray-950'>Post a new job</h1>
-        <p className='mt-2 text-gray-600'>Craft a polished role that attracts qualified candidates.</p>
+      <div className='mb-6 grid gap-5 lg:grid-cols-[1fr_360px] lg:items-end'>
+        <div>
+          <p className='section-kicker'>Create listing</p>
+          <h1 className='mt-2 text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl'>Build a candidate-ready role brief.</h1>
+          <p className='mt-3 max-w-2xl text-sm leading-7 text-slate-600'>Write the opening once, then publish it into a recruiter workspace that keeps visibility and applicant decisions organized.</p>
+        </div>
+        <div className='grid gap-3 sm:grid-cols-3 lg:grid-cols-1'>
+          <DraftSignal icon={<BriefcaseBusiness />} label='Role' value={title || 'Untitled'} />
+          <DraftSignal icon={<MapPin />} label='Location' value={location} tone='emerald' />
+          <DraftSignal icon={<Sparkles />} label='Level' value={level.replace(' Level', '')} tone='violet' />
+        </div>
       </div>
 
       <form onSubmit={onSubmitHandler} className='premium-panel overflow-hidden rounded-[1.5rem]'>
-        <div className='border-b border-slate-200 bg-gradient-to-br from-white via-slate-50 to-blue-50 px-6 py-7 text-slate-950 sm:px-8'>
-          <h2 className='text-2xl font-extrabold'>Role details</h2>
-          <p className='mt-1 text-sm text-slate-600'>Keep the title clear and the description outcome-focused.</p>
+        <div className='border-b border-slate-200 bg-gradient-to-br from-white via-blue-50/70 to-cyan-50/40 px-6 py-7 text-slate-950 sm:px-8'>
+          <h2 className='text-2xl font-semibold tracking-tight'>Role intelligence</h2>
+          <p className='mt-1 text-sm leading-6 text-slate-600'>Keep the title searchable, the description outcome-focused, and the salary clear enough for qualified candidates to act.</p>
         </div>
 
         <div className='space-y-8 p-6 sm:p-8'>
@@ -99,12 +106,31 @@ const AddJob = () => {
           </div>
         </div>
 
-        <div className='flex justify-end border-t border-gray-200 bg-gray-50 px-6 py-5 sm:px-8'>
+        <div className='flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 bg-slate-50 px-6 py-5 sm:px-8'>
+          <p className='text-xs font-semibold text-slate-500'>Listings remain hidden until your workspace is approved.</p>
           <button className='premium-button cursor-pointer px-8 py-3.5'>
             Post Job <Send size={17} />
           </button>
         </div>
       </form>
+    </div>
+  )
+}
+
+const DraftSignal = ({ icon, label, value, tone = 'blue' }) => {
+  const styles = {
+    blue: 'border-blue-100 bg-blue-50 text-blue-700',
+    emerald: 'border-emerald-100 bg-emerald-50 text-emerald-700',
+    violet: 'border-violet-100 bg-violet-50 text-violet-700'
+  }[tone]
+
+  return (
+    <div className={`rounded-2xl border p-4 shadow-sm ${styles}`}>
+      <div className='mb-2 flex items-center justify-between gap-3'>
+        {React.cloneElement(icon, { size: 17 })}
+        <span className='truncate text-sm font-semibold'>{value}</span>
+      </div>
+      <p className='text-[10px] font-bold uppercase tracking-[0.14em]'>{label}</p>
     </div>
   )
 }

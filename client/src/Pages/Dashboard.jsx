@@ -2,13 +2,17 @@ import React, { useContext, useEffect } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
-import { BriefcaseBusiness, ClipboardList, FilePlus2, LogOut, UsersRound } from 'lucide-react'
+import { BriefcaseBusiness, ClipboardList, FilePlus2, LogOut, ShieldCheck, UsersRound } from 'lucide-react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { readRecruiterCache } from '../utils/recruiterCache'
 
 const Dashboard = () => {
   const navigate = useNavigate()
   const { companyData, setcompanyData, setCompanyToken, companyToken, backendUrl } = useContext(AppContext)
+  const cachedRecruiterData = readRecruiterCache(companyToken)
+  const cachedJobs = cachedRecruiterData?.jobs || []
+  const cachedApplications = cachedRecruiterData?.applications || []
 
   const handleResendVerification = async () => {
     try {
@@ -54,7 +58,7 @@ const Dashboard = () => {
             <div className='flex items-center gap-3'>
               <div className='text-right max-sm:hidden'>
                 <p className='text-sm font-extrabold text-gray-950'>{companyData.name}</p>
-                <p className='text-xs text-gray-500'>Hiring workspace</p>
+                <p className='text-xs text-gray-500'>{companyData.isVerified ? 'Verified hiring workspace' : 'Workspace under review'}</p>
               </div>
               <div className='relative group'>
                 <img className='h-10 w-10 rounded-full border border-gray-200 object-cover p-0.5' src={companyData.image} alt={companyData.name} />
@@ -70,13 +74,32 @@ const Dashboard = () => {
       </header>
 
       <div className='flex items-start'>
-        <aside className='sticky top-[73px] hidden min-h-[calc(100vh-73px)] w-72 border-r border-slate-200 bg-white/78 p-4 text-slate-950 shadow-[12px_0_40px_rgba(15,23,42,0.04)] backdrop-blur-xl md:block'>
-          <div className='mb-6 rounded-2xl border border-blue-100 bg-blue-50/70 p-4'>
-            <BriefcaseBusiness className='mb-3 text-blue-600' size={22} />
-            <p className='text-sm font-extrabold'>Executive hiring tools</p>
-            <p className='mt-1 text-xs leading-relaxed text-slate-600'>Post roles, review applicants, and keep pipeline decisions clean.</p>
+        <aside className='sticky top-[73px] hidden min-h-[calc(100vh-73px)] w-80 border-r border-slate-200 bg-white/78 p-4 text-slate-950 shadow-[12px_0_40px_rgba(15,23,42,0.04)] backdrop-blur-xl md:block'>
+          <div className='mb-5 overflow-hidden rounded-[1.25rem] border border-slate-200 bg-white shadow-sm'>
+            <div className='border-b border-slate-200 bg-gradient-to-br from-white via-blue-50/60 to-cyan-50/40 p-4'>
+              <div className='flex items-center gap-3'>
+                <div className='flex h-11 w-11 items-center justify-center rounded-2xl border border-blue-100 bg-white text-blue-700 shadow-sm'>
+                  <BriefcaseBusiness size={21} />
+                </div>
+                <div>
+                  <p className='text-sm font-extrabold text-slate-950'>Hiring operations</p>
+                  <p className='text-xs text-slate-500'>Recruiter workspace</p>
+                </div>
+              </div>
+              <p className='mt-4 text-xs leading-relaxed text-slate-600'>Post roles, review applicants, and keep every decision visible without waiting on cold dashboards.</p>
+            </div>
+            <div className='grid grid-cols-2 gap-2 p-3'>
+              <SidebarStat label='Postings' value={cachedJobs.length} />
+              <SidebarStat label='Candidates' value={cachedApplications.length} />
+            </div>
           </div>
           <DashboardNav />
+          <div className='mt-5 rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4 text-emerald-800'>
+            <div className='mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em]'>
+              <ShieldCheck size={15} /> Workspace trust
+            </div>
+            <p className='text-sm font-semibold'>{companyData?.isVerified ? 'Approved for candidate visibility.' : 'Pending verification review.'}</p>
+          </div>
         </aside>
 
         <aside className='sticky top-[73px] min-h-[calc(100vh-73px)] border-r border-slate-200 bg-white/82 p-2 text-slate-950 md:hidden'>
@@ -120,7 +143,7 @@ const Dashboard = () => {
               </div>
             </div>
           )}
-          <div className='rounded-[1.75rem] border border-slate-200 bg-white/60 p-3 shadow-[0_18px_55px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:p-5'>
+          <div className='rounded-[1.4rem] border border-slate-200 bg-white/72 p-3 shadow-[0_18px_55px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:p-5'>
             <Outlet />
           </div>
         </main>
@@ -128,6 +151,13 @@ const Dashboard = () => {
     </div>
   )
 }
+
+const SidebarStat = ({ label, value }) => (
+  <div className='rounded-2xl border border-slate-200 bg-slate-50 p-3'>
+    <p className='text-xl font-semibold text-slate-950'>{value}</p>
+    <p className='mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
+  </div>
+)
 
 const DashboardNav = ({ compact = false }) => {
   const links = [
