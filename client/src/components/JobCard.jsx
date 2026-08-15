@@ -69,7 +69,7 @@ const JobCard = ({ job, onQuickView }) => {
             </div>
             <div className='hidden shrink-0 rounded-2xl border border-emerald-100 bg-emerald-50 p-3 text-center sm:block'>
               <p className='text-2xl font-semibold text-emerald-700'>{matchScore}</p>
-              <p className='text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-700'>AI fit</p>
+              <p className='text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-700'>Role match</p>
             </div>
           </div>
 

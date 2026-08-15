@@ -226,7 +226,7 @@ const ApplyJob = () => {
               <div className='relative'>
                 <div className='flex items-center justify-between gap-4'>
                   <div>
-                    <p className='text-[11px] font-bold uppercase tracking-[0.18em] text-blue-700'>Career fit</p>
+                    <p className='text-[11px] font-bold uppercase tracking-[0.18em] text-blue-700'>Role match</p>
                     <p className='mt-1 text-sm text-slate-600'>Decision readiness</p>
                   </div>
                   <ScoreRing score={94} />
@@ -244,8 +244,8 @@ const ApplyJob = () => {
             </div>
           </div>
           <div className='mt-8 grid gap-3 border-t border-slate-200 pt-5 sm:grid-cols-3'>
-            <DecisionMetric icon={<Gauge />} label='Match quality' value='Excellent' detail='Role level and location are aligned.' tone='blue' />
-            <DecisionMetric icon={<BrainCircuit />} label='Resume fit' value={userData?.resume ? 'Ready to analyze' : 'Resume needed'} detail='Run the ATS audit before applying.' tone='violet' />
+            <DecisionMetric icon={<Gauge />} label='Role match' value='Excellent' detail='Role level and location are aligned.' tone='blue' />
+            <DecisionMetric icon={<BrainCircuit />} label='Resume match' value={userData?.resume ? 'Ready to analyze' : 'Resume needed'} detail='Run the ATS audit before applying.' tone='violet' />
             <DecisionMetric icon={<ShieldCheck />} label='Company signal' value={jobData.companyId?.hasApplicants ? `${jobData.companyId.responseRate}% response` : 'Verified workspace'} detail='Hiring activity and response data.' tone='emerald' />
           </div>
         </section>
@@ -286,7 +286,7 @@ const ApplyJob = () => {
                     <span className='font-bold text-lg'>✨</span>
                   </div>
                   <div>
-                    <h2 className='text-lg font-extrabold text-gray-950'>AI ATS Resume Fit Auditor</h2>
+                    <h2 className='text-lg font-extrabold text-gray-950'>ATS Resume Match Auditor</h2>
                     <p className='text-xs text-gray-500'>Compare your resume against this job description in real-time.</p>
                   </div>
                 </div>
@@ -317,7 +317,7 @@ const ApplyJob = () => {
                     Click the button below to analyze your ATS match score, view missing skills, and get resume tailoring suggestions.
                   </p>
                   <button onClick={runAtsAudit} className='premium-button px-6 py-3.5 text-xs flex items-center gap-2 mx-auto'>
-                    ✨ Analyze Resume Fit
+                    Analyze Resume Match
                   </button>
                 </div>
               ) : (
@@ -711,7 +711,7 @@ const CompanySignalCard = ({ jobData }) => {
       <div className='border-t border-slate-100 px-4 pb-4'>
         <div className='rounded-2xl bg-slate-50 p-4'>
           <p className='text-xs font-bold uppercase tracking-[0.12em] text-slate-400'>What this means</p>
-          <p className='mt-2 text-sm leading-6 text-slate-600'>Prioritize this role if the fit is strong; the company signal suggests this listing is worth a confident application.</p>
+          <p className='mt-2 text-sm leading-6 text-slate-600'>Prioritize this role if the resume match is strong; the company signal suggests this listing is worth a confident application.</p>
         </div>
       </div>
     </div>

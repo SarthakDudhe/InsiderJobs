@@ -123,7 +123,7 @@ const Hero = () => {
                 <button className='hidden rounded-md border border-slate-200 bg-slate-50 p-1.5 text-slate-600 transition hover:bg-white sm:inline-flex' aria-label='Notifications'>
                   <Bell className='h-4 w-4' />
                 </button>
-                <button className='rounded-md bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-500'>Analyze fit</button>
+                <button className='rounded-md bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-500'>Analyze match</button>
               </div>
             </div>
 
@@ -145,7 +145,7 @@ const Hero = () => {
                   <p className='text-xs font-semibold text-slate-700'>Application health</p>
                   <div className='mt-3 space-y-3'>
                     <Progress label='Profile strength' value='88%' />
-                    <Progress label='Match quality' value='76%' />
+                    <Progress label='Resume match' value='76%' />
                     <Progress label='Pipeline clarity' value='64%' />
                   </div>
                 </div>
@@ -162,15 +162,15 @@ const Hero = () => {
                   <div className='border-b border-slate-200 bg-white p-4'>
                     <div className='flex items-start justify-between gap-4'>
                       <div>
-                        <h3 className='text-2xl font-semibold tracking-tight text-slate-950'>Best-fit opportunities</h3>
-                        <p className='mt-1 text-sm leading-6 text-slate-500'>Ranked by profile fit, growth potential, recruiter velocity, and freshness.</p>
+                        <h3 className='text-2xl font-semibold tracking-tight text-slate-950'>Best-match opportunities</h3>
+                        <p className='mt-1 text-sm leading-6 text-slate-500'>Ranked by resume match, growth potential, recruiter velocity, and freshness.</p>
                       </div>
                       <span className='rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700'>Live</span>
                     </div>
                   </div>
                   <div className='divide-y divide-slate-200'>
                     {[
-                      ['Vercel Labs', 'Senior Frontend Engineer', 'Remote', 'Top 3% fit', '94'],
+                      ['Vercel Labs', 'Senior Frontend Engineer', 'Remote', 'Top 3% match', '94'],
                       ['Stripe Systems', 'Product Engineer', 'Bengaluru', 'Fast response', '91'],
                       ['Linear Works', 'Design Systems Engineer', 'Mumbai', 'Skill stretch', '88']
                     ].map((item, index) => (
@@ -200,7 +200,7 @@ const Hero = () => {
 
               <aside className='hidden border-l border-slate-200 bg-slate-50/80 p-4 md:col-span-3 md:block'>
                 <div className='mb-4 rounded-xl border border-slate-200 bg-white p-4'>
-                  <p className='text-xs font-semibold uppercase tracking-[0.14em] text-slate-400'>Career fit</p>
+                  <p className='text-xs font-semibold uppercase tracking-[0.14em] text-slate-400'>Role match</p>
                   <div className='mt-3 flex items-end gap-2'>
                     <span className='text-5xl font-semibold text-slate-950'>94</span>
                     <span className='mb-2 text-sm font-bold text-emerald-700'>Excellent</span>

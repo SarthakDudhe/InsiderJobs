@@ -65,7 +65,7 @@ const JobListing = () => {
             </div>
             <div className='mt-5 grid grid-cols-3 gap-2'>
               <ConsoleStat value={totalJobs} label='roles' />
-              <ConsoleStat value='92%' label='fit' />
+              <ConsoleStat value='92%' label='match' />
               <ConsoleStat value={activeFilterCount} label='signals' />
             </div>
             <div className='mt-5 rounded-2xl border border-slate-200 bg-white/85 p-3 shadow-sm'>
@@ -103,7 +103,7 @@ const JobListing = () => {
                   <SlidersHorizontal size={14} className='text-blue-600' /> Match controls
                 </div>
                 <div className='mt-4 space-y-3'>
-                  <SignalMeter label='Fit confidence' value='92%' width='92%' />
+                  <SignalMeter label='Match confidence' value='92%' width='92%' />
                   <SignalMeter label='Freshness bias' value='High' width='78%' />
                   <SignalMeter label='Filter precision' value={activeFilterCount ? 'Focused' : 'Broad'} width={activeFilterCount ? '68%' : '38%'} />
                 </div>
@@ -122,7 +122,7 @@ const JobListing = () => {
             <div className='flex flex-col justify-between gap-4 sm:flex-row sm:items-center'>
             <div>
               <h2 className='text-xl font-bold text-slate-950'>Recommended roles</h2>
-              <p className='mt-1 text-sm text-slate-600'>Sorted for fit, freshness, company signal, and response velocity.</p>
+              <p className='mt-1 text-sm text-slate-600'>Sorted by resume match, freshness, company signal, and response velocity.</p>
             </div>
             <div className='flex flex-wrap items-center gap-2'>
               <ResultChip icon={<Sparkles />} label='AI ranked' />
@@ -216,7 +216,7 @@ const EmptyJobsState = ({ onClear }) => (
     <div className='flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600'>
       <SearchX size={24} />
     </div>
-    <h3 className='mt-5 text-xl font-bold text-slate-950'>No high-fit roles found</h3>
+    <h3 className='mt-5 text-xl font-bold text-slate-950'>No strong-match roles found</h3>
     <p className='mt-2 max-w-md text-sm leading-6 text-slate-600'>Try widening the role, location, or category filters. InsiderJobs will keep the results focused as new roles become available.</p>
     <button onClick={onClear} className='premium-button mt-6 px-5 py-3 text-sm'>
       Clear filters

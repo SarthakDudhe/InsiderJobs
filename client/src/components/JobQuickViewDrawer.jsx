@@ -84,7 +84,7 @@ const JobQuickViewDrawer = ({ job, onClose }) => {
               <div>
                 <p className='text-sm font-bold text-slate-950'>AI match summary</p>
                 <p className='mt-1 text-sm leading-6 text-slate-600'>
-                  Strong alignment with role level, location preference, and verified hiring activity. Review the requirements, then use resume fit analysis before applying.
+                  Strong alignment with role level, location preference, and verified hiring activity. Review the requirements, then run a resume match analysis before applying.
                 </p>
               </div>
             </div>
@@ -127,7 +127,7 @@ const JobQuickViewDrawer = ({ job, onClose }) => {
               onClick={handleApply}
               className='premium-button flex-1 px-6 py-3.5 text-sm font-bold shadow-lg shadow-blue-500/20'
             >
-              Apply and analyze resume fit <ArrowRight size={18} />
+              Apply and analyze resume match <ArrowRight size={18} />
             </button>
           </div>
         </div>

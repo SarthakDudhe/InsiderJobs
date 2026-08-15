@@ -20,7 +20,7 @@ const features = [
   {
     icon: <Radar />,
     title: 'Opportunity radar',
-    description: 'Track fresh listings, remote flexibility, verified companies, saved roles, and high-fit searches from one command surface.'
+    description: 'Track fresh listings, remote flexibility, verified companies, saved roles, and strong-match searches from one command surface.'
   },
   {
     icon: <ShieldCheck />,
