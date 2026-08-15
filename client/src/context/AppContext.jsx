@@ -41,7 +41,6 @@ export const AppcontextProvider = (props) => {
             if (data.success) {
                 setjobs(data.jobs)
                 setTotalJobs(data.totalJobs || 0)
-                console.log(data.jobs)
             }
             else {
                 toast.error(data.message)
