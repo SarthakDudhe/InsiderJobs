@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   ArrowRight,
   BarChart3,
-  BriefcaseBusiness,
   CheckCircle2,
   Clock3,
   ExternalLink,
@@ -151,32 +150,21 @@ const Application = () => {
     <div className='min-h-screen ij-shell'>
       <Navbar />
       <main className='ij-container min-h-[65vh] py-8'>
-        <section className='mb-8 overflow-hidden rounded-[1.35rem] border border-slate-200 bg-slate-950 shadow-[0_30px_90px_rgba(15,23,42,0.18)]'>
-          <div className='relative grid gap-8 p-6 text-white md:p-8 lg:grid-cols-[1.15fr_0.85fr]'>
-            <div className='absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(37,99,235,0.46),transparent_24rem),radial-gradient(circle_at_92%_18%,rgba(6,182,212,0.18),transparent_22rem)]' />
-            <div className='relative'>
-              <p className='inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-blue-100'>
-                <BriefcaseBusiness size={14} /> Career command center
-              </p>
-              <h1 className='mt-5 max-w-4xl text-3xl font-semibold leading-tight tracking-tight md:text-5xl'>
-                Manage every application like a focused career pipeline.
-              </h1>
-              <p className='mt-4 max-w-2xl text-sm leading-7 text-slate-300 md:text-base'>
-                Resume, profile strength, application status, stale follow-ups, and outcome signals stay visible immediately while the latest data syncs in the background.
-              </p>
-              <div className='mt-6 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-300'>
-                <span className='rounded-full border border-white/10 bg-white/8 px-3 py-1.5'>Cached instantly</span>
-                <span className='rounded-full border border-white/10 bg-white/8 px-3 py-1.5'>Background refresh</span>
-                <span className='rounded-full border border-white/10 bg-white/8 px-3 py-1.5'>Pipeline CRM</span>
-              </div>
-            </div>
-
-            <div className='relative grid gap-3 sm:grid-cols-2'>
-              <HeroMetric icon={<Target />} label='Applications' value={metrics.total} />
-              <HeroMetric icon={<Clock3 />} label='Pending' value={metrics.pending} tone='amber' />
-              <HeroMetric icon={<CheckCircle2 />} label='Accepted' value={metrics.accepted} tone='emerald' />
-              <HeroMetric icon={<AlertTriangle />} label='Stale' value={metrics.staleApps.length} tone='rose' />
-            </div>
+        <section className='mb-8 grid gap-5 lg:grid-cols-[1fr_420px] lg:items-end'>
+          <div>
+            <p className='section-kicker'>Career command center</p>
+            <h1 className='mt-2 max-w-4xl text-3xl font-semibold leading-tight tracking-tight text-slate-950 md:text-5xl'>
+              Applications, resume, and follow-ups in one operating view.
+            </h1>
+            <p className='mt-4 max-w-2xl text-sm leading-7 text-slate-600 md:text-base'>
+              See your pipeline immediately from cache, then let InsiderJobs refresh profile and application data quietly in the background.
+            </p>
+          </div>
+          <div className='grid gap-3 sm:grid-cols-2'>
+            <HeroMetric icon={<Target />} label='Applications' value={metrics.total} />
+            <HeroMetric icon={<Clock3 />} label='Pending' value={metrics.pending} tone='amber' />
+            <HeroMetric icon={<CheckCircle2 />} label='Accepted' value={metrics.accepted} tone='emerald' />
+            <HeroMetric icon={<AlertTriangle />} label='Stale' value={metrics.staleApps.length} tone='rose' />
           </div>
         </section>
 
@@ -219,17 +207,17 @@ const Application = () => {
 
 const ProfileIdentityCard = ({ user, profileStrength, isEdit, resume, setResume, setIsEdit, updateResume }) => (
   <section className='overflow-hidden rounded-[1.25rem] border border-slate-200 bg-white shadow-[0_22px_70px_rgba(15,23,42,0.08)]'>
-    <div className='bg-slate-950 p-5 text-white'>
-      <p className='text-[11px] font-bold uppercase tracking-[0.16em] text-blue-200'>Career identity</p>
-      <h2 className='mt-2 text-2xl font-semibold tracking-tight'>{user?.name || 'Candidate profile'}</h2>
-      <p className='mt-2 text-sm leading-6 text-slate-300'>{user?.email || 'Connect your account to personalize applications.'}</p>
-      <div className='mt-5'>
+    <div className='border-b border-slate-200 bg-gradient-to-br from-white via-blue-50/60 to-cyan-50/40 p-5'>
+      <p className='section-kicker'>Career identity</p>
+      <h2 className='mt-2 text-2xl font-semibold tracking-tight text-slate-950'>{user?.name || 'Candidate profile'}</h2>
+      <p className='mt-2 text-sm leading-6 text-slate-600'>{user?.email || 'Connect your account to personalize applications.'}</p>
+      <div className='mt-5 rounded-2xl border border-white/80 bg-white/85 p-4 shadow-sm'>
         <div className='mb-2 flex items-center justify-between text-xs font-bold'>
-          <span className='text-slate-300'>Profile strength</span>
-          <span>{profileStrength}%</span>
+          <span className='text-slate-500'>Profile strength</span>
+          <span className='text-slate-950'>{profileStrength}%</span>
         </div>
-        <div className='h-2 overflow-hidden rounded-full bg-white/12'>
-          <div className='h-full rounded-full bg-blue-400' style={{ width: `${profileStrength}%` }} />
+        <div className='h-2 overflow-hidden rounded-full bg-slate-200'>
+          <div className='h-full rounded-full bg-blue-600' style={{ width: `${profileStrength}%` }} />
         </div>
       </div>
     </div>
@@ -425,20 +413,20 @@ const PipelineStatus = ({ status }) => {
 }
 
 const HeroMetric = ({ icon, label, value, tone = 'blue' }) => {
-  const color = {
-    blue: 'text-blue-200',
-    amber: 'text-amber-200',
-    emerald: 'text-emerald-200',
-    rose: 'text-rose-200'
+  const styles = {
+    blue: 'border-blue-100 bg-blue-50 text-blue-700',
+    amber: 'border-amber-100 bg-amber-50 text-amber-700',
+    emerald: 'border-emerald-100 bg-emerald-50 text-emerald-700',
+    rose: 'border-rose-100 bg-rose-50 text-rose-700'
   }[tone]
 
   return (
-    <div className='rounded-2xl border border-white/10 bg-white/8 p-4'>
+    <div className={`rounded-2xl border p-4 shadow-sm ${styles}`}>
       <div className='mb-3 flex items-center justify-between'>
-        {React.cloneElement(icon, { size: 18, className: color })}
+        {React.cloneElement(icon, { size: 18 })}
         <span className='text-2xl font-semibold'>{value}</span>
       </div>
-      <p className='text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
+      <p className='text-[10px] font-bold uppercase tracking-[0.14em]'>{label}</p>
     </div>
   )
 }

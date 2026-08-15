@@ -53,13 +53,13 @@ const JobListing = () => {
     <div className='ij-container py-8'>
       <div className='grid gap-8 lg:grid-cols-[320px_1fr] lg:items-start'>
         <aside className='overflow-hidden rounded-[1.25rem] border border-slate-200 bg-white shadow-[0_22px_70px_rgba(15,23,42,0.08)] lg:sticky lg:top-24'>
-          <div className='bg-slate-950 p-5 text-white'>
+          <div className='border-b border-slate-200 bg-gradient-to-br from-white via-blue-50/60 to-cyan-50/40 p-5'>
             <div className='flex items-center justify-between gap-4'>
               <div>
-                <p className='text-[11px] font-bold uppercase tracking-[0.18em] text-blue-200'>Discovery console</p>
-                <h3 className='mt-2 text-xl font-semibold tracking-tight'>Tune your search signals</h3>
+                <p className='section-kicker'>Discovery console</p>
+                <h3 className='mt-2 text-xl font-semibold tracking-tight text-slate-950'>Tune your search signals</h3>
               </div>
-              <button onClick={() => setShowFilter(prev => !prev)} className='ij-focus-ring inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/8 text-white lg:hidden' aria-label='Toggle filters'>
+              <button onClick={() => setShowFilter(prev => !prev)} className='ij-focus-ring inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm lg:hidden' aria-label='Toggle filters'>
                 {showFilter ? <X size={18} /> : <Filter size={18} />}
               </button>
             </div>
@@ -68,11 +68,11 @@ const JobListing = () => {
               <ConsoleStat value='92%' label='fit' />
               <ConsoleStat value={activeFilterCount} label='signals' />
             </div>
-            <div className='mt-5 rounded-2xl border border-white/10 bg-white/8 p-3'>
-              <div className='flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-300'>
-                <Target size={14} className='text-blue-200' /> Search intent
+            <div className='mt-5 rounded-2xl border border-slate-200 bg-white/85 p-3 shadow-sm'>
+              <div className='flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500'>
+                <Target size={14} className='text-blue-600' /> Search intent
               </div>
-              <p className='mt-2 text-sm leading-6 text-slate-300'>
+              <p className='mt-2 text-sm leading-6 text-slate-600'>
                 {searchFilter.title || searchFilter.location ? `${searchFilter.title || 'Any role'} in ${searchFilter.location || 'any location'}` : 'Open discovery across verified roles'}
               </p>
             </div>
@@ -186,8 +186,8 @@ const FilterGroup = ({ title, items, selected, onToggle, className = '' }) => (
 )
 
 const ConsoleStat = ({ value, label }) => (
-  <div className='rounded-2xl border border-white/10 bg-white/8 p-3 text-center'>
-    <p className='text-xl font-semibold tracking-tight'>{value}</p>
+  <div className='rounded-2xl border border-slate-200 bg-white p-3 text-center shadow-sm'>
+    <p className='text-xl font-semibold tracking-tight text-slate-950'>{value}</p>
     <p className='mt-1 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
   </div>
 )

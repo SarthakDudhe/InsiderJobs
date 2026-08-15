@@ -312,11 +312,11 @@ const App = () => {
           <section className='mb-6 grid gap-4 xl:grid-cols-[1fr_380px]'>
             <div className='admin-hero'>
               <div>
-                <p className='admin-kicker text-blue-100'>Live moderation</p>
-                <h2 className='mt-3 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl'>
+                <p className='admin-kicker'>Live moderation</p>
+                <h2 className='mt-3 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-slate-950 md:text-5xl'>
                   Review the platform without waiting on cold dashboards.
                 </h2>
-                <p className='mt-4 max-w-2xl text-sm leading-7 text-slate-300'>Cached data appears instantly, then the console quietly revalidates companies, jobs, reports, and analytics from the admin bundle endpoint.</p>
+                <p className='mt-4 max-w-2xl text-sm leading-7 text-slate-600'>Cached data appears instantly, then the console quietly revalidates companies, jobs, reports, and analytics from the admin bundle endpoint.</p>
               </div>
               <div className='mt-7 grid gap-3 sm:grid-cols-4'>
                 <HeroMetric icon={<Building2 />} label='Companies' value={stats.totalCompanies} />
@@ -464,19 +464,19 @@ const AdminNavButton = ({ active, icon, label, count, danger = false, onClick })
 
 const HeroMetric = ({ icon, label, value, tone = 'blue' }) => {
   const tones = {
-    blue: 'text-blue-200',
-    amber: 'text-amber-200',
-    emerald: 'text-emerald-200',
-    cyan: 'text-cyan-200'
+    blue: 'border-blue-100 bg-blue-50 text-blue-700',
+    amber: 'border-amber-100 bg-amber-50 text-amber-700',
+    emerald: 'border-emerald-100 bg-emerald-50 text-emerald-700',
+    cyan: 'border-cyan-100 bg-cyan-50 text-cyan-700'
   }
 
   return (
-    <div className='rounded-2xl border border-white/10 bg-white/8 p-4'>
+    <div className={`rounded-2xl border p-4 shadow-sm ${tones[tone]}`}>
       <div className='mb-3 flex items-center justify-between'>
-        {React.cloneElement(icon, { size: 18, className: tones[tone] })}
-        <span className='text-2xl font-semibold text-white'>{value}</span>
+        {React.cloneElement(icon, { size: 18 })}
+        <span className='text-2xl font-semibold'>{value}</span>
       </div>
-      <p className='text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
+      <p className='text-[10px] font-bold uppercase tracking-[0.14em]'>{label}</p>
     </div>
   )
 }

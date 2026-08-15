@@ -221,13 +221,13 @@ const ApplyJob = () => {
               </div>
             </div>
 
-            <div className='relative overflow-hidden rounded-[1.15rem] border border-slate-200 bg-slate-950 p-4 text-white shadow-[0_22px_60px_rgba(15,23,42,0.18)] md:w-80'>
-              <div className='absolute inset-0 bg-[radial-gradient(circle_at_80%_0%,rgba(37,99,235,0.45),transparent_14rem)]' />
+            <div className='relative overflow-hidden rounded-[1.15rem] border border-blue-100 bg-gradient-to-br from-white via-blue-50/70 to-cyan-50/40 p-4 text-slate-950 shadow-[0_22px_60px_rgba(37,99,235,0.12)] md:w-80'>
+              <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-300 to-transparent' />
               <div className='relative'>
                 <div className='flex items-center justify-between gap-4'>
                   <div>
-                    <p className='text-[11px] font-bold uppercase tracking-[0.18em] text-blue-200'>Career fit</p>
-                    <p className='mt-1 text-sm text-slate-300'>Decision readiness</p>
+                    <p className='text-[11px] font-bold uppercase tracking-[0.18em] text-blue-700'>Career fit</p>
+                    <p className='mt-1 text-sm text-slate-600'>Decision readiness</p>
                   </div>
                   <ScoreRing score={94} />
                 </div>
@@ -237,10 +237,10 @@ const ApplyJob = () => {
                   <SignalPill label='Speed' value={jobData.companyId?.averageDecisionDays ? `${jobData.companyId.averageDecisionDays}d` : 'Live'} />
                 </div>
               </div>
-              <button onClick={applyHandler} className={`relative mt-5 w-full px-8 py-4 ${isAlreadyApplied ? 'rounded-xl bg-white/12 font-bold text-slate-300' : 'premium-button cursor-pointer'}`}>
+              <button onClick={applyHandler} className={`relative mt-5 w-full px-8 py-4 ${isAlreadyApplied ? 'rounded-xl bg-slate-200 font-bold text-slate-500' : 'premium-button cursor-pointer'}`}>
                 {isAlreadyApplied ? 'Already applied' : 'Apply now'}
               </button>
-              <p className='relative mt-3 text-sm font-semibold text-slate-300'>CTC: {kConvert.convertTo(jobData.salary)}</p>
+              <p className='relative mt-3 text-sm font-semibold text-slate-600'>CTC: {kConvert.convertTo(jobData.salary)}</p>
             </div>
           </div>
           <div className='mt-8 grid gap-3 border-t border-slate-200 pt-5 sm:grid-cols-3'>
@@ -638,17 +638,17 @@ const Info = ({ icon, text }) => (
 )
 
 const ScoreRing = ({ score }) => (
-  <div className='relative grid h-20 w-20 place-items-center rounded-full' style={{ background: `conic-gradient(#60a5fa ${score * 3.6}deg, rgba(255,255,255,0.14) 0deg)` }}>
-    <div className='grid h-[62px] w-[62px] place-items-center rounded-full bg-slate-950 ring-1 ring-white/10'>
-      <span className='text-2xl font-semibold tracking-tight text-white'>{score}</span>
+  <div className='relative grid h-20 w-20 place-items-center rounded-full shadow-sm' style={{ background: `conic-gradient(#2563eb ${score * 3.6}deg, #dbeafe 0deg)` }}>
+    <div className='grid h-[62px] w-[62px] place-items-center rounded-full bg-white ring-1 ring-blue-100'>
+      <span className='text-2xl font-semibold tracking-tight text-slate-950'>{score}</span>
     </div>
   </div>
 )
 
 const SignalPill = ({ label, value }) => (
-  <div className='rounded-xl border border-white/10 bg-white/8 px-2 py-2'>
+  <div className='rounded-xl border border-slate-200 bg-white px-2 py-2 shadow-sm'>
     <p className='text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
-    <p className='mt-1 truncate text-xs font-bold text-white'>{value}</p>
+    <p className='mt-1 truncate text-xs font-bold text-slate-950'>{value}</p>
   </div>
 )
 
@@ -682,20 +682,20 @@ const CompanySignalCard = ({ jobData }) => {
 
   return (
     <div className='overflow-hidden rounded-[1.25rem] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.08)]'>
-      <div className='bg-slate-950 p-5 text-white'>
+      <div className='border-b border-slate-200 bg-gradient-to-br from-white via-blue-50/60 to-cyan-50/40 p-5'>
         <div className='flex items-center gap-4'>
-          <div className='flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white p-2 shadow-sm'>
+          <div className='flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white p-2 shadow-sm'>
             <img className='h-10 w-10 object-contain' src={jobData.companyId.image} alt={jobData.companyId.name} />
           </div>
           <div>
-            <h3 className='text-lg font-semibold tracking-tight'>{jobData.companyId.name}</h3>
-            <p className='mt-1 text-[11px] font-bold uppercase tracking-[0.16em] text-blue-200'>Verified workspace</p>
+            <h3 className='text-lg font-semibold tracking-tight text-slate-950'>{jobData.companyId.name}</h3>
+            <p className='mt-1 text-[11px] font-bold uppercase tracking-[0.16em] text-blue-700'>Verified workspace</p>
           </div>
         </div>
-        <div className='mt-5 rounded-2xl border border-white/10 bg-white/8 p-4'>
+        <div className='mt-5 rounded-2xl border border-slate-200 bg-white/85 p-4 shadow-sm'>
           <p className='text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400'>Hiring signal</p>
           <div className='mt-2 flex items-center justify-between gap-3'>
-            <span className='text-xl font-semibold'>{activity.label}</span>
+            <span className='text-xl font-semibold text-slate-950'>{activity.label}</span>
             <span className='relative flex h-2.5 w-2.5'>
               {activity.pulse && <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${activity.dot} opacity-75`} />}
               <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${activity.dot}`} />
