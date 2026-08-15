@@ -3,7 +3,20 @@ import { AppContext } from '../context/AppContext'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { Building2, Mail, Shield, UploadCloud, X, Eye, EyeOff, User, Link2 } from 'lucide-react'
+import {
+  Building2,
+  CheckCircle2,
+  ClipboardList,
+  Eye,
+  EyeOff,
+  Link2,
+  Mail,
+  Shield,
+  UploadCloud,
+  User,
+  UsersRound,
+  X
+} from 'lucide-react'
 
 const RecruiterLogin = () => {
   const navigate = useNavigate()
@@ -22,7 +35,7 @@ const RecruiterLogin = () => {
     setState('Login')
     setemail('slack@demo.com')
     setPassword('slackpassword')
-    toast.success('Demo recruiter credentials pre-filled!')
+    toast.success('Demo recruiter credentials pre-filled.')
   }
 
   const onSubmitHandler = async (e) => {
@@ -30,18 +43,19 @@ const RecruiterLogin = () => {
 
     if (state === 'Sign Up' && !isTextDataSubmitted) {
       if (!name || !email || !password || !recruiterName || !linkedin) {
-        return toast.error("Please fill in all details.")
+        return toast.error('Please fill in all details.')
       }
-      if (!linkedin.includes("linkedin.com")) {
-        return toast.error("Please enter a valid LinkedIn profile URL.")
+      if (!linkedin.includes('linkedin.com')) {
+        return toast.error('Please enter a valid LinkedIn profile URL.')
       }
-      const publicDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'aol.com', 'icloud.com'];
-      const emailDomain = email.split('@')[1]?.toLowerCase();
+      const publicDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'aol.com', 'icloud.com']
+      const emailDomain = email.split('@')[1]?.toLowerCase()
       if (publicDomains.includes(emailDomain)) {
-        return toast.error("Corporate work email is required to register a company profile.")
+        return toast.error('Corporate work email is required to register a company profile.')
       }
       return setIsDataSubmitted(true)
     }
+
     try {
       if (state === 'Login') {
         const { data } = await axios.post(backendUrl + '/api/company/login', { email, password })
@@ -87,52 +101,39 @@ const RecruiterLogin = () => {
   }, [])
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-950/60 p-4 backdrop-blur-md'>
-      <div className='relative grid w-full max-w-4xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.22)] md:grid-cols-[0.9fr_1.1fr]'>
-        
-        {/* Left Side Pane - Recruiter Benefits & Stats */}
-        <div className='relative hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 p-8 text-slate-950 md:flex md:flex-col md:justify-between'>
-          <div className='absolute right-0 top-0 h-48 w-48 rounded-full bg-blue-400/20 blur-3xl' />
-          
-          <div className='relative z-10'>
-            <div className='mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.4)]'>
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-md'>
+      <div className='relative grid w-full max-w-5xl overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.22)] md:grid-cols-[0.95fr_1.05fr]'>
+        <div className='hidden border-r border-slate-200 bg-gradient-to-br from-white via-blue-50/70 to-cyan-50/40 p-8 text-slate-950 md:flex md:flex-col md:justify-between'>
+          <div>
+            <div className='mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-100 bg-white text-blue-700 shadow-sm'>
               <Building2 size={24} />
             </div>
-            <h2 className='text-3xl font-extrabold leading-tight'>Hire with a sharper command center.</h2>
-            <p className='mt-3 text-sm leading-relaxed text-slate-600'>
-              Post roles, review resumes, and move applicants through a clean professional pipeline.
+            <p className='section-kicker'>Recruiter workspace</p>
+            <h2 className='mt-3 text-3xl font-semibold leading-tight tracking-tight'>
+              Run hiring from a verified operating console.
+            </h2>
+            <p className='mt-4 text-sm leading-7 text-slate-600'>
+              Publish roles, review candidate resumes, and keep every applicant decision visible from one professional workspace.
             </p>
-            
-            {/* Features Checklists */}
-            <div className='space-y-3.5 mt-8'>
-              <div className='flex items-center gap-3 rounded-xl bg-white/80 p-3 border border-slate-200 hover:bg-white transition-colors'>
-                <span className='flex h-5 w-5 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400 text-xs font-extrabold'>✓</span>
-                <p className='text-xs text-slate-700 font-semibold'>Real-time Hiring Activity Tracker</p>
-              </div>
-              <div className='flex items-center gap-3 rounded-xl bg-white/80 p-3 border border-slate-200 hover:bg-white transition-colors'>
-                <span className='flex h-5 w-5 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 text-xs font-extrabold'>✓</span>
-                <p className='text-xs text-slate-700 font-semibold'>ATS Resume Parser Integration</p>
-              </div>
-              <div className='flex items-center gap-3 rounded-xl bg-white/80 p-3 border border-slate-200 hover:bg-white transition-colors'>
-                <span className='flex h-5 w-5 items-center justify-center rounded-lg bg-purple-500/20 text-purple-400 text-xs font-extrabold'>✓</span>
-                <p className='text-xs text-slate-700 font-semibold'>Instant Ghost-Job Prevention Shield</p>
-              </div>
+
+            <div className='mt-8 grid gap-3'>
+              <RecruiterSignal icon={<ClipboardList />} title='Structured postings' description='Create candidate-ready listings with clear role context.' />
+              <RecruiterSignal icon={<UsersRound />} title='Candidate pipeline' description='Review resumes, links, status, and match signals quickly.' />
+              <RecruiterSignal icon={<Shield />} title='Verified workspace' description='Work email and company review keep listings accountable.' />
             </div>
           </div>
 
-          <div className='relative z-10 rounded-2xl border border-slate-200 bg-white/82 p-4 mt-6'>
-            <p className='text-xs font-bold uppercase tracking-[0.16em] text-blue-600'>Enterprise-grade Suite</p>
-            <p className='mt-2 text-xs text-slate-600 leading-relaxed'>
-              Structured listings, verified company profiles, and faster candidate decisions all in one place.
-            </p>
+          <div className='mt-6 grid grid-cols-3 gap-2'>
+            <TrustMetric value='Live' label='posting tools' />
+            <TrustMetric value='AI' label='resume review' />
+            <TrustMetric value='Verified' label='workspace' />
           </div>
         </div>
 
-        {/* Right Side Pane - Form */}
         <div className='relative flex flex-col justify-center bg-white p-7 sm:p-9'>
           <button
             onClick={() => setShowRecruiterLogin(false)}
-            className='absolute right-5 top-5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-900'
+            className='absolute right-5 top-5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-900'
             aria-label='Close recruiter login'
           >
             <X size={18} />
@@ -141,28 +142,27 @@ const RecruiterLogin = () => {
           <form onSubmit={onSubmitHandler} className='w-full'>
             <div className='mb-6 pr-8'>
               <p className='section-kicker mb-2.5'>Recruiter {state}</p>
-              <h1 className='text-3xl font-extrabold text-gray-950 tracking-tight'>
-                {state === 'Login' ? 'Welcome back.' : 'Create your workspace.'}
+              <h1 className='text-3xl font-semibold tracking-tight text-slate-950'>
+                {state === 'Login' ? 'Welcome back to hiring ops.' : 'Create a verified workspace.'}
               </h1>
-              <p className='mt-1 text-sm text-gray-500'>
-                {state === 'Login' ? 'Sign in to manage postings and applications.' : 'Set up your company profile to start hiring.'}
+              <p className='mt-2 text-sm leading-6 text-slate-500'>
+                {state === 'Login' ? 'Sign in to manage postings, candidates, and application decisions.' : 'Set up your company profile so candidates see a trusted hiring team.'}
               </p>
             </div>
 
-            {/* Quick Demo Fill Card */}
             {state === 'Login' && (
-              <div className='mb-5 rounded-2xl border border-blue-100 bg-blue-50/50 p-4 transition-all hover:bg-blue-50/80'>
+              <div className='mb-5 rounded-2xl border border-blue-100 bg-blue-50/70 p-4 transition-all hover:bg-blue-50'>
                 <div className='flex items-center justify-between gap-3'>
                   <div>
-                    <p className='text-xs font-bold text-blue-700 uppercase tracking-wider'>Demo Account Available</p>
-                    <p className='text-[11px] text-gray-500 mt-0.5 leading-relaxed'>Skip registering and test the workspace immediately.</p>
+                    <p className='text-xs font-bold uppercase tracking-[0.14em] text-blue-700'>Demo workspace</p>
+                    <p className='mt-0.5 text-[11px] leading-relaxed text-slate-500'>Skip registering and test the workspace immediately.</p>
                   </div>
                   <button
                     type='button'
                     onClick={fillDemoCredentials}
-                    className='cursor-pointer text-nowrap rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-extrabold text-white transition-all hover:bg-blue-700 active:scale-95 shadow-sm'
+                    className='cursor-pointer text-nowrap rounded-xl bg-blue-600 px-3.5 py-1.5 text-xs font-extrabold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-95'
                   >
-                    Quick Fill
+                    Quick fill
                   </button>
                 </div>
               </div>
@@ -171,25 +171,26 @@ const RecruiterLogin = () => {
             {state === 'Sign Up' && isTextDataSubmitted ? (
               <div className='flex flex-col items-center gap-4 py-4'>
                 <label htmlFor='image' className='cursor-pointer'>
-                  <div className='flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:border-blue-500'>
-                    {image ? <img className='h-full w-full object-cover' src={URL.createObjectURL(image)} alt='Preview' /> : <UploadCloud className='text-gray-400' size={30} />}
+                  <div className='flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed border-blue-200 bg-blue-50/70 transition-all hover:border-blue-500'>
+                    {image ? <img className='h-full w-full object-cover' src={URL.createObjectURL(image)} alt='Preview' /> : <UploadCloud className='text-slate-400' size={30} />}
                   </div>
                   <input onChange={e => setImage(e.target.files[0])} type='file' id='image' hidden />
                 </label>
-                <p className='text-sm font-extrabold text-gray-600'>Upload Company Logo</p>
+                <div className='text-center'>
+                  <p className='text-sm font-extrabold text-slate-700'>Upload company logo</p>
+                  <p className='mt-1 max-w-xs text-xs leading-5 text-slate-500'>This appears on candidate-facing listings and company signal cards.</p>
+                </div>
               </div>
             ) : (
               <div className='space-y-3.5'>
                 {state !== 'Login' && (
                   <>
-                    <Field icon={<Building2 />} value={name} onChange={setName} type='text' placeholder='Company Name' />
-                    <Field icon={<User />} value={recruiterName} onChange={setRecruiterName} type='text' placeholder='Your Full Name (Recruiter)' />
-                    <Field icon={<Link2 />} value={linkedin} onChange={setLinkedin} type='text' placeholder='LinkedIn Profile URL' />
+                    <Field icon={<Building2 />} value={name} onChange={setName} type='text' placeholder='Company name' />
+                    <Field icon={<User />} value={recruiterName} onChange={setRecruiterName} type='text' placeholder='Recruiter full name' />
+                    <Field icon={<Link2 />} value={linkedin} onChange={setLinkedin} type='text' placeholder='LinkedIn profile URL' />
                   </>
                 )}
-                <Field icon={<Mail />} value={email} onChange={setemail} type='email' placeholder='Email Address' />
-                
-                {/* Password field with Show/Hide toggle */}
+                <Field icon={<Mail />} value={email} onChange={setemail} type='email' placeholder='Work email address' />
                 <Field
                   icon={<Shield />}
                   value={password}
@@ -200,7 +201,7 @@ const RecruiterLogin = () => {
                     <button
                       type='button'
                       onClick={() => setShowPassword(!showPassword)}
-                      className='text-gray-400 hover:text-gray-600 focus:outline-none transition-colors'
+                      className='text-slate-400 transition-colors hover:text-slate-600 focus:outline-none'
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
@@ -216,24 +217,22 @@ const RecruiterLogin = () => {
             )}
 
             <button type='submit' className='premium-button mt-5 w-full cursor-pointer py-3.5 shadow-sm'>
-              {state === 'Login' ? 'Login' : isTextDataSubmitted ? 'Create Account' : 'Next'}
+              {state === 'Login' ? 'Open recruiter console' : isTextDataSubmitted ? 'Create workspace' : 'Continue setup'}
             </button>
-
-
 
             <div className='pt-5 text-center'>
               {state === 'Login' ? (
-                <p className='text-sm font-medium text-gray-500'>
-                  Don't have an account?{' '}
+                <p className='text-sm font-medium text-slate-500'>
+                  Do not have an account?{' '}
                   <span onClick={() => setState('Sign Up')} className='cursor-pointer font-extrabold text-blue-600 hover:underline'>
-                    Sign Up
+                    Create workspace
                   </span>
                 </p>
               ) : (
-                <p className='text-sm font-medium text-gray-500'>
+                <p className='text-sm font-medium text-slate-500'>
                   Already have an account?{' '}
                   <span onClick={() => setState('Login')} className='cursor-pointer font-extrabold text-blue-600 hover:underline'>
-                    Login
+                    Sign in
                   </span>
                 </p>
               )}
@@ -245,12 +244,34 @@ const RecruiterLogin = () => {
   )
 }
 
+const RecruiterSignal = ({ icon, title, description }) => (
+  <div className='flex items-start gap-3 rounded-2xl border border-slate-200 bg-white/85 p-3 shadow-sm'>
+    <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700'>
+      {React.cloneElement(icon, { size: 17 })}
+    </div>
+    <div>
+      <p className='text-sm font-bold text-slate-950'>{title}</p>
+      <p className='mt-0.5 text-xs leading-5 text-slate-500'>{description}</p>
+    </div>
+  </div>
+)
+
+const TrustMetric = ({ value, label }) => (
+  <div className='rounded-2xl border border-slate-200 bg-white/85 p-3 shadow-sm'>
+    <div className='mb-2 flex items-center gap-1.5 text-blue-700'>
+      <CheckCircle2 size={14} />
+      <span className='text-sm font-bold'>{value}</span>
+    </div>
+    <p className='text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
+  </div>
+)
+
 const Field = ({ icon, value, onChange, type, placeholder, rightElement }) => (
   <div className='premium-input flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 transition-all focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100'>
     <div className='flex flex-1 items-center gap-3'>
-      {React.cloneElement(icon, { size: 17, className: 'text-gray-400' })}
+      {React.cloneElement(icon, { size: 17, className: 'text-slate-400' })}
       <input
-        className='w-full bg-transparent text-sm font-semibold text-gray-800 outline-none placeholder:text-gray-400'
+        className='w-full bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400'
         onChange={e => onChange(e.target.value)}
         value={value}
         type={type}
