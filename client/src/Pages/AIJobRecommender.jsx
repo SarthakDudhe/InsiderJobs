@@ -14,14 +14,39 @@ const suggestedPrompts = [
   'Show interview-ready opportunities'
 ]
 
+const RECOMMENDER_CACHE_KEY = 'insiderjobs-ai-recommendations'
+
+const readRecommendationCache = (userToken) => {
+  if (!userToken) return null
+  try {
+    const raw = localStorage.getItem(`${RECOMMENDER_CACHE_KEY}:${userToken}`)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+const writeRecommendationCache = (userToken, recommendations, keywords) => {
+  if (!userToken || !recommendations) return
+  try {
+    localStorage.setItem(
+      `${RECOMMENDER_CACHE_KEY}:${userToken}`,
+      JSON.stringify({ recommendations, keywords, cachedAt: Date.now() })
+    )
+  } catch {
+    // Recommendations cache is a display-speed layer only.
+  }
+}
+
 const AIJobRecommender = () => {
   const { backendUrl, userData, userToken } = useContext(AppContext)
   const navigate = useNavigate()
+  const cached = readRecommendationCache(userToken)
 
   const [loading, setLoading] = useState(false)
-  const [recommendations, setRecommendations] = useState(null)
+  const [recommendations, setRecommendations] = useState(cached?.recommendations || null)
   const [error, setError] = useState(null)
-  const [keywords, setKeywords] = useState([])
+  const [keywords, setKeywords] = useState(cached?.keywords || [])
   const [newKeywordInput, setNewKeywordInput] = useState('')
 
   const fetchRecommendations = async (customKeywordsList = null) => {
@@ -45,6 +70,7 @@ const AIJobRecommender = () => {
       if (data.success) {
         setRecommendations(data)
         setKeywords(data.keywords || [])
+        writeRecommendationCache(userToken, data, data.keywords || [])
         if (data.message) toast.info(data.message)
       } else {
         setError(data.message)
@@ -85,24 +111,37 @@ const AIJobRecommender = () => {
               InsiderJobs reads your candidate context, extracts useful signals, and turns them into live role recommendations you can refine.
             </p>
           </div>
-          <div className='premium-panel rounded-[1.15rem] p-4'>
-            <div className='flex items-center gap-3'>
-              <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600'>
-                <BrainCircuit size={22} />
-              </div>
-              <div>
-                <p className='text-sm font-bold text-slate-950'>Persistent career context</p>
-                <p className='text-xs leading-5 text-slate-500'>Resume, skills, keywords, and live roles stay connected.</p>
-              </div>
-            </div>
+          <div className='grid gap-3 sm:grid-cols-3 lg:grid-cols-1'>
+            <AssistantMetric icon={<BrainCircuit />} label='Context' value={userData?.resume ? 'Ready' : 'Resume needed'} />
+            <AssistantMetric icon={<Target />} label='Signals' value={keywords.length ? keywords.length : 'Auto'} tone='emerald' />
+            <AssistantMetric icon={<Briefcase />} label='Results' value={recommendations?.jobs?.length || 0} tone='cyan' />
           </div>
         </section>
+
+        {cached?.recommendations && recommendations && (
+          <section className='mb-6 rounded-2xl border border-blue-100 bg-blue-50/70 p-4 shadow-sm'>
+            <div className='flex flex-wrap items-center justify-between gap-3'>
+              <div className='flex items-center gap-3'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-white text-blue-700 shadow-sm'>
+                  <CheckCircle2 size={18} />
+                </div>
+                <div>
+                  <p className='text-sm font-bold text-slate-950'>Showing cached recommendations</p>
+                  <p className='text-xs leading-5 text-slate-600'>Refresh any time to re-check live roles against your latest signals.</p>
+                </div>
+              </div>
+              <button onClick={() => fetchRecommendations(keywords)} disabled={loading} className='premium-button px-4 py-2.5 text-xs disabled:opacity-60'>
+                <RefreshCw size={15} className={loading ? 'animate-spin' : ''} /> Refresh
+              </button>
+            </div>
+          </section>
+        )}
 
         <div className='grid gap-7 lg:grid-cols-[340px_1fr]'>
           <aside className='space-y-5'>
             <div className='premium-panel rounded-[1.15rem] p-5'>
               <div className='mb-5 flex items-center gap-3'>
-                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-white'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-blue-700'>
                   <FileText size={18} />
                 </div>
                 <div>
@@ -234,6 +273,24 @@ const ContextRow = ({ icon, label, value, active }) => (
     </div>
   </div>
 )
+
+const AssistantMetric = ({ icon, label, value, tone = 'blue' }) => {
+  const styles = {
+    blue: 'border-blue-100 bg-blue-50 text-blue-700',
+    emerald: 'border-emerald-100 bg-emerald-50 text-emerald-700',
+    cyan: 'border-cyan-100 bg-cyan-50 text-cyan-700'
+  }[tone]
+
+  return (
+    <div className={`rounded-2xl border p-4 shadow-sm ${styles}`}>
+      <div className='flex items-center justify-between gap-3'>
+        {React.cloneElement(icon, { size: 18 })}
+        <span className='truncate text-lg font-semibold'>{value}</span>
+      </div>
+      <p className='mt-3 text-[10px] font-bold uppercase tracking-[0.14em]'>{label}</p>
+    </div>
+  )
+}
 
 const LoadingState = () => (
   <div className='grid gap-4'>
