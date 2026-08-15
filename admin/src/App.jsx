@@ -1,774 +1,652 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import {
-  Briefcase,
-  Building,
-  CheckCircle,
-  FileText,
+  AlertTriangle,
+  ArrowUpRight,
+  BarChart3,
+  BriefcaseBusiness,
+  Building2,
+  CheckCircle2,
+  Database,
   Lock,
+  LogOut,
   Mail,
+  MapPin,
+  RefreshCw,
   Search,
   ShieldAlert,
-  LogOut,
-  XCircle,
-  AlertTriangle,
-  MapPin,
+  ShieldCheck,
+  Sparkles,
   Tag,
-  RefreshCw
+  Trash2,
+  UserCheck
 } from 'lucide-react'
-import logo from './assets/logo.svg'
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
-const App = () => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"
-  const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken') || null)
-  // Separate pagination states for each tab
-  const [pageCompanies, setPageCompanies] = useState(1);
-  const [pageJobs, setPageJobs] = useState(1);
-  const [pageReported, setPageReported] = useState(1);
-  const rowsPerPage = 10;
+const CACHE_KEY = 'insiderjobs-admin-dashboard-cache'
+const rowsPerPage = 10
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  
-  const [stats, setStats] = useState({
+const emptyBundle = {
+  stats: {
     totalCompanies: 0,
     pendingVerifications: 0,
     totalJobs: 0,
     totalApplications: 0
-  })
-  
-  const [companies, setCompanies] = useState([])
-  const [reportedJobs, setReportedJobs] = useState([])
-  const [allJobs, setAllJobs] = useState([])
-  const [analyticsData, setAnalyticsData] = useState([])
+  },
+  companies: [],
+  reportedJobs: [],
+  jobs: [],
+  analytics: []
+}
+
+const App = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
+  const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken') || null)
+  const cachedBundle = readCachedBundle()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loginLoading, setLoginLoading] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(Boolean(cachedBundle))
+  const [lastSyncedAt, setLastSyncedAt] = useState(cachedBundle?.cachedAt || null)
+
+  const [stats, setStats] = useState(cachedBundle?.stats || emptyBundle.stats)
+  const [companies, setCompanies] = useState(cachedBundle?.companies || [])
+  const [reportedJobs, setReportedJobs] = useState(cachedBundle?.reportedJobs || [])
+  const [allJobs, setAllJobs] = useState(cachedBundle?.jobs || [])
+  const [analyticsData, setAnalyticsData] = useState(cachedBundle?.analytics || [])
+
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTab, setActiveTab] = useState('workspaces')
+  const [pageCompanies, setPageCompanies] = useState(1)
+  const [pageJobs, setPageJobs] = useState(1)
+  const [pageReported, setPageReported] = useState(1)
 
-  // Reset page numbers when search query or active tab changes
   useEffect(() => {
-    setPageCompanies(1);
-    setPageJobs(1);
-    setPageReported(1);
-  }, [searchQuery, activeTab]);
+    setPageCompanies(1)
+    setPageJobs(1)
+    setPageReported(1)
+  }, [searchQuery, activeTab])
 
-  // Handle Login
+  const persistBundle = (bundle) => {
+    const next = { ...bundle, cachedAt: Date.now() }
+    localStorage.setItem(CACHE_KEY, JSON.stringify(next))
+    setLastSyncedAt(next.cachedAt)
+  }
+
+  const applyBundle = (bundle) => {
+    setStats(bundle.stats || emptyBundle.stats)
+    setCompanies(bundle.companies || [])
+    setReportedJobs(bundle.reportedJobs || [])
+    setAllJobs(bundle.jobs || [])
+    setAnalyticsData(bundle.analytics || [])
+    setHasLoadedOnce(true)
+    persistBundle(bundle)
+  }
+
+  const fetchDashboardBundle = async ({ silent = false } = {}) => {
+    if (!adminToken) return
+    if (!silent) setIsRefreshing(true)
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/admin/dashboard-bundle`, {
+        headers: { token: adminToken }
+      })
+      if (data.success) {
+        applyBundle(data)
+      } else if (!silent) {
+        toast.error(data.message || 'Unable to load dashboard data')
+      }
+    } catch (error) {
+      if (!silent) toast.error(error.message)
+      console.error(error)
+    } finally {
+      if (!silent) setIsRefreshing(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!adminToken) return
+    fetchDashboardBundle({ silent: hasLoadedOnce })
+    const interval = setInterval(() => fetchDashboardBundle({ silent: true }), 45000)
+    return () => clearInterval(interval)
+  }, [adminToken])
+
   const handleLogin = async (e) => {
     e.preventDefault()
-    setLoading(true)
+    setLoginLoading(true)
     try {
       const { data } = await axios.post(`${backendUrl}/api/admin/login`, { email, password })
       if (data.success) {
         setAdminToken(data.token)
         localStorage.setItem('adminToken', data.token)
-        toast.success('Access Granted. Welcome back Admin.')
+        toast.success('Admin access granted')
       } else {
         toast.error(data.message)
       }
     } catch (error) {
       toast.error(error.message)
     } finally {
-      setLoading(false)
+      setLoginLoading(false)
     }
   }
 
-  // Handle Logout
   const handleLogout = () => {
     setAdminToken(null)
     localStorage.removeItem('adminToken')
-    toast.info('Logged out of Admin Portal.')
+    toast.info('Logged out of admin console')
   }
 
-  // Fetch All Dashboard Data in 1 Fast Request
-  const fetchDashboardBundle = async () => {
-    try {
-      const { data } = await axios.get(`${backendUrl}/api/admin/dashboard-bundle`, {
-        headers: { token: adminToken }
-      })
-      if (data.success) {
-        setStats(data.stats)
-        setCompanies(data.companies)
-        setReportedJobs(data.reportedJobs)
-        setAllJobs(data.jobs)
-        setAnalyticsData(data.analytics)
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  // Refresh all data
-  const [isRefreshing, setIsRefreshing] = useState(false)
   const refreshAll = async () => {
-    setIsRefreshing(true)
     await fetchDashboardBundle()
-    setIsRefreshing(false)
-    toast.success('Dashboard refreshed!')
+    toast.success('Dashboard refreshed')
   }
 
-  // Fetch Dashboard Statistics
-  const fetchStats = async () => {
-    try {
-      const { data } = await axios.get(`${backendUrl}/api/admin/stats`, {
-        headers: { token: adminToken }
-      })
-      if (data.success) {
-        setStats(data.stats)
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  // Fetch Registered Companies
-  const fetchCompanies = async () => {
-    try {
-      const { data } = await axios.get(`${backendUrl}/api/admin/companies`, {
-        headers: { token: adminToken }
-      })
-      if (data.success) {
-        setCompanies(data.companies)
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  // Fetch Reported Jobs
-  const fetchReportedJobs = async () => {
-    try {
-      const { data } = await axios.get(`${backendUrl}/api/admin/reported-jobs`, {
-        headers: { token: adminToken }
-      })
-      if (data.success) {
-        setReportedJobs(data.reportedJobs)
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  // Fetch All Jobs
-  const fetchAllJobs = async () => {
-    try {
-      const { data } = await axios.get(`${backendUrl}/api/admin/jobs`, {
-        headers: { token: adminToken }
-      })
-      if (data.success) {
-        setAllJobs(data.jobs)
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  // Fetch 7-day Analytics Data
-  const fetchAnalytics = async () => {
-    try {
-      const { data } = await axios.get(`${backendUrl}/api/admin/analytics`, {
-        headers: { token: adminToken }
-      })
-      if (data.success) {
-        setAnalyticsData(data.stats)
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  // Toggle Verification Status
   const toggleVerification = async (companyId, currentStatus) => {
+    const nextStatus = !currentStatus
+    setCompanies(prev => prev.map(company => company._id === companyId ? { ...company, isVerified: nextStatus, isEmailVerified: nextStatus || company.isEmailVerified } : company))
+    setStats(prev => ({
+      ...prev,
+      pendingVerifications: Math.max(0, prev.pendingVerifications + (nextStatus ? -1 : 1))
+    }))
+
     try {
       const { data } = await axios.post(
         `${backendUrl}/api/admin/verify`,
-        { id: companyId, isVerified: !currentStatus },
+        { id: companyId, isVerified: nextStatus },
         { headers: { token: adminToken } }
       )
       if (data.success) {
         toast.success(data.message)
-        fetchCompanies()
-        fetchStats()
+        fetchDashboardBundle({ silent: true })
       } else {
         toast.error(data.message)
+        fetchDashboardBundle({ silent: true })
       }
     } catch (error) {
       toast.error(error.message)
+      fetchDashboardBundle({ silent: true })
     }
   }
 
-  // Dismiss Reported Job Flags
   const dismissReports = async (jobId) => {
+    setReportedJobs(prev => prev.filter(job => job._id !== jobId))
     try {
       const { data } = await axios.post(
         `${backendUrl}/api/admin/dismiss-report`,
         { id: jobId },
         { headers: { token: adminToken } }
       )
-      if (data.success) {
-        toast.success(data.message)
-        fetchReportedJobs()
-      } else {
-        toast.error(data.message)
-      }
+      if (data.success) toast.success(data.message)
+      else toast.error(data.message)
+      fetchDashboardBundle({ silent: true })
     } catch (error) {
       toast.error(error.message)
+      fetchDashboardBundle({ silent: true })
     }
   }
 
-  // Delete Reported Job Listing
   const handleDeleteJob = async (jobId) => {
+    setAllJobs(prev => prev.filter(job => job._id !== jobId))
+    setReportedJobs(prev => prev.filter(job => job._id !== jobId))
+    setStats(prev => ({ ...prev, totalJobs: Math.max(0, prev.totalJobs - 1) }))
+
     try {
       const { data } = await axios.post(
         `${backendUrl}/api/admin/delete-job`,
         { id: jobId },
         { headers: { token: adminToken } }
       )
-      if (data.success) {
-        toast.success(data.message)
-        fetchDashboardBundle()
-      } else {
-        toast.error(data.message)
-      }
+      if (data.success) toast.success(data.message)
+      else toast.error(data.message)
+      fetchDashboardBundle({ silent: true })
     } catch (error) {
       toast.error(error.message)
+      fetchDashboardBundle({ silent: true })
     }
   }
 
-  useEffect(() => {
-    if (adminToken) {
-      fetchDashboardBundle()
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+  const filteredCompanies = useMemo(() => companies.filter(company =>
+    company.name?.toLowerCase().includes(normalizedQuery) ||
+    company.email?.toLowerCase().includes(normalizedQuery) ||
+    company.recruiterName?.toLowerCase().includes(normalizedQuery)
+  ), [companies, normalizedQuery])
 
-      // Auto-refresh every 30 seconds
-      const interval = setInterval(() => {
-        fetchDashboardBundle()
-      }, 30000)
-      return () => clearInterval(interval)
-    }
-  }, [adminToken])
+  const filteredJobs = useMemo(() => allJobs.filter(job =>
+    job.title?.toLowerCase().includes(normalizedQuery) ||
+    job.category?.toLowerCase().includes(normalizedQuery) ||
+    job.location?.toLowerCase().includes(normalizedQuery) ||
+    job.companyId?.name?.toLowerCase().includes(normalizedQuery)
+  ), [allJobs, normalizedQuery])
 
-  // Filtered companies based on search
-  const filteredCompanies = companies.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.email.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredReportedJobs = useMemo(() => reportedJobs.filter(job =>
+    job.title?.toLowerCase().includes(normalizedQuery) ||
+    job.companyId?.name?.toLowerCase().includes(normalizedQuery) ||
+    job.reports?.some(report => report.reason?.toLowerCase().includes(normalizedQuery))
+  ), [reportedJobs, normalizedQuery])
 
-  // Filtered jobs based on search
-  const filteredJobs = allJobs.filter((job) =>
-    job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (job.companyId && job.companyId.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  )
+  const paginatedCompanies = useMemo(() => paginate(filteredCompanies, pageCompanies), [filteredCompanies, pageCompanies])
+  const paginatedJobs = useMemo(() => paginate(filteredJobs, pageJobs), [filteredJobs, pageJobs])
+  const paginatedReported = useMemo(() => paginate(filteredReportedJobs, pageReported), [filteredReportedJobs, pageReported])
 
-  // Pagination slices (memoized for performance)
-  const paginatedCompanies = useMemo(() => {
-    const start = (pageCompanies - 1) * rowsPerPage;
-    return filteredCompanies.slice(start, start + rowsPerPage);
-  }, [filteredCompanies, pageCompanies, rowsPerPage]);
-
-  const paginatedJobs = useMemo(() => {
-    const start = (pageJobs - 1) * rowsPerPage;
-    return filteredJobs.slice(start, start + rowsPerPage);
-  }, [filteredJobs, pageJobs, rowsPerPage]);
-
-  const paginatedReported = useMemo(() => {
-    const start = (pageReported - 1) * rowsPerPage;
-    return reportedJobs.slice(start, start + rowsPerPage);
-  }, [reportedJobs, pageReported, rowsPerPage]);
-
-  // Login view if unauthenticated
   if (!adminToken) {
     return (
-      <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f5f7fb] p-4 font-sans text-slate-950 w-full'>
-        <ToastContainer theme="light" />
-        <div className='absolute left-1/4 top-1/4 h-[350px] w-[350px] rounded-full bg-blue-300/20 blur-3xl' />
-        <div className='absolute right-1/4 bottom-1/4 h-[350px] w-[350px] rounded-full bg-cyan-300/20 blur-3xl' />
-
-        <div className='relative w-full max-w-md rounded-3xl border border-slate-200 bg-white/88 p-8 shadow-[0_30px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl'>
-          <div className='mb-8 text-center'>
-            <div className='mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.4)]'>
-              <ShieldAlert size={28} className='text-white' />
+      <div className='admin-shell relative flex min-h-screen items-center justify-center overflow-hidden p-4 text-slate-950'>
+        <ToastContainer theme='light' />
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(37,99,235,0.16),transparent_28rem),radial-gradient(circle_at_80%_80%,rgba(6,182,212,0.14),transparent_26rem)]' />
+        <form onSubmit={handleLogin} className='relative w-full max-w-md overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white p-8 shadow-[0_30px_90px_rgba(15,23,42,0.14)]'>
+          <div className='mb-8'>
+            <div className='mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-[0_18px_45px_rgba(15,23,42,0.22)]'>
+              <ShieldAlert size={27} />
             </div>
-            <h1 className='text-2xl font-extrabold tracking-tight'>Control Console</h1>
-            <p className='text-xs text-slate-500 mt-2'>Sign in with administrator credentials.</p>
+            <p className='admin-kicker'>InsiderJobs Admin</p>
+            <h1 className='mt-2 text-3xl font-semibold tracking-tight'>Operations console</h1>
+            <p className='mt-2 text-sm leading-6 text-slate-500'>Sign in to review workspaces, postings, reports, and platform health.</p>
           </div>
 
-          <form onSubmit={handleLogin} className='space-y-4'>
-            <div className='flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 focus-within:border-blue-500/50 transition-all'>
-              <Mail size={18} className='text-slate-400' />
-              <input
-                type='email'
-                placeholder='Admin Email'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className='w-full bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400 text-slate-950'
-              />
-            </div>
-
-            <div className='flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 focus-within:border-blue-500/50 transition-all'>
-              <Lock size={18} className='text-slate-400' />
-              <input
-                type='password'
-                placeholder='Password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className='w-full bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400 text-slate-950'
-              />
-            </div>
-
-            <button
-              type='submit'
-              disabled={loading}
-              className='w-full rounded-2xl bg-blue-600 py-3.5 text-sm font-bold text-white shadow-lg transition-all hover:bg-blue-700 active:scale-98 disabled:opacity-50 cursor-pointer'
-            >
-              {loading ? 'Authenticating...' : 'Access Console'}
+          <div className='space-y-4'>
+            <Field icon={<Mail />} type='email' placeholder='Admin email' value={email} onChange={setEmail} />
+            <Field icon={<Lock />} type='password' placeholder='Password' value={password} onChange={setPassword} />
+            <button type='submit' disabled={loginLoading} className='admin-primary w-full py-3.5'>
+              {loginLoading ? 'Authenticating...' : 'Access console'}
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     )
   }
 
   return (
-    <div className='min-h-screen bg-[#f5f7fb] text-slate-950 font-sans selection:bg-blue-600 selection:text-white w-full'>
-      <ToastContainer theme="light" />
-      
-      {/* Upper Navigation Bar */}
-      <header className='sticky top-0 z-40 border-b border-slate-200 bg-white/86 shadow-[0_12px_40px_rgba(15,23,42,0.06)] backdrop-blur-xl'>
-        <div className='flex items-center justify-between px-6 py-4 max-w-7xl mx-auto'>
-          <div className='flex items-center gap-4'>
-            <img className='w-32 opacity-95' src={logo} alt='InsiderJobs' />
-            <span className='rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-red-600'>
-               Admin Console
-            </span>
-          </div>
+    <div className='admin-shell min-h-screen text-slate-950'>
+      <ToastContainer theme='light' />
 
-          <div className='flex items-center gap-2'>
-            <button
-              onClick={refreshAll}
-              disabled={isRefreshing}
-              title='Refresh Dashboard'
-              className='flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed'
-            >
-              <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
-              {isRefreshing ? 'Refreshing…' : 'Refresh'}
-            </button>
-            <button
-              onClick={handleLogout}
-              className='flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors'
-            >
-              <LogOut size={14} /> Logout
-            </button>
+      <aside className='fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-slate-200 bg-white/92 px-4 py-5 shadow-[12px_0_40px_rgba(15,23,42,0.05)] backdrop-blur-xl lg:block'>
+        <div className='mb-7 flex items-center gap-3 px-2'>
+          <div className='grid h-10 w-10 place-items-center rounded-2xl bg-slate-950 text-sm font-black text-white'>IJ</div>
+          <div>
+            <p className='text-sm font-bold tracking-tight'>InsiderJobs</p>
+            <p className='text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400'>Admin OS</p>
           </div>
         </div>
-      </header>
 
-      <main className='max-w-7xl mx-auto px-6 py-8'>
-        
-        {/* Metric Cards & Visual Recharts area */}
-        <section className='grid gap-6 lg:grid-cols-3 mb-8'>
-          
-          {/* Recharts Activity Graph */}
-          <div className='lg:col-span-2 rounded-3xl border border-slate-200 bg-white/88 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-md flex flex-col justify-between min-h-[300px]'>
+        <nav className='space-y-2'>
+          <AdminNavButton active={activeTab === 'workspaces'} icon={<Building2 />} label='Workspaces' count={companies.length} onClick={() => setActiveTab('workspaces')} />
+          <AdminNavButton active={activeTab === 'active-postings'} icon={<BriefcaseBusiness />} label='Active postings' count={allJobs.length} onClick={() => setActiveTab('active-postings')} />
+          <AdminNavButton active={activeTab === 'reported-jobs'} icon={<AlertTriangle />} label='Reported queue' count={reportedJobs.length} danger onClick={() => setActiveTab('reported-jobs')} />
+        </nav>
+
+        <div className='mt-6 rounded-2xl border border-blue-100 bg-blue-50/70 p-4'>
+          <p className='flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-blue-700'>
+            <Database size={14} /> Data cache
+          </p>
+          <p className='mt-2 text-sm leading-6 text-slate-600'>
+            {lastSyncedAt ? `Visible immediately. Synced ${formatSyncedAt(lastSyncedAt)}.` : 'Waiting for first dashboard sync.'}
+          </p>
+        </div>
+      </aside>
+
+      <div className='lg:pl-72'>
+        <header className='sticky top-0 z-30 border-b border-slate-200 bg-white/88 backdrop-blur-xl'>
+          <div className='mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4'>
             <div>
-              <h3 className='text-sm font-black tracking-tight text-slate-950'>7-Day Activity Trends</h3>
-              <p className='text-[10px] text-slate-500 mt-0.5'>Monitor daily jobs posted vs. candidate applications submitted.</p>
-            </div>
-            
-            <div className='h-[200px] w-full mt-4'>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={analyticsData} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorJobs" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorApps" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="date" stroke="#6b7280" fontSize={10} tickLine={false} />
-                  <YAxis stroke="#6b7280" fontSize={10} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', fontSize: '11px', color: '#0f172a', boxShadow: '0 18px 40px rgba(15,23,42,0.12)' }} />
-                  <Area type="monotone" dataKey="jobs" name="Jobs Posted" stroke="#10b981" fillOpacity={1} fill="url(#colorJobs)" strokeWidth={2.5} />
-                  <Area type="monotone" dataKey="applications" name="Applications" stroke="#3b82f6" fillOpacity={1} fill="url(#colorApps)" strokeWidth={2.5} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Core Metric Cards */}
-          <div className='flex flex-col gap-4 justify-between'>
-            <MetricCard icon={<Building />} title='Total Companies' count={stats.totalCompanies} color='text-blue-400 bg-blue-500/10 border-blue-500/10' />
-            <MetricCard icon={<ShieldAlert />} title='Pending Approval' count={stats.pendingVerifications} color='text-amber-400 bg-amber-500/10 border-amber-500/10' highlight={stats.pendingVerifications > 0} />
-            <MetricCard icon={<Briefcase />} title='Active Postings' count={stats.totalJobs} color='text-emerald-400 bg-emerald-500/10 border-emerald-500/10' />
-          </div>
-        </section>
-
-        {/* Tab Selection Row */}
-        <div className='flex border-b border-slate-200 mb-6 gap-6'>
-          <button
-            onClick={() => setActiveTab('workspaces')}
-            className={`pb-3 text-sm font-bold transition-all relative cursor-pointer ${
-              activeTab === 'workspaces' ? 'text-blue-600' : 'text-slate-500 hover:text-slate-950'
-            }`}
-          >
-            Workspaces
-            {activeTab === 'workspaces' && <span className='absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 rounded-full'></span>}
-          </button>
-          <button
-            onClick={() => setActiveTab('active-postings')}
-            className={`pb-3 text-sm font-bold transition-all relative cursor-pointer ${
-              activeTab === 'active-postings' ? 'text-emerald-600' : 'text-slate-500 hover:text-slate-950'
-            }`}
-          >
-            Active Postings
-            {activeTab === 'active-postings' && <span className='absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full'></span>}
-          </button>
-          <button
-            onClick={() => setActiveTab('reported-jobs')}
-            className={`pb-3 text-sm font-bold transition-all relative cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'reported-jobs' ? 'text-rose-600' : 'text-slate-500 hover:text-slate-950'
-            }`}
-          >
-            Reported Jobs
-            {reportedJobs.length > 0 && (
-              <span className='h-2 w-2 rounded-full bg-rose-500 animate-pulse'></span>
-            )}
-            {activeTab === 'reported-jobs' && <span className='absolute bottom-0 left-0 right-0 h-0.5 bg-rose-500 rounded-full'></span>}
-          </button>
-        </div>
-
-        {/* Workspaces Moderation Tab Content */}
-        {activeTab === 'workspaces' && (
-          <section className='rounded-3xl border border-slate-200 bg-white/88 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl'>
-            <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6'>
-              <div>
-                <h2 className='text-lg font-black tracking-tight'>Workspaces Moderation</h2>
-                <p className='text-xs text-slate-500 mt-1'>Review recruiter profiles and toggle domain verification state.</p>
-              </div>
-              
-              {/* Actions Box */}
-              <div className='flex items-center gap-3 w-full sm:w-auto'>
-                <div className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 w-full sm:max-w-xs focus-within:border-blue-500/30 transition-all'>
-                  <Search size={16} className='text-slate-400' />
-                  <input
-                    type='text'
-                    placeholder='Search by workspace...'
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className='bg-transparent text-xs font-semibold outline-none text-slate-950 w-full placeholder:text-slate-400'
-                  />
-                </div>
-                <button
-                  type='button'
-                  onClick={fetchCompanies}
-                  className='flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition-all active:scale-95 shadow-sm'
-                  title='Refresh Workspaces'
-                >
-                  <RefreshCw size={16} />
-                </button>
-              </div>
+              <p className='admin-kicker'>Platform command center</p>
+              <h1 className='mt-1 text-xl font-semibold tracking-tight md:text-2xl'>Admin operations</h1>
             </div>
 
-            <div className='overflow-x-auto rounded-2xl border border-slate-200 bg-white'>
-              <table className='w-full text-left border-collapse text-xs'>
-                <thead>
-                  <tr className='border-b border-slate-200 bg-slate-50 font-extrabold text-slate-500'>
-                    <th className='p-4'>Company</th>
-                    <th className='p-4'>Email Domain</th>
-                    <th className='p-4'>Recruiter Profile</th>
-                    <th className='p-4'>Verification Status</th>
-                    <th className='p-4 text-right'>Action</th>
-                  </tr>
-                </thead>
-                <tbody className='divide-y divide-slate-100'>
-                  {paginatedCompanies.length > 0 ? (
-                    paginatedCompanies.map((company) => (
-                      <tr key={company._id} className='hover:bg-blue-50/40 transition-colors'>
-                        <td className='p-4'>
-                          <div className='flex items-center gap-3'>
-                            <img src={company.image} alt={company.name} className='h-8 w-8 rounded-lg object-contain bg-white p-1' />
-                            <span className='font-bold text-slate-950'>{company.name}</span>
-                          </div>
-                        </td>
-                        <td className='p-4 font-semibold text-slate-500'>
-                          {company.email}
-                        </td>
-                        <td className='p-4'>
-                          <div className='flex flex-col'>
-                            <span className='font-bold text-slate-950'>{company.recruiterName || 'N/A'}</span>
-                            {company.linkedin ? (
-                              <a href={company.linkedin.startsWith('http') ? company.linkedin : `https://${company.linkedin}`}
-                                 target='_blank'
-                                 rel='noopener noreferrer'
-                                 className='inline-flex items-center gap-0.5 text-[10px] text-blue-500 hover:underline font-semibold mt-0.5 w-fit'>
-                                LinkedIn Profile ↗
-                              </a>
-                            ) : (
-                              <span className='text-[10px] text-slate-400'>No LinkedIn</span>
-                            )}
-                          </div>
-                        </td>
-                        <td className='p-4'>
-                          {company.isVerified ? (
-                            <span className='inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-400 border border-emerald-500/10'>
-                              <CheckCircle size={10} /> Verified
-                            </span>
-                          ) : (
-                            <span className='inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-1 text-[10px] font-bold text-amber-400 border border-amber-500/10 animate-pulse'>
-                              <ShieldAlert size={10} /> Pending Approval
-                            </span>
-                          )}
-                        </td>
-                        <td className='p-4 text-right'>
-                          <button type='button' onClick={() => toggleVerification(company._id, company.isVerified)}
-                                  className={`cursor-pointer rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all active:scale-95 ${company.isVerified ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/10' : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/10'}`}>
-                            {company.isVerified ? 'Revoke Approval' : 'Approve Domain'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className='p-8 text-center text-slate-500 font-semibold'>
-                        No workspace profiles match your search criteria.
-                      </td>
-                    </tr>
-                  )}
-                  {/* Pagination Controls */}
-                  {filteredCompanies.length > rowsPerPage && (
-                    <tr>
-                      <td colSpan={5} className='p-4 flex justify-center space-x-2'>
-                        <button onClick={() => setPageCompanies(p => Math.max(p - 1, 1))} disabled={pageCompanies === 1}
-                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Prev</button>
-                        <span className='px-2 text-slate-500 flex items-center'>Page {pageCompanies} of {Math.ceil(filteredCompanies.length / rowsPerPage)}</span>
-                        <button onClick={() => setPageCompanies(p => Math.min(p + 1, Math.ceil(filteredCompanies.length / rowsPerPage)))}
-                                disabled={pageCompanies >= Math.ceil(filteredCompanies.length / rowsPerPage)}
-                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Next</button>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )}
-
-        {/* Active Postings Tab Content */}
-        {activeTab === 'active-postings' && (
-          <section className='rounded-3xl border border-slate-200 bg-white/88 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl'>
-            <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6'>
-              <div>
-                <h2 className='text-lg font-black tracking-tight'>Active Postings Moderation</h2>
-                <p className='text-xs text-slate-500 mt-1'>Review all active jobs and delete any inappropriate or stale listings.</p>
-              </div>
-              
-              {/* Actions Box */}
-              <div className='flex items-center gap-3 w-full sm:w-auto'>
-                <div className='flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 w-full sm:max-w-xs focus-within:border-blue-500/30 transition-all'>
-                  <Search size={16} className='text-slate-400' />
-                  <input
-                    type='text'
-                    placeholder='Search by job title or company...'
-                    value={searchQuery}
-                    onChange={(e) => { setSearchQuery(e.target.value); setPageJobs(1); }}
-                    className='bg-transparent text-xs font-semibold outline-none text-slate-950 w-full placeholder:text-slate-400'
-                  />
-                </div>
-                <button
-                  type='button'
-                  onClick={fetchAllJobs}
-                  className='flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white p-2.5 text-slate-500 hover:bg-slate-50 hover:text-blue-600 transition-all active:scale-95 shadow-sm'
-                  title='Refresh Jobs'
-                >
-                  <RefreshCw size={16} />
-                </button>
-              </div>
-            </div>
-
-            <div className='overflow-x-auto rounded-2xl border border-slate-200 bg-white'>
-              <table className='w-full text-left border-collapse text-xs'>
-                <thead>
-                  <tr className='border-b border-slate-200 bg-slate-50 font-extrabold text-slate-500'>
-                    <th className='p-4'>Job Title & Company</th>
-                    <th className='p-4'>Details</th>
-                    <th className='p-4'>Listed Date</th>
-                    <th className='p-4 text-right'>Action</th>
-                  </tr>
-                </thead>
-                <tbody className='divide-y divide-slate-100'>
-                  {paginatedJobs.length > 0 ? (
-                    paginatedJobs.map((job) => (
-                      <tr key={job._id} className='hover:bg-blue-50/40 transition-colors'>
-                        <td className='p-4'>
-                          <div className='flex items-center gap-3'>
-                            {job.companyId ? (
-                              <img src={job.companyId.image} alt='' className='h-8 w-8 rounded-lg object-contain bg-white p-1' />
-                            ) : (
-                              <span className='h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center'>HQ</span>
-                            )}
-                            <div>
-                              <p className='font-bold text-slate-950'>{job.title}</p>
-                              <p className='text-[10px] text-slate-500 mt-0.5'>{job.companyId ? job.companyId.name : 'Unknown Company'}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className='p-4 text-slate-500 space-y-1'>
-                          <p className='flex items-center gap-1.5'><MapPin size={12} className='text-slate-400' /> {job.location}</p>
-                          <p className='flex items-center gap-1.5'><Tag size={12} className='text-slate-400' /> {job.category}</p>
-                        </td>
-                        <td className='p-4 font-semibold text-slate-500'>
-                          {new Date(job.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </td>
-                        <td className='p-4 text-right'>
-                          <button type='button' onClick={() => handleDeleteJob(job._id)}
-                                  className='cursor-pointer rounded-lg bg-rose-600 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-rose-700 active:scale-95 transition-all shadow-sm'>
-                            Delete Listing
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={4} className='p-8 text-center text-slate-500 font-semibold'>
-                        No active job postings match your search criteria.
-                      </td>
-                    </tr>
-                  )}
-                  {/* Pagination Controls */}
-                  {filteredJobs.length > rowsPerPage && (
-                    <tr>
-                      <td colSpan={4} className='p-4 flex justify-center space-x-2'>
-                        <button onClick={() => setPageJobs(p => Math.max(p - 1, 1))} disabled={pageJobs === 1}
-                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Prev</button>
-                        <span className='px-2 text-slate-500 flex items-center'>Page {pageJobs} of {Math.ceil(filteredJobs.length / rowsPerPage)}</span>
-                        <button onClick={() => setPageJobs(p => Math.min(p + 1, Math.ceil(filteredJobs.length / rowsPerPage)))}
-                                disabled={pageJobs >= Math.ceil(filteredJobs.length / rowsPerPage)}
-                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Next</button>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )}
-
-        {/* Reported Jobs Tab Content */}
-        {activeTab === 'reported-jobs' && (
-          <section className='rounded-3xl border border-rose-200 bg-white/88 p-6 shadow-[0_18px_55px_rgba(15,23,42,0.08)] backdrop-blur-xl'>
-            <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6'>
-              <div>
-                <h2 className='text-lg font-black tracking-tight text-rose-400 flex items-center gap-2'>
-                  <AlertTriangle size={20} /> Reported Listings Queue
-                </h2>
-                <p className='text-xs text-slate-500 mt-1'>Audit suspect job listings flagged by candidates for inactivity or scams.</p>
-              </div>
-              <button
-                type='button'
-                onClick={fetchReportedJobs}
-                className='flex cursor-pointer items-center justify-center rounded-xl border border-rose-200 bg-white p-2.5 text-rose-500 hover:bg-rose-50 hover:text-rose-600 transition-all active:scale-95 shadow-sm h-fit self-end sm:self-center'
-                title='Refresh Reported Jobs'
-              >
-                <RefreshCw size={16} />
+            <div className='flex items-center gap-2'>
+              <button onClick={refreshAll} disabled={isRefreshing} className='admin-secondary'>
+                <RefreshCw size={15} className={isRefreshing ? 'animate-spin' : ''} />
+                {isRefreshing ? 'Syncing' : 'Refresh'}
+              </button>
+              <button onClick={handleLogout} className='admin-secondary'>
+                <LogOut size={15} /> Logout
               </button>
             </div>
+          </div>
+        </header>
 
-            <div className='overflow-x-auto rounded-2xl border border-slate-200 bg-white'>
-              <table className='w-full text-left border-collapse text-xs'>
-                <thead>
-                  <tr className='border-b border-slate-200 bg-slate-50 font-extrabold text-slate-500'>
-                    <th className='p-4'>Job Title & Company</th>
-                    <th className='p-4'>Details</th>
-                    <th className='p-4'>Report Reasons</th>
-                    <th className='p-4 text-right'>Actions</th>
-                  </tr>
-                </thead>
-                <tbody className='divide-y divide-slate-100'>
-                  {paginatedReported.length > 0 ? (
-                    paginatedReported.map((job) => (
-                      <tr key={job._id} className='hover:bg-rose-50/40 transition-colors'>
-                        <td className='p-4 align-top'>
-                          <div className='flex items-center gap-3'>
-                            {job.companyId ? (
-                              <img src={job.companyId.image} alt='' className='h-8 w-8 rounded-lg object-contain bg-white p-1' />
-                            ) : (
-                              <span className='h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center'>HQ</span>
-                            )}
-                            <div>
-                              <p className='font-bold text-slate-950'>{job.title}</p>
-                              <p className='text-[10px] text-slate-500 mt-0.5'>{job.companyId ? job.companyId.name : 'Unknown Company'}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className='p-4 align-top text-slate-500 space-y-1'>
-                          <p className='flex items-center gap-1.5'><MapPin size={12} className='text-slate-400' /> {job.location}</p>
-                          <p className='flex items-center gap-1.5'><Tag size={12} className='text-slate-400' /> {job.category}</p>
-                        </td>
-                        <td className='p-4 align-top'>
-                          <div className='space-y-1.5'>
-                            {job.reports.map((report, idx) => (
-                              <div key={idx} className='bg-rose-500/5 border border-rose-500/10 rounded-lg p-2 max-w-sm'>
-                                <p className='font-bold text-rose-400 text-[10px]'>Reason: {report.reason}</p>
-                                <p className='text-[9px] text-slate-500 mt-0.5'>Reporter ID: {report.userId}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </td>
-                        <td className='p-4 text-right align-top space-x-2'>
-                          <button type='button' onClick={() => dismissReports(job._id)}
-                                  className='cursor-pointer rounded-lg bg-slate-50 px-3 py-1.5 text-[11px] font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 active:scale-95 transition-all'>Dismiss Flags</button>
-                          <button type='button' onClick={() => handleDeleteJob(job._id)}
-                                  className='cursor-pointer rounded-lg bg-rose-600 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-rose-700 active:scale-95 transition-all shadow-sm'>Delete Listing</button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={4} className='p-8 text-center text-slate-500 font-semibold'>
-                        No reported job listings found in the queue.
-                      </td>
-                    </tr>
-                  )}
-                  {/* Pagination Controls */}
-                  {reportedJobs.length > rowsPerPage && (
-                    <tr>
-                      <td colSpan={4} className='p-4 flex justify-center space-x-2'>
-                        <button onClick={() => setPageReported(p => Math.max(p - 1, 1))} disabled={pageReported === 1}
-                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Prev</button>
-                        <span className='px-2 text-slate-500 flex items-center'>Page {pageReported} of {Math.ceil(reportedJobs.length / rowsPerPage)}</span>
-                        <button onClick={() => setPageReported(p => Math.min(p + 1, Math.ceil(reportedJobs.length / rowsPerPage)))}
-                                disabled={pageReported >= Math.ceil(reportedJobs.length / rowsPerPage)}
-                                className='px-3 py-1 border rounded disabled:opacity-50 text-slate-500'>Next</button>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+        <main className='mx-auto max-w-7xl px-5 py-7'>
+          <section className='mb-6 grid gap-4 xl:grid-cols-[1fr_380px]'>
+            <div className='admin-hero'>
+              <div>
+                <p className='admin-kicker text-blue-100'>Live moderation</p>
+                <h2 className='mt-3 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl'>
+                  Review the platform without waiting on cold dashboards.
+                </h2>
+                <p className='mt-4 max-w-2xl text-sm leading-7 text-slate-300'>Cached data appears instantly, then the console quietly revalidates companies, jobs, reports, and analytics from the admin bundle endpoint.</p>
+              </div>
+              <div className='mt-7 grid gap-3 sm:grid-cols-4'>
+                <HeroMetric icon={<Building2 />} label='Companies' value={stats.totalCompanies} />
+                <HeroMetric icon={<ShieldAlert />} label='Pending' value={stats.pendingVerifications} tone='amber' />
+                <HeroMetric icon={<BriefcaseBusiness />} label='Postings' value={stats.totalJobs} tone='emerald' />
+                <HeroMetric icon={<UserCheck />} label='Applications' value={stats.totalApplications} tone='cyan' />
+              </div>
+            </div>
+
+            <div className='admin-panel p-5'>
+              <div className='mb-4 flex items-center justify-between'>
+                <div>
+                  <p className='admin-kicker'>7-day activity</p>
+                  <h3 className='mt-1 text-lg font-semibold tracking-tight'>Platform movement</h3>
+                </div>
+                <BarChart3 className='text-blue-600' size={21} />
+              </div>
+              <div className='h-56'>
+                {analyticsData.length ? (
+                  <ResponsiveContainer width='100%' height='100%'>
+                    <AreaChart data={analyticsData} margin={{ top: 10, right: 8, left: -25, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id='adminJobs' x1='0' y1='0' x2='0' y2='1'>
+                          <stop offset='5%' stopColor='#059669' stopOpacity={0.26} />
+                          <stop offset='95%' stopColor='#059669' stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id='adminApps' x1='0' y1='0' x2='0' y2='1'>
+                          <stop offset='5%' stopColor='#2563eb' stopOpacity={0.26} />
+                          <stop offset='95%' stopColor='#2563eb' stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray='3 3' stroke='#e2e8f0' />
+                      <XAxis dataKey='date' stroke='#64748b' fontSize={10} tickLine={false} />
+                      <YAxis stroke='#64748b' fontSize={10} tickLine={false} />
+                      <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', fontSize: '12px', boxShadow: '0 18px 40px rgba(15,23,42,0.12)' }} />
+                      <Area type='monotone' dataKey='jobs' name='Jobs posted' stroke='#059669' fill='url(#adminJobs)' strokeWidth={2.4} />
+                      <Area type='monotone' dataKey='applications' name='Applications' stroke='#2563eb' fill='url(#adminApps)' strokeWidth={2.4} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <SkeletonBlock label='Loading analytics' />
+                )}
+              </div>
             </div>
           </section>
-        )}
-      </main>
+
+          <section className='admin-panel overflow-hidden'>
+            <div className='border-b border-slate-200 p-5'>
+              <div className='flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between'>
+                <div>
+                  <p className='admin-kicker'>{tabMeta[activeTab].eyebrow}</p>
+                  <h2 className='mt-1 text-2xl font-semibold tracking-tight'>{tabMeta[activeTab].title}</h2>
+                  <p className='mt-1 text-sm text-slate-500'>{tabMeta[activeTab].description}</p>
+                </div>
+                <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+                  <div className='flex min-w-72 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5'>
+                    <Search size={17} className='text-slate-400' />
+                    <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder='Search records...' className='w-full bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400' />
+                  </div>
+                  <div className='flex rounded-2xl border border-slate-200 bg-slate-50 p-1 lg:hidden'>
+                    {Object.entries(tabMeta).map(([key, item]) => (
+                      <button key={key} onClick={() => setActiveTab(key)} className={`rounded-xl px-3 py-2 text-xs font-bold ${activeTab === key ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>
+                        {item.short}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {!hasLoadedOnce ? (
+              <TableSkeleton />
+            ) : activeTab === 'workspaces' ? (
+              <WorkspaceTable rows={paginatedCompanies} total={filteredCompanies.length} page={pageCompanies} setPage={setPageCompanies} onToggle={toggleVerification} />
+            ) : activeTab === 'active-postings' ? (
+              <JobsTable rows={paginatedJobs} total={filteredJobs.length} page={pageJobs} setPage={setPageJobs} onDelete={handleDeleteJob} />
+            ) : (
+              <ReportsTable rows={paginatedReported} total={filteredReportedJobs.length} page={pageReported} setPage={setPageReported} onDismiss={dismissReports} onDelete={handleDeleteJob} />
+            )}
+          </section>
+        </main>
+      </div>
     </div>
   )
 }
 
-const MetricCard = ({ icon, title, count, color, highlight = false }) => (
-  <div className={`rounded-3xl border p-5 flex items-center justify-between transition-all hover:scale-[1.01] ${highlight ? 'bg-amber-50 border-amber-100' : 'bg-white/88 border-slate-200 shadow-[0_14px_40px_rgba(15,23,42,0.06)]'}`}>
-    <div>
-      <p className='text-[10px] font-bold uppercase tracking-wider text-slate-500'>{title}</p>
-      <h3 className='text-2xl font-black mt-1 text-slate-950'>{count}</h3>
+const readCachedBundle = () => {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+const paginate = (items, page) => {
+  const start = (page - 1) * rowsPerPage
+  return items.slice(start, start + rowsPerPage)
+}
+
+const formatSyncedAt = (time) => {
+  const seconds = Math.max(1, Math.round((Date.now() - time) / 1000))
+  if (seconds < 60) return `${seconds}s ago`
+  const minutes = Math.round(seconds / 60)
+  return `${minutes}m ago`
+}
+
+const tabMeta = {
+  workspaces: {
+    eyebrow: 'Workspace governance',
+    title: 'Recruiter workspaces',
+    short: 'Companies',
+    description: 'Approve verified hiring teams and inspect recruiter identity signals.'
+  },
+  'active-postings': {
+    eyebrow: 'Posting moderation',
+    title: 'Active job inventory',
+    short: 'Jobs',
+    description: 'Review live listings, company ownership, location, category, and stale content.'
+  },
+  'reported-jobs': {
+    eyebrow: 'Trust and safety',
+    title: 'Reported listings queue',
+    short: 'Reports',
+    description: 'Resolve listings flagged by candidates for fraud, inactivity, or inaccurate details.'
+  }
+}
+
+const Field = ({ icon, type, placeholder, value, onChange }) => (
+  <label className='flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 focus-within:border-blue-400 focus-within:bg-white'>
+    {React.cloneElement(icon, { size: 18, className: 'text-slate-400' })}
+    <input type={type} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} required className='w-full bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400' />
+  </label>
+)
+
+const AdminNavButton = ({ active, icon, label, count, danger = false, onClick }) => (
+  <button onClick={onClick} className={`flex w-full items-center justify-between rounded-2xl px-3 py-3 text-sm font-bold transition ${active ? 'bg-slate-950 text-white shadow-[0_16px_35px_rgba(15,23,42,0.2)]' : 'text-slate-600 hover:bg-slate-100'}`}>
+    <span className='flex items-center gap-3'>
+      {React.cloneElement(icon, { size: 18, className: active ? 'text-blue-200' : danger ? 'text-rose-500' : 'text-slate-500' })}
+      {label}
+    </span>
+    <span className={`rounded-full px-2 py-0.5 text-xs ${active ? 'bg-white/12 text-white' : danger ? 'bg-rose-50 text-rose-600' : 'bg-slate-100 text-slate-500'}`}>{count}</span>
+  </button>
+)
+
+const HeroMetric = ({ icon, label, value, tone = 'blue' }) => {
+  const tones = {
+    blue: 'text-blue-200',
+    amber: 'text-amber-200',
+    emerald: 'text-emerald-200',
+    cyan: 'text-cyan-200'
+  }
+
+  return (
+    <div className='rounded-2xl border border-white/10 bg-white/8 p-4'>
+      <div className='mb-3 flex items-center justify-between'>
+        {React.cloneElement(icon, { size: 18, className: tones[tone] })}
+        <span className='text-2xl font-semibold text-white'>{value}</span>
+      </div>
+      <p className='text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400'>{label}</p>
     </div>
-    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${color}`}>
-      {React.cloneElement(icon, { size: 18 })}
-    </div>
+  )
+}
+
+const StatusBadge = ({ verified }) => verified ? (
+  <span className='admin-badge bg-emerald-50 text-emerald-700 ring-emerald-100'><CheckCircle2 size={13} /> Verified</span>
+) : (
+  <span className='admin-badge bg-amber-50 text-amber-700 ring-amber-100'><ShieldAlert size={13} /> Pending</span>
+)
+
+const WorkspaceTable = ({ rows, total, page, setPage, onToggle }) => (
+  <DataTable
+    total={total}
+    page={page}
+    setPage={setPage}
+    columns={['Workspace', 'Recruiter', 'Domain status', 'Action']}
+    empty='No workspace profiles match your search.'
+  >
+    {rows.map(company => (
+      <tr key={company._id} className='admin-row'>
+        <td className='admin-cell'>
+          <div className='flex items-center gap-3'>
+            <img src={company.image} alt={company.name} className='h-10 w-10 rounded-xl border border-slate-200 bg-white object-contain p-1' />
+            <div>
+              <p className='font-bold text-slate-950'>{company.name}</p>
+              <p className='text-xs text-slate-500'>{company.email}</p>
+            </div>
+          </div>
+        </td>
+        <td className='admin-cell'>
+          <p className='font-semibold text-slate-800'>{company.recruiterName || 'Not provided'}</p>
+          {company.linkedin ? (
+            <a href={company.linkedin.startsWith('http') ? company.linkedin : `https://${company.linkedin}`} target='_blank' rel='noopener noreferrer' className='mt-1 inline-flex items-center gap-1 text-xs font-bold text-blue-600'>
+              LinkedIn <ArrowUpRight size={12} />
+            </a>
+          ) : <p className='text-xs text-slate-400'>No LinkedIn attached</p>}
+        </td>
+        <td className='admin-cell'><StatusBadge verified={company.isVerified} /></td>
+        <td className='admin-cell text-right'>
+          <button onClick={() => onToggle(company._id, company.isVerified)} className={`admin-action ${company.isVerified ? 'admin-action-danger' : 'admin-action-success'}`}>
+            {company.isVerified ? 'Revoke' : 'Approve'}
+          </button>
+        </td>
+      </tr>
+    ))}
+  </DataTable>
+)
+
+const JobsTable = ({ rows, total, page, setPage, onDelete }) => (
+  <DataTable total={total} page={page} setPage={setPage} columns={['Posting', 'Signals', 'Listed', 'Action']} empty='No active postings match your search.'>
+    {rows.map(job => (
+      <tr key={job._id} className='admin-row'>
+        <td className='admin-cell'>
+          <div className='flex items-center gap-3'>
+            {job.companyId?.image ? <img src={job.companyId.image} alt='' className='h-10 w-10 rounded-xl border border-slate-200 bg-white object-contain p-1' /> : <div className='grid h-10 w-10 place-items-center rounded-xl bg-slate-100 text-xs font-black'>HQ</div>}
+            <div>
+              <p className='font-bold text-slate-950'>{job.title}</p>
+              <p className='text-xs text-slate-500'>{job.companyId?.name || 'Unknown company'}</p>
+            </div>
+          </div>
+        </td>
+        <td className='admin-cell'>
+          <div className='flex flex-wrap gap-2'>
+            <SignalChip icon={<MapPin />} label={job.location || 'No location'} />
+            <SignalChip icon={<Tag />} label={job.category || 'Uncategorized'} />
+          </div>
+        </td>
+        <td className='admin-cell text-slate-600'>{formatDate(job.date)}</td>
+        <td className='admin-cell text-right'>
+          <button onClick={() => onDelete(job._id)} className='admin-action admin-action-danger'><Trash2 size={13} /> Delete</button>
+        </td>
+      </tr>
+    ))}
+  </DataTable>
+)
+
+const ReportsTable = ({ rows, total, page, setPage, onDismiss, onDelete }) => (
+  <DataTable total={total} page={page} setPage={setPage} columns={['Reported listing', 'Details', 'Candidate reports', 'Actions']} empty='No reported listings in the queue.'>
+    {rows.map(job => (
+      <tr key={job._id} className='admin-row'>
+        <td className='admin-cell align-top'>
+          <p className='font-bold text-slate-950'>{job.title}</p>
+          <p className='mt-1 text-xs text-slate-500'>{job.companyId?.name || 'Unknown company'}</p>
+        </td>
+        <td className='admin-cell align-top'>
+          <div className='flex flex-wrap gap-2'>
+            <SignalChip icon={<MapPin />} label={job.location || 'No location'} />
+            <SignalChip icon={<Tag />} label={job.category || 'Uncategorized'} />
+          </div>
+        </td>
+        <td className='admin-cell align-top'>
+          <div className='space-y-2'>
+            {job.reports?.map((report, index) => (
+              <div key={index} className='rounded-xl border border-rose-100 bg-rose-50 p-3'>
+                <p className='text-xs font-bold text-rose-700'>{report.reason}</p>
+                <p className='mt-1 text-[10px] font-semibold text-rose-500'>Reporter: {report.userId}</p>
+              </div>
+            ))}
+          </div>
+        </td>
+        <td className='admin-cell align-top text-right'>
+          <div className='flex justify-end gap-2'>
+            <button onClick={() => onDismiss(job._id)} className='admin-action'>Dismiss</button>
+            <button onClick={() => onDelete(job._id)} className='admin-action admin-action-danger'><Trash2 size={13} /> Delete</button>
+          </div>
+        </td>
+      </tr>
+    ))}
+  </DataTable>
+)
+
+const DataTable = ({ columns, children, total, page, setPage, empty }) => {
+  const pageCount = Math.max(1, Math.ceil(total / rowsPerPage))
+  const hasRows = React.Children.count(children) > 0
+
+  return (
+    <>
+      <div className='overflow-x-auto'>
+        <table className='w-full min-w-[850px] text-left text-sm'>
+          <thead>
+            <tr className='border-b border-slate-200 bg-slate-50 text-[11px] font-bold uppercase tracking-[0.13em] text-slate-400'>
+              {columns.map(column => <th key={column} className='px-5 py-4'>{column}</th>)}
+            </tr>
+          </thead>
+          <tbody className='divide-y divide-slate-100'>
+            {hasRows ? children : (
+              <tr>
+                <td colSpan={columns.length} className='px-5 py-16 text-center text-sm font-semibold text-slate-500'>{empty}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      {total > rowsPerPage && (
+        <div className='flex items-center justify-between border-t border-slate-200 px-5 py-4 text-sm'>
+          <p className='font-semibold text-slate-500'>Page {page} of {pageCount}</p>
+          <div className='flex gap-2'>
+            <button onClick={() => setPage(prev => Math.max(prev - 1, 1))} disabled={page === 1} className='admin-page-button'>Previous</button>
+            <button onClick={() => setPage(prev => Math.min(prev + 1, pageCount))} disabled={page >= pageCount} className='admin-page-button'>Next</button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+const SignalChip = ({ icon, label }) => (
+  <span className='inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold text-slate-600'>
+    {React.cloneElement(icon, { size: 12, className: 'text-slate-400' })}
+    {label}
+  </span>
+)
+
+const SkeletonBlock = ({ label }) => (
+  <div className='grid h-full place-items-center rounded-2xl border border-dashed border-slate-200 bg-slate-50'>
+    <p className='text-sm font-bold text-slate-400'>{label}</p>
   </div>
 )
+
+const TableSkeleton = () => (
+  <div className='space-y-3 p-5'>
+    {[0, 1, 2, 3, 4].map(item => (
+      <div key={item} className='h-16 animate-pulse rounded-2xl bg-slate-100' />
+    ))}
+  </div>
+)
+
+const formatDate = (date) => {
+  if (!date) return 'Unknown'
+  return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
 export default App
