@@ -4,7 +4,8 @@ import { JobCategories, JobLocations } from '../assets/assets'
 import axios from 'axios'
 import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
-import { BriefcaseBusiness, MapPin, Send, Sparkles } from 'lucide-react'
+import { BriefcaseBusiness, Loader2, MapPin, Send, Sparkles } from 'lucide-react'
+import { writeRecruiterCache } from '../utils/recruiterCache'
 
 const AddJob = () => {
   const [title, settitle] = useState('')
@@ -12,6 +13,7 @@ const AddJob = () => {
   const [category, setCategory] = useState('Programming')
   const [level, setLevel] = useState('Beginner Level')
   const [salary, setSalary] = useState(0)
+  const [isPosting, setIsPosting] = useState(false)
 
   const editorRef = useRef(null)
   const quilRef = useRef(null)
@@ -19,6 +21,8 @@ const AddJob = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault()
+    if (isPosting) return
+    setIsPosting(true)
     try {
       const description = quilRef.current.root.innerHTML
       const { data } = await axios.post(
@@ -29,6 +33,7 @@ const AddJob = () => {
 
       if (data.success) {
         toast.success(data.message)
+        await refreshRecruiterJobsCache()
         settitle('')
         setSalary(0)
         quilRef.current.root.innerHTML = ''
@@ -37,6 +42,21 @@ const AddJob = () => {
       }
     } catch (error) {
       toast.error(error.message)
+    } finally {
+      setIsPosting(false)
+    }
+  }
+
+  const refreshRecruiterJobsCache = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + '/api/company/list-jobs', {
+        headers: { token: companyToken }
+      })
+      if (data.success) {
+        writeRecruiterCache(companyToken, { jobs: [...(data.jobsData || [])].reverse() })
+      }
+    } catch {
+      // The manage page will revalidate if this cache refresh misses.
     }
   }
 
@@ -108,8 +128,16 @@ const AddJob = () => {
 
         <div className='flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 bg-slate-50 px-6 py-5 sm:px-8'>
           <p className='text-xs font-semibold text-slate-500'>Listings remain hidden until your workspace is approved.</p>
-          <button className='premium-button cursor-pointer px-8 py-3.5'>
-            Post Job <Send size={17} />
+          <button disabled={isPosting} className='premium-button cursor-pointer px-8 py-3.5 disabled:cursor-not-allowed disabled:opacity-70'>
+            {isPosting ? (
+              <>
+                Posting <Loader2 size={17} className='animate-spin' />
+              </>
+            ) : (
+              <>
+                Post job <Send size={17} />
+              </>
+            )}
           </button>
         </div>
       </form>
