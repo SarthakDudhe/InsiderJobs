@@ -152,7 +152,7 @@ const Application = () => {
       <main className='ij-container min-h-[65vh] py-8'>
         <section className='mb-8 grid gap-5 lg:grid-cols-[1fr_420px] lg:items-end'>
           <div>
-            <p className='section-kicker'>Career command center</p>
+            <p className='section-kicker'>Career workspace</p>
             <h1 className='mt-2 max-w-4xl text-3xl font-semibold leading-tight tracking-tight text-slate-950 md:text-5xl'>
               Applications, resume, and follow-ups in one operating view.
             </h1>

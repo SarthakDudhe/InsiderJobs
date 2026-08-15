@@ -292,7 +292,7 @@ const App = () => {
         <header className='sticky top-0 z-30 border-b border-slate-200 bg-white/88 backdrop-blur-xl'>
           <div className='mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4'>
             <div>
-              <p className='admin-kicker'>Platform command center</p>
+              <p className='admin-kicker'>Platform operations</p>
               <h1 className='mt-1 text-xl font-semibold tracking-tight md:text-2xl'>Admin operations</h1>
             </div>
 

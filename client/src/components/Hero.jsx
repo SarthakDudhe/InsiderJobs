@@ -57,7 +57,7 @@ const Hero = () => {
               Your AI career operating system.
             </h1>
             <p className='mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600 md:text-lg'>
-              InsiderJobs turns career search into a focused command center: intelligent recommendations, verified openings, application tracking, and actionable next steps in one polished workspace.
+              InsiderJobs turns career search into a focused operating workspace: intelligent recommendations, verified openings, application tracking, and actionable next steps in one polished product.
             </p>
 
             <MotionDiv

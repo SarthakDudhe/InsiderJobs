@@ -22,7 +22,7 @@ const AppDownload = () => {
           <div className='flex-1 text-center md:text-left'>
             <p className='section-kicker mb-3'>Mobile workspace</p>
             <h2 className='mb-4 max-w-2xl text-3xl font-semibold leading-tight tracking-tight md:text-5xl'>
-              Carry your career command center into every follow-up.
+              Carry your career workspace into every follow-up.
             </h2>
             <p className='mx-auto mb-8 max-w-xl text-sm leading-7 text-slate-600 md:mx-0 md:text-base'>
               Keep match alerts, application stages, interview reminders, and AI prep plans close so every next step stays visible.

@@ -9,7 +9,7 @@ import JobCard from '../components/JobCard'
 import Footer from '../components/Footer'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { AlertTriangle, BrainCircuit, Briefcase, CalendarClock, CheckCircle2, Flag, Gauge, MapPin, RefreshCw, ShieldCheck, Sparkles, Users, Wand2, X } from 'lucide-react'
+import { AlertTriangle, BrainCircuit, Briefcase, CalendarClock, CheckCircle2, Flag, Gauge, Loader2, MapPin, RefreshCw, ShieldCheck, Sparkles, Users, Wand2, X } from 'lucide-react'
 
 const activityConfig = {
   active: {
@@ -29,6 +29,25 @@ const activityConfig = {
     dot: 'bg-rose-500'
   }
 }
+
+const reportReasons = [
+  {
+    title: 'Recruiter appears inactive',
+    description: 'The posting looks like a ghost job or has no meaningful recruiter response.'
+  },
+  {
+    title: 'Suspicious or fake posting',
+    description: 'The company, role, or application flow seems misleading or unsafe.'
+  },
+  {
+    title: 'Inaccurate role details',
+    description: 'Location, compensation, experience level, or job requirements appear incorrect.'
+  },
+  {
+    title: 'Role is already closed',
+    description: 'The listing appears filled, expired, or no longer accepting candidates.'
+  }
+]
 
 const ApplyJob = () => {
   const { id } = useParams()
@@ -240,7 +259,7 @@ const ApplyJob = () => {
               <button onClick={applyHandler} className={`relative mt-5 w-full px-8 py-4 ${isAlreadyApplied ? 'rounded-xl bg-slate-200 font-bold text-slate-500' : 'premium-button cursor-pointer'}`}>
                 {isAlreadyApplied ? 'Already applied' : 'Apply now'}
               </button>
-              <p className='relative mt-3 text-sm font-semibold text-slate-600'>CTC: {kConvert.convertTo(jobData.salary)}</p>
+              <p className='relative mt-3 text-sm font-semibold text-slate-600'>Compensation: {kConvert.convertTo(jobData.salary)}</p>
             </div>
           </div>
           <div className='mt-8 grid gap-3 border-t border-slate-200 pt-5 sm:grid-cols-3'>
@@ -575,48 +594,64 @@ const ApplyJob = () => {
 
         {/* Reported Jobs Modal */}
         {showReportModal && (
-          <div className='fixed inset-0 z-50 flex items-center justify-center bg-gray-950/60 p-4 backdrop-blur-sm'>
-            <div className='relative w-full max-w-md overflow-hidden rounded-[2rem] border border-gray-200 bg-white p-7 shadow-2xl'>
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4 backdrop-blur-sm'>
+            <div className='relative w-full max-w-lg overflow-hidden rounded-[1.35rem] border border-slate-200 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.24)]'>
               <button
                 type='button'
                 onClick={() => setShowReportModal(false)}
-                className='absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors cursor-pointer'
+                className='absolute right-5 top-5 z-10 flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition-colors hover:text-slate-950'
+                aria-label='Close report modal'
               >
                 <X size={16} />
               </button>
-              
-              <div className='mb-6'>
-                <span className='mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 font-bold'><Flag size={18} /></span>
-                <h3 className='text-lg font-extrabold text-gray-950'>Report Job Listing</h3>
-                <p className='text-xs text-gray-500 mt-1'>Help us keep the InsiderJobs workspace clean and verified.</p>
+
+              <div className='border-b border-slate-200 bg-gradient-to-br from-white via-rose-50/70 to-orange-50/40 p-6 pr-16'>
+                <span className='mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-rose-100 bg-white text-rose-600 shadow-sm'><Flag size={19} /></span>
+                <p className='section-kicker text-rose-700'>Listing quality</p>
+                <h3 className='mt-2 text-2xl font-semibold tracking-tight text-slate-950'>Report this job listing</h3>
+                <p className='mt-2 text-sm leading-6 text-slate-600'>Help keep InsiderJobs useful by flagging stale, misleading, or inaccurate postings.</p>
               </div>
 
-              <div className='space-y-2.5 mb-6'>
-                {['Ghost Job (Recruiter inactive / No response)', 'Fake / Scam Posting', 'Inaccurate Location / CTC Details', 'Job already filled / Closed'].map((reason) => (
+              <div className='space-y-2.5 p-6'>
+                {reportReasons.map((reason) => (
                   <button
-                    key={reason}
+                    key={reason.title}
                     type='button'
-                    onClick={() => setReportReason(reason)}
-                    className={`w-full text-left p-3.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-between cursor-pointer ${
-                      reportReason === reason
-                        ? 'border-rose-500 bg-rose-50/50 text-rose-700'
-                        : 'border-gray-200 hover:bg-gray-50 text-gray-700'
+                    onClick={() => setReportReason(reason.title)}
+                    className={`flex w-full cursor-pointer items-start justify-between gap-4 rounded-2xl border p-4 text-left transition-all ${
+                      reportReason === reason.title
+                        ? 'border-rose-200 bg-rose-50 text-rose-800 shadow-sm'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-rose-100 hover:bg-rose-50/40'
                     }`}
                   >
-                    <span>{reason}</span>
-                    {reportReason === reason && <span className='h-2 w-2 rounded-full bg-rose-500'></span>}
+                    <span>
+                      <span className='block text-sm font-bold'>{reason.title}</span>
+                      <span className='mt-1 block text-xs leading-5 text-slate-500'>{reason.description}</span>
+                    </span>
+                    {reportReason === reason.title && <CheckCircle2 className='mt-0.5 shrink-0 text-rose-600' size={17} />}
                   </button>
                 ))}
-              </div>
 
-              <button
-                type='button'
-                onClick={submitReport}
-                disabled={submittingReport || !reportReason}
-                className='w-full rounded-xl bg-rose-600 py-3.5 text-xs font-bold text-white shadow-md hover:bg-rose-700 active:scale-95 disabled:opacity-50 transition-all cursor-pointer'
-              >
-                {submittingReport ? 'Submitting Report...' : 'Submit Report'}
-              </button>
+                <div className='mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5'>
+                  <p className='max-w-xs text-xs leading-5 text-slate-500'>Reports are reviewed by the platform team and help improve candidate trust.</p>
+                  <button
+                    type='button'
+                    onClick={submitReport}
+                    disabled={submittingReport || !reportReason}
+                    className='inline-flex cursor-pointer items-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-xs font-bold text-white shadow-md shadow-rose-100 transition-all hover:bg-rose-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50'
+                  >
+                    {submittingReport ? (
+                      <>
+                        Submitting <Loader2 size={15} className='animate-spin' />
+                      </>
+                    ) : (
+                      <>
+                        Submit report <Flag size={15} />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
